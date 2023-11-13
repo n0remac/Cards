@@ -1,0 +1,27 @@
+{
+  "name": "cards",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev": "cd frontend && node esbuild.mjs",
+    "build": "cd frontend && BUILD=true node esbuild.mjs"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@types/react-dom": "^18.2.15",
+    "bootstrap": "^5.3.2",
+    "esbuild": "^0.19.5",
+    "react-bootstrap": "^2.9.1",
+    "react-dom": "^18.2.0"
+  },
+  "devDependencies": {
+    "@bufbuild/buf": "^1.27.0",
+    "@bufbuild/connect": "^0.13.0",
+    "@bufbuild/connect-web": "^0.13.0",
+    "@bufbuild/protobuf": "^1.3.3",
+    "@bufbuild/protoc-gen-connect-es": "^0.13.0",
+    "@bufbuild/protoc-gen-es": "^1.3.3"
+  }
+}

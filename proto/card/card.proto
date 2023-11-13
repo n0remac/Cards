@@ -1,0 +1,29 @@
+syntax = "proto3";
+
+package card;
+
+service CardService {
+  rpc GetCards(GetCardsRequest) returns (GetCardsResponse);
+  rpc NewCard(Card) returns (Card);
+
+}
+
+message GetCardsRequest {
+  string user_id = 1;
+}
+
+message GetCardsResponse {
+  repeated Card cards = 1;
+}
+
+message Card {
+  string id = 1;
+  string user_id = 2;
+  string name = 3;
+  string number = 4;
+  string cvv = 5;
+  string expiration_date = 6;
+  string created_at = 7;
+  string updated_at = 8;
+}
+
