@@ -65,13 +65,14 @@ export default function App() {
                         left: positions[index]?.x + 'px',
                         top: positions[index]?.y + 'px',
                         width: '100px',
-                        height: '100px',
+                        height: '140px',
                         backgroundColor: 'red',
                         position: 'absolute',
                         border: '1px solid black',
                         textAlign: 'center',
-                        lineHeight: '100px',
+                        lineHeight: '140px',
                         cursor: 'move',
+                        fontSize: '50px',
                     }}
                     onMouseDown={() => handleMouseDown(index)}
                 >
