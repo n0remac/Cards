@@ -9,22 +9,36 @@ import (
 	"fmt"
 	"log/slog"
 	"net/http"
+
 	"github.com/bufbuild/connect-go"
 	grpcreflect "github.com/bufbuild/connect-grpcreflect-go"
 	"golang.org/x/net/http2"
 	"golang.org/x/net/http2/h2c"
 )
 
-type CardService struct{
-	
+type CardService struct {
 }
+
 var _ cardconnect.CardServiceHandler = (*CardService)(nil)
 
 func (s *CardService) GetCards(ctx context.Context, req *connect.Request[card.GetCardsRequest]) (*connect.Response[card.GetCardsResponse], error) {
 	return connect.NewResponse(&card.GetCardsResponse{
 		Cards: []*card.Card{
 			{
-				Id: "1",
+				Id:   "1",
+				Name: "A",
+			},
+			{
+				Id:   "2",
+				Name: "K",
+			},
+			{
+				Id:   "3",
+				Name: "Q",
+			},
+			{
+				Id:   "4",
+				Name: "J",
 			},
 		},
 	}), nil
@@ -35,7 +49,6 @@ func (s *CardService) NewCard(ctx context.Context, req *connect.Request[card.Car
 		Id: "1",
 	}), nil
 }
-
 
 func NewLogInterceptor() connect.UnaryInterceptorFunc {
 	interceptor := func(next connect.UnaryFunc) connect.UnaryFunc {
@@ -70,7 +83,7 @@ func main() {
 	cardService := &CardService{}
 
 	apiRoot.Handle(cardconnect.NewCardServiceHandler(cardService, interceptors))
-	
+
 	reflector := grpcreflect.NewStaticReflector(
 		"card.CardService",
 	)
@@ -84,7 +97,7 @@ func main() {
 	apiRoot.Handle(grpcreflect.NewHandlerV1(reflector, connect.WithRecover(recoverCall)))
 	// Many tools still expect the older version of the server reflection Service, so
 	// most servers should mount both handlers.
-	apiRoot.Handle(grpcreflect.NewHandlerV1Alpha(reflector, connect.WithRecover(recoverCall)))	
+	apiRoot.Handle(grpcreflect.NewHandlerV1Alpha(reflector, connect.WithRecover(recoverCall)))
 
 	addr := fmt.Sprintf(":%d", 8080)
 
