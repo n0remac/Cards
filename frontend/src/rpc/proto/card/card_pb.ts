@@ -85,44 +85,14 @@ export class GetCardsResponse extends Message<GetCardsResponse> {
  */
 export class Card extends Message<Card> {
   /**
-   * @generated from field: string id = 1;
+   * @generated from field: string rank = 1;
    */
-  id = "";
+  rank = "";
 
   /**
-   * @generated from field: string user_id = 2;
+   * @generated from field: string suit = 2;
    */
-  userId = "";
-
-  /**
-   * @generated from field: string name = 3;
-   */
-  name = "";
-
-  /**
-   * @generated from field: string number = 4;
-   */
-  number = "";
-
-  /**
-   * @generated from field: string cvv = 5;
-   */
-  cvv = "";
-
-  /**
-   * @generated from field: string expiration_date = 6;
-   */
-  expirationDate = "";
-
-  /**
-   * @generated from field: string created_at = 7;
-   */
-  createdAt = "";
-
-  /**
-   * @generated from field: string updated_at = 8;
-   */
-  updatedAt = "";
+  suit = "";
 
   constructor(data?: PartialMessage<Card>) {
     super();
@@ -132,14 +102,8 @@ export class Card extends Message<Card> {
   static readonly runtime: typeof proto3 = proto3;
   static readonly typeName = "card.Card";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 1, name: "id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 2, name: "user_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 3, name: "name", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 4, name: "number", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 5, name: "cvv", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 6, name: "expiration_date", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 7, name: "created_at", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 8, name: "updated_at", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 1, name: "rank", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "suit", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): Card {

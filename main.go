@@ -3,8 +3,8 @@ package main
 //go:generate npx buf generate
 
 import (
-	"cards/gen/card"
-	"cards/gen/card/cardconnect"
+	"cards/gen/proto/card"
+	"cards/gen/proto/card/cardconnect"
 	"context"
 	"fmt"
 	"log/slog"
@@ -25,20 +25,20 @@ func (s *CardService) GetCards(ctx context.Context, req *connect.Request[card.Ge
 	return connect.NewResponse(&card.GetCardsResponse{
 		Cards: []*card.Card{
 			{
-				Id:   "1",
-				Name: "A",
+				Rank: "1",
+				Suit: "A",
 			},
 			{
-				Id:   "2",
-				Name: "K",
+				Rank: "2",
+				Suit: "K",
 			},
 			{
-				Id:   "3",
-				Name: "Q",
+				Rank: "3",
+				Suit: "Q",
 			},
 			{
-				Id:   "4",
-				Name: "J",
+				Rank: "4",
+				Suit: "J",
 			},
 		},
 	}), nil
@@ -46,7 +46,7 @@ func (s *CardService) GetCards(ctx context.Context, req *connect.Request[card.Ge
 
 func (s *CardService) NewCard(ctx context.Context, req *connect.Request[card.Card]) (*connect.Response[card.Card], error) {
 	return connect.NewResponse(&card.Card{
-		Id: "1",
+		Rank: "1",
 	}), nil
 }
 
