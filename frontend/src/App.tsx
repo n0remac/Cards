@@ -76,7 +76,7 @@ export default function App() {
                     }}
                     onMouseDown={() => handleMouseDown(index)}
                 >
-                    {card.rank} {card.suit}
+                    {card.name} {card.description}
                 </div>
             ))}
         </div>

@@ -85,14 +85,14 @@ export class GetCardsResponse extends Message<GetCardsResponse> {
  */
 export class Card extends Message<Card> {
   /**
-   * @generated from field: string rank = 1;
+   * @generated from field: string name = 1;
    */
-  rank = "";
+  name = "";
 
   /**
-   * @generated from field: string suit = 2;
+   * @generated from field: string description = 2;
    */
-  suit = "";
+  description = "";
 
   constructor(data?: PartialMessage<Card>) {
     super();
@@ -102,8 +102,8 @@ export class Card extends Message<Card> {
   static readonly runtime: typeof proto3 = proto3;
   static readonly typeName = "card.Card";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 1, name: "rank", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 2, name: "suit", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 1, name: "name", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "description", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): Card {

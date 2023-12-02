@@ -7,38 +7,30 @@ import (
 	"cards/gen/proto/card/cardconnect"
 	"context"
 	"fmt"
+	"log"
 	"log/slog"
 	"net/http"
 
 	"github.com/bufbuild/connect-go"
 	grpcreflect "github.com/bufbuild/connect-grpcreflect-go"
+	"github.com/upper/db/v4/adapter/mysql"
 	"golang.org/x/net/http2"
 	"golang.org/x/net/http2/h2c"
 )
 
 type CardService struct {
+
 }
 
 var _ cardconnect.CardServiceHandler = (*CardService)(nil)
 
 func (s *CardService) GetCards(ctx context.Context, req *connect.Request[card.GetCardsRequest]) (*connect.Response[card.GetCardsResponse], error) {
+
 	return connect.NewResponse(&card.GetCardsResponse{
 		Cards: []*card.Card{
 			{
-				Rank: "1",
-				Suit: "A",
-			},
-			{
-				Rank: "2",
-				Suit: "K",
-			},
-			{
-				Rank: "3",
-				Suit: "Q",
-			},
-			{
-				Rank: "4",
-				Suit: "J",
+				Name: "1",
+				Description: "A",
 			},
 		},
 	}), nil
@@ -46,7 +38,7 @@ func (s *CardService) GetCards(ctx context.Context, req *connect.Request[card.Ge
 
 func (s *CardService) NewCard(ctx context.Context, req *connect.Request[card.Card]) (*connect.Response[card.Card], error) {
 	return connect.NewResponse(&card.Card{
-		Rank: "1",
+		Name: "1",
 	}), nil
 }
 
@@ -75,7 +67,20 @@ func loggingMiddleware(next http.Handler) http.Handler {
 	})
 }
 
+var settings = mysql.ConnectionURL{
+	Database: `carddatabase`,
+	Host:     `localhost`,
+	User:     `root`,
+	Password: `password`,
+}
+
 func main() {
+	sess, err := mysql.Open(settings)
+	if err != nil {
+		log.Fatalf("Failed to connect to database: %v", err)
+	}
+	defer sess.Close()
+
 	interceptors := connect.WithInterceptors(NewLogInterceptor())
 
 	apiRoot := http.NewServeMux()

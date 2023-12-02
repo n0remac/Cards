@@ -5,7 +5,6 @@ package card;
 service CardService {
   rpc GetCards(GetCardsRequest) returns (GetCardsResponse);
   rpc NewCard(Card) returns (Card);
-
 }
 
 message GetCardsRequest {
@@ -17,7 +16,6 @@ message GetCardsResponse {
 }
 
 message Card {
-  string rank = 1;
-  string suit = 2;
+  string name = 1;
+  string description = 2;
 }
-
