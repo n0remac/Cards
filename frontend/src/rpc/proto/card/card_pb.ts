@@ -81,6 +81,43 @@ export class GetCardsResponse extends Message<GetCardsResponse> {
 }
 
 /**
+ * @generated from message card.CreateCardResponse
+ */
+export class CreateCardResponse extends Message<CreateCardResponse> {
+  /**
+   * @generated from field: card.Card card = 1;
+   */
+  card?: Card;
+
+  constructor(data?: PartialMessage<CreateCardResponse>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "card.CreateCardResponse";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "card", kind: "message", T: Card },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): CreateCardResponse {
+    return new CreateCardResponse().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): CreateCardResponse {
+    return new CreateCardResponse().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): CreateCardResponse {
+    return new CreateCardResponse().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: CreateCardResponse | PlainMessage<CreateCardResponse> | undefined, b: CreateCardResponse | PlainMessage<CreateCardResponse> | undefined): boolean {
+    return proto3.util.equals(CreateCardResponse, a, b);
+  }
+}
+
+/**
  * @generated from message card.Card
  */
 export class Card extends Message<Card> {

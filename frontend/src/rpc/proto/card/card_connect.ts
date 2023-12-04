@@ -3,7 +3,7 @@
 /* eslint-disable */
 // @ts-nocheck
 
-import { Card, GetCardsRequest, GetCardsResponse } from "./card_pb.js";
+import { Card, CreateCardResponse, GetCardsRequest, GetCardsResponse } from "./card_pb.js";
 import { MethodKind } from "@bufbuild/protobuf";
 
 /**
@@ -22,12 +22,12 @@ export const CardService = {
       kind: MethodKind.Unary,
     },
     /**
-     * @generated from rpc card.CardService.NewCard
+     * @generated from rpc card.CardService.CreateCard
      */
-    newCard: {
-      name: "NewCard",
+    createCard: {
+      name: "CreateCard",
       I: Card,
-      O: Card,
+      O: CreateCardResponse,
       kind: MethodKind.Unary,
     },
   }
