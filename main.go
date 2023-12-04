@@ -4,8 +4,8 @@
 
 	import (
 		"cards/gen/proto/card/cardconnect"
-		"cards/card"
-
+		"cards/gen/proto/card"
+		"cards/cards"
 		"context"
 		"fmt"
 		"log/slog"
@@ -49,7 +49,7 @@
 
 		apiRoot := http.NewServeMux()
 
-		cardService := &card.CardService{}
+		cardService := &cards.CardService{}
 
 		apiRoot.Handle(cardconnect.NewCardServiceHandler(cardService, interceptors))
 

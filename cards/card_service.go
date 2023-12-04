@@ -1,4 +1,4 @@
-package card
+package cards
 
 import (
 	"cards/gen/proto/card/cardconnect"
