@@ -4,8 +4,7 @@ package card;
 
 service CardService {
   rpc GetCards(GetCardsRequest) returns (GetCardsResponse);
-  rpc CreateCard(CreateCardRequest) returns (CreateCardResponse);
-  rpc DeleteCard(DeleteCardRequest) returns (DeleteCardResponse);
+  rpc NewCard(Card) returns (Card);
 }
 
 message GetCardsRequest {
@@ -14,24 +13,6 @@ message GetCardsRequest {
 
 message GetCardsResponse {
   repeated Card cards = 1;
-}
-
-message CreateCardRequest {
-  string user_id = 1;
-  Card card = 2;
-}
-
-message CreateCardResponse {
-  Card card = 1;
-}
-
-message DeleteCardRequest {
-  string user_id = 1;
-  Card card = 2;
-}
-
-message DeleteCardResponse {
-  Card card = 1;
 }
 
 message Card {

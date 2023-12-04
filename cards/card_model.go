@@ -31,11 +31,11 @@ type Card struct {
 	Data string `db:"data"`
 }
 
-func createCardInDB(card *card.Card) error {
+func createCardInDB(card *card.Card) (*card.Card, error) {
 	cardJSON, err := json.Marshal(card)
-	if err != nil {
-		return err
-	}
+	// if err != nil {
+	// 	return err
+	// }
 
 	// Create a new card record
 	newCard := Card{
@@ -44,7 +44,7 @@ func createCardInDB(card *card.Card) error {
 
 	// Insert the new card into the database
 	_, err = sess.Collection("cards").Insert(newCard)
-	return err
+	return card, err
 }
 
 func getCardsFromDB() ([]*card.Card, error) {

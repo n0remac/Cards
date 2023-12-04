@@ -25,22 +25,12 @@ func (s *CardService) GetCards(ctx context.Context, req *connect.Request[card.Ge
 	}), nil
 }
 
-func (s *CardService) CreateCard(ctx context.Context, req *connect.Request[card.Card]) (*connect.Response[card.CreateCardResponse], error) {
-	err := createCardInDB(req.Msg)
+func (s *CardService) NewCard(ctx context.Context, req *connect.Request[card.Card]) (*connect.Response[card.Card], error) {
+	newCard, err := createCardInDB(req.Msg)
 	if err != nil {
 		return nil, err
 	}
 
-	return connect.NewResponse(&card.CreateCardResponse{
-		Card: req.Msg,
-	}), nil
+	return connect.NewResponse(newCard), nil
 }
 
-func (s *CardService) DeleteCard(ctx context.Context, req *connect.Request[card.DeleteCardRequest]) (*connect.Response[card.DeleteCardResponse], error) {
-	err := deleteCardFromDB(req.Msg.Id)
-	if err != nil {
-		return nil, err
-	}
-
-	return connect.NewResponse(&card.DeleteCardResponse{}), nil
-}
