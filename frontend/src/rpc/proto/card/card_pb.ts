@@ -7,6 +7,166 @@ import type { BinaryReadOptions, FieldList, JsonReadOptions, JsonValue, PartialM
 import { Message, proto3 } from "@bufbuild/protobuf";
 
 /**
+ * @generated from message card.GenerateCardsRequest
+ */
+export class GenerateCardsRequest extends Message<GenerateCardsRequest> {
+  /**
+   * @generated from field: string user_id = 1;
+   */
+  userId = "";
+
+  /**
+   * @generated from field: int32 count = 2;
+   */
+  count = 0;
+
+  constructor(data?: PartialMessage<GenerateCardsRequest>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "card.GenerateCardsRequest";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "user_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "count", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): GenerateCardsRequest {
+    return new GenerateCardsRequest().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): GenerateCardsRequest {
+    return new GenerateCardsRequest().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): GenerateCardsRequest {
+    return new GenerateCardsRequest().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: GenerateCardsRequest | PlainMessage<GenerateCardsRequest> | undefined, b: GenerateCardsRequest | PlainMessage<GenerateCardsRequest> | undefined): boolean {
+    return proto3.util.equals(GenerateCardsRequest, a, b);
+  }
+}
+
+/**
+ * @generated from message card.GenerateCardsResponse
+ */
+export class GenerateCardsResponse extends Message<GenerateCardsResponse> {
+  /**
+   * @generated from field: repeated card.Card cards = 1;
+   */
+  cards: Card[] = [];
+
+  constructor(data?: PartialMessage<GenerateCardsResponse>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "card.GenerateCardsResponse";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "cards", kind: "message", T: Card, repeated: true },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): GenerateCardsResponse {
+    return new GenerateCardsResponse().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): GenerateCardsResponse {
+    return new GenerateCardsResponse().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): GenerateCardsResponse {
+    return new GenerateCardsResponse().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: GenerateCardsResponse | PlainMessage<GenerateCardsResponse> | undefined, b: GenerateCardsResponse | PlainMessage<GenerateCardsResponse> | undefined): boolean {
+    return proto3.util.equals(GenerateCardsResponse, a, b);
+  }
+}
+
+/**
+ * @generated from message card.DeleteCardRequest
+ */
+export class DeleteCardRequest extends Message<DeleteCardRequest> {
+  /**
+   * @generated from field: string user_id = 1;
+   */
+  userId = "";
+
+  /**
+   * @generated from field: string card_id = 2;
+   */
+  cardId = "";
+
+  constructor(data?: PartialMessage<DeleteCardRequest>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "card.DeleteCardRequest";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "user_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "card_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): DeleteCardRequest {
+    return new DeleteCardRequest().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): DeleteCardRequest {
+    return new DeleteCardRequest().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): DeleteCardRequest {
+    return new DeleteCardRequest().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: DeleteCardRequest | PlainMessage<DeleteCardRequest> | undefined, b: DeleteCardRequest | PlainMessage<DeleteCardRequest> | undefined): boolean {
+    return proto3.util.equals(DeleteCardRequest, a, b);
+  }
+}
+
+/**
+ * @generated from message card.DeleteCardResponse
+ */
+export class DeleteCardResponse extends Message<DeleteCardResponse> {
+  /**
+   * @generated from field: string card_id = 1;
+   */
+  cardId = "";
+
+  constructor(data?: PartialMessage<DeleteCardResponse>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "card.DeleteCardResponse";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "card_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): DeleteCardResponse {
+    return new DeleteCardResponse().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): DeleteCardResponse {
+    return new DeleteCardResponse().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): DeleteCardResponse {
+    return new DeleteCardResponse().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: DeleteCardResponse | PlainMessage<DeleteCardResponse> | undefined, b: DeleteCardResponse | PlainMessage<DeleteCardResponse> | undefined): boolean {
+    return proto3.util.equals(DeleteCardResponse, a, b);
+  }
+}
+
+/**
  * @generated from message card.GetCardsRequest
  */
 export class GetCardsRequest extends Message<GetCardsRequest> {
@@ -77,6 +237,86 @@ export class GetCardsResponse extends Message<GetCardsResponse> {
 
   static equals(a: GetCardsResponse | PlainMessage<GetCardsResponse> | undefined, b: GetCardsResponse | PlainMessage<GetCardsResponse> | undefined): boolean {
     return proto3.util.equals(GetCardsResponse, a, b);
+  }
+}
+
+/**
+ * @generated from message card.NewCardRequest
+ */
+export class NewCardRequest extends Message<NewCardRequest> {
+  /**
+   * @generated from field: string user_id = 1;
+   */
+  userId = "";
+
+  /**
+   * @generated from field: card.Card card = 2;
+   */
+  card?: Card;
+
+  constructor(data?: PartialMessage<NewCardRequest>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "card.NewCardRequest";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "user_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "card", kind: "message", T: Card },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): NewCardRequest {
+    return new NewCardRequest().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): NewCardRequest {
+    return new NewCardRequest().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): NewCardRequest {
+    return new NewCardRequest().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: NewCardRequest | PlainMessage<NewCardRequest> | undefined, b: NewCardRequest | PlainMessage<NewCardRequest> | undefined): boolean {
+    return proto3.util.equals(NewCardRequest, a, b);
+  }
+}
+
+/**
+ * @generated from message card.NewCardResponse
+ */
+export class NewCardResponse extends Message<NewCardResponse> {
+  /**
+   * @generated from field: card.Card card = 1;
+   */
+  card?: Card;
+
+  constructor(data?: PartialMessage<NewCardResponse>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "card.NewCardResponse";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "card", kind: "message", T: Card },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): NewCardResponse {
+    return new NewCardResponse().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): NewCardResponse {
+    return new NewCardResponse().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): NewCardResponse {
+    return new NewCardResponse().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: NewCardResponse | PlainMessage<NewCardResponse> | undefined, b: NewCardResponse | PlainMessage<NewCardResponse> | undefined): boolean {
+    return proto3.util.equals(NewCardResponse, a, b);
   }
 }
 

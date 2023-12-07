@@ -1,0 +1,63 @@
+/* styles.css */
+
+/* Style for the overall container */
+.container {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+}
+
+/* Style for the form */
+.form-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    gap: 10px;
+    background-color: #f2f2f2;
+}
+
+/* Style for the cards container */
+.cards-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    padding: 10px;
+    flex-grow: 1;
+}
+
+/* Style for individual cards */
+.card {
+    flex-basis: calc(25% - 10px); /* Adjusts the card width to be one-fourth of the container width minus the gap */
+    width: 100px;
+    height: 140px;
+    background-color: rgb(43, 32, 32);
+    border: 1px solid black;
+    text-align: center;
+    line-height: 140px;
+    /* font-size: 50px; */
+    position: 'absolute';
+    border: '1px solid black';
+    cursor: 'move';
+}
+
+.card-title {
+    font-size: 2px;
+    text-align: center;
+}
+.card-description {
+    font-size: 15px;
+    text-align: center;
+    margin-bottom: 10px;
+}
+
+.generate-cards-form {
+    margin: 20px 0;
+    display: flex;
+    justify-content: center;
+}
+
+.generate-cards-form form {
+    display: flex;
+    gap: 10px;
+}

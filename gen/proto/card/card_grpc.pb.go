@@ -23,7 +23,9 @@ const _ = grpc.SupportPackageIsVersion7
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type CardServiceClient interface {
 	GetCards(ctx context.Context, in *GetCardsRequest, opts ...grpc.CallOption) (*GetCardsResponse, error)
-	NewCard(ctx context.Context, in *Card, opts ...grpc.CallOption) (*Card, error)
+	NewCard(ctx context.Context, in *NewCardRequest, opts ...grpc.CallOption) (*NewCardResponse, error)
+	DeleteCard(ctx context.Context, in *DeleteCardRequest, opts ...grpc.CallOption) (*DeleteCardResponse, error)
+	GenerateCards(ctx context.Context, in *GenerateCardsRequest, opts ...grpc.CallOption) (*GenerateCardsResponse, error)
 }
 
 type cardServiceClient struct {
@@ -43,9 +45,27 @@ func (c *cardServiceClient) GetCards(ctx context.Context, in *GetCardsRequest, o
 	return out, nil
 }
 
-func (c *cardServiceClient) NewCard(ctx context.Context, in *Card, opts ...grpc.CallOption) (*Card, error) {
-	out := new(Card)
+func (c *cardServiceClient) NewCard(ctx context.Context, in *NewCardRequest, opts ...grpc.CallOption) (*NewCardResponse, error) {
+	out := new(NewCardResponse)
 	err := c.cc.Invoke(ctx, "/card.CardService/NewCard", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *cardServiceClient) DeleteCard(ctx context.Context, in *DeleteCardRequest, opts ...grpc.CallOption) (*DeleteCardResponse, error) {
+	out := new(DeleteCardResponse)
+	err := c.cc.Invoke(ctx, "/card.CardService/DeleteCard", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *cardServiceClient) GenerateCards(ctx context.Context, in *GenerateCardsRequest, opts ...grpc.CallOption) (*GenerateCardsResponse, error) {
+	out := new(GenerateCardsResponse)
+	err := c.cc.Invoke(ctx, "/card.CardService/GenerateCards", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -57,7 +77,9 @@ func (c *cardServiceClient) NewCard(ctx context.Context, in *Card, opts ...grpc.
 // for forward compatibility
 type CardServiceServer interface {
 	GetCards(context.Context, *GetCardsRequest) (*GetCardsResponse, error)
-	NewCard(context.Context, *Card) (*Card, error)
+	NewCard(context.Context, *NewCardRequest) (*NewCardResponse, error)
+	DeleteCard(context.Context, *DeleteCardRequest) (*DeleteCardResponse, error)
+	GenerateCards(context.Context, *GenerateCardsRequest) (*GenerateCardsResponse, error)
 }
 
 // UnimplementedCardServiceServer should be embedded to have forward compatible implementations.
@@ -67,8 +89,14 @@ type UnimplementedCardServiceServer struct {
 func (UnimplementedCardServiceServer) GetCards(context.Context, *GetCardsRequest) (*GetCardsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetCards not implemented")
 }
-func (UnimplementedCardServiceServer) NewCard(context.Context, *Card) (*Card, error) {
+func (UnimplementedCardServiceServer) NewCard(context.Context, *NewCardRequest) (*NewCardResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method NewCard not implemented")
+}
+func (UnimplementedCardServiceServer) DeleteCard(context.Context, *DeleteCardRequest) (*DeleteCardResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteCard not implemented")
+}
+func (UnimplementedCardServiceServer) GenerateCards(context.Context, *GenerateCardsRequest) (*GenerateCardsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GenerateCards not implemented")
 }
 
 // UnsafeCardServiceServer may be embedded to opt out of forward compatibility for this service.
@@ -101,7 +129,7 @@ func _CardService_GetCards_Handler(srv interface{}, ctx context.Context, dec fun
 }
 
 func _CardService_NewCard_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(Card)
+	in := new(NewCardRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -113,7 +141,43 @@ func _CardService_NewCard_Handler(srv interface{}, ctx context.Context, dec func
 		FullMethod: "/card.CardService/NewCard",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(CardServiceServer).NewCard(ctx, req.(*Card))
+		return srv.(CardServiceServer).NewCard(ctx, req.(*NewCardRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _CardService_DeleteCard_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeleteCardRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CardServiceServer).DeleteCard(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/card.CardService/DeleteCard",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CardServiceServer).DeleteCard(ctx, req.(*DeleteCardRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _CardService_GenerateCards_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GenerateCardsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CardServiceServer).GenerateCards(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/card.CardService/GenerateCards",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CardServiceServer).GenerateCards(ctx, req.(*GenerateCardsRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -132,6 +196,14 @@ var CardService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "NewCard",
 			Handler:    _CardService_NewCard_Handler,
+		},
+		{
+			MethodName: "DeleteCard",
+			Handler:    _CardService_DeleteCard_Handler,
+		},
+		{
+			MethodName: "GenerateCards",
+			Handler:    _CardService_GenerateCards_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

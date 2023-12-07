@@ -3,44 +3,18 @@ package main
 //go:generate npx buf generate
 
 import (
-	"cards/gen/proto/card"
+	"cards/cards"
 	"cards/gen/proto/card/cardconnect"
 	"context"
 	"fmt"
-	"log"
 	"log/slog"
 	"net/http"
 
 	"github.com/bufbuild/connect-go"
 	grpcreflect "github.com/bufbuild/connect-grpcreflect-go"
-	"github.com/upper/db/v4/adapter/mysql"
 	"golang.org/x/net/http2"
 	"golang.org/x/net/http2/h2c"
 )
-
-type CardService struct {
-
-}
-
-var _ cardconnect.CardServiceHandler = (*CardService)(nil)
-
-func (s *CardService) GetCards(ctx context.Context, req *connect.Request[card.GetCardsRequest]) (*connect.Response[card.GetCardsResponse], error) {
-
-	return connect.NewResponse(&card.GetCardsResponse{
-		Cards: []*card.Card{
-			{
-				Name: "1",
-				Description: "A",
-			},
-		},
-	}), nil
-}
-
-func (s *CardService) NewCard(ctx context.Context, req *connect.Request[card.Card]) (*connect.Response[card.Card], error) {
-	return connect.NewResponse(&card.Card{
-		Name: "1",
-	}), nil
-}
 
 func NewLogInterceptor() connect.UnaryInterceptorFunc {
 	interceptor := func(next connect.UnaryFunc) connect.UnaryFunc {
@@ -67,25 +41,12 @@ func loggingMiddleware(next http.Handler) http.Handler {
 	})
 }
 
-var settings = mysql.ConnectionURL{
-	Database: `carddatabase`,
-	Host:     `localhost`,
-	User:     `root`,
-	Password: `password`,
-}
-
 func main() {
-	sess, err := mysql.Open(settings)
-	if err != nil {
-		log.Fatalf("Failed to connect to database: %v", err)
-	}
-	defer sess.Close()
-
 	interceptors := connect.WithInterceptors(NewLogInterceptor())
 
 	apiRoot := http.NewServeMux()
 
-	cardService := &CardService{}
+	cardService := &cards.CardService{}
 
 	apiRoot.Handle(cardconnect.NewCardServiceHandler(cardService, interceptors))
 

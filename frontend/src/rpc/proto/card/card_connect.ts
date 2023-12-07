@@ -3,7 +3,7 @@
 /* eslint-disable */
 // @ts-nocheck
 
-import { Card, GetCardsRequest, GetCardsResponse } from "./card_pb.js";
+import { DeleteCardRequest, DeleteCardResponse, GenerateCardsRequest, GenerateCardsResponse, GetCardsRequest, GetCardsResponse, NewCardRequest, NewCardResponse } from "./card_pb.js";
 import { MethodKind } from "@bufbuild/protobuf";
 
 /**
@@ -26,8 +26,26 @@ export const CardService = {
      */
     newCard: {
       name: "NewCard",
-      I: Card,
-      O: Card,
+      I: NewCardRequest,
+      O: NewCardResponse,
+      kind: MethodKind.Unary,
+    },
+    /**
+     * @generated from rpc card.CardService.DeleteCard
+     */
+    deleteCard: {
+      name: "DeleteCard",
+      I: DeleteCardRequest,
+      O: DeleteCardResponse,
+      kind: MethodKind.Unary,
+    },
+    /**
+     * @generated from rpc card.CardService.GenerateCards
+     */
+    generateCards: {
+      name: "GenerateCards",
+      I: GenerateCardsRequest,
+      O: GenerateCardsResponse,
       kind: MethodKind.Unary,
     },
   }
