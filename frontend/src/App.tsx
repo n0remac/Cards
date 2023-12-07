@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { cardService } from './service';
-import { Card } from './rpc/proto/card/card_pb';
+import { Card, NewCardRequest } from './rpc/proto/card/card_pb';
 import './styles.css';
 
 
@@ -19,6 +19,9 @@ export default function App() {
     const [draggingCard, setDraggingCard] = useState<number | null>(null);
     const [newCardName, setNewCardName] = useState('');
     const [newCardDescription, setNewCardDescription] = useState('');
+    const [userId, setUserId] = useState('');
+    const [cardCount, setCardCount] = useState(1); // Default to generating 1 card
+
 
     useEffect(() => {
         (async () => {
@@ -43,14 +46,25 @@ export default function App() {
     const handleCreateCard = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         try {
-            const newCard = new Card();
-            newCard.name = newCardName;
-            newCard.description = newCardDescription;
-    
-            await cardService.createCard(newCard);
+            const newCard = new NewCardRequest();
+            newCard.card = new Card();
+            newCard.card.name = newCardName;
+            newCard.card.description = newCardDescription;
+            
+            await cardService.newCard(newCard);
             // Optionally, fetch cards again to update the list
         } catch (error) {
             console.error("Error creating card:", error);
+        }
+    };
+
+    const handleGenerateCards = async (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        try {
+            const generatedCards = await cardService.generateCards({ userId, count: cardCount });
+            setCards([...cards, ...generatedCards.cards]);
+        } catch (error) {
+            console.error("Error generating cards:", error);
         }
     };
 
@@ -91,6 +105,25 @@ export default function App() {
                     <button type="submit">Create Card</button>
                 </form>
             </div>
+            <div className="generate-cards-form">
+                <form onSubmit={handleGenerateCards}>
+                    <input
+                        type="text"
+                        value={userId}
+                        onChange={(e) => setUserId(e.target.value)}
+                        placeholder="User ID"
+                    />
+                    <input
+                        type="number"
+                        value={cardCount}
+                        onChange={(e) => setCardCount(Number(e.target.value))}
+                        placeholder="Number of Cards"
+                        min="1"
+                    />
+                    <button type="submit">Generate Cards</button>
+                </form>
+            </div>
+
             <div className="cards-container" onMouseMove={handleMouseMove} onMouseUp={handleMouseUp}>
                 {cards.map((card, index,) => (
                      <div
@@ -126,7 +159,7 @@ export default function App() {
                             height: '120px',
                         }}
                     >{card.description}</div>
-        </div>
+            </div>
                 ))}
             </div>
         </div>
