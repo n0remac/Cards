@@ -14,7 +14,6 @@ const TemplateForm: React.FC = () => {
   const [selectedOptions, setSelectedOptions] = useState<{ [key: string]: string }>({});
 
   useEffect(() => {
-    // Initialize state with default values
     Statements().I_statement_templates.forEach((template, index) => {
       Object.keys(template.examples).forEach((key) => {
         setSelectedOptions(prev => ({ ...prev, [`${index}-${key}`]: template.examples[key][0] }));
@@ -29,33 +28,34 @@ const TemplateForm: React.FC = () => {
     });
   };
 
-  const renderTemplate = (template: Template, index: number) => {
-    let statement = template.template;
-    Object.keys(template.examples).forEach((key) => {
-      const regex = new RegExp(`\\[${key}\\]`, 'g');
-      statement = statement.replace(regex, selectedOptions[`${index}-${key}`] || key);
+  const renderTemplateWithSelectors = (template: Template, index: number) => {
+    const segments = template.template.split(/\[([^\]]+)\]/);
+    return segments.map((segment, i) => {
+      if (i % 2 === 0) {
+        return <span key={i}>{segment}</span>;
+      } else {
+        return (
+          <select
+            key={i}
+            value={selectedOptions[`${index}-${segment}`]}
+            onChange={(e) => handleChange(index, segment, e.target.value)}
+          >
+            {template.examples[segment].map((option) => (
+              <option key={option} value={option}>
+                {option}
+              </option>
+            ))}
+          </select>
+        );
+      }
     });
-    return statement;
   };
 
   return (
     <form>
       {Statements().I_statement_templates.map((template, index) => (
-        <div key={index}>
-          {Object.entries(template.examples).map(([key, options]) => (
-            <select
-              key={key}
-              value={selectedOptions[`${index}-${key}`]}
-              onChange={(e) => handleChange(index, key, e.target.value)}
-            >
-              {options.map((option) => (
-                <option key={option} value={option}>
-                  {option}
-                </option>
-              ))}
-            </select>
-          ))}
-          <p>{renderTemplate(template, index)}</p>
+        <div key={index} style={{ display: 'flex', alignItems: 'center' }}>
+          {renderTemplateWithSelectors(template, index)}
         </div>
       ))}
     </form>

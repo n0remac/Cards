@@ -8,26 +8,33 @@ interface Template {
 const TemplateBuilder: React.FC = () => {
   const [templates, setTemplates] = useState<Template[]>([]);
   const [newTemplate, setNewTemplate] = useState<string>('');
+  const [currentTemplateIndex, setCurrentTemplateIndex] = useState<number | null>(null);
   const [newPlaceholder, setNewPlaceholder] = useState<string>('');
   const [newOptions, setNewOptions] = useState<string>('');
 
   const handleAddTemplate = () => {
-    setTemplates([...templates, { template: newTemplate, examples: {} }]);
+    const newTemplates = [...templates, { template: newTemplate, examples: {} }];
+    setTemplates(newTemplates);
+    setCurrentTemplateIndex(newTemplates.length - 1);
     setNewTemplate('');
   };
 
-  const handleAddOptions = (templateIndex: number) => {
-    const updatedTemplates = [...templates];
-    const options = newOptions.split(',').map(option => option.trim());
-    updatedTemplates[templateIndex].examples[newPlaceholder] = options;
-    setTemplates(updatedTemplates);
-    setNewPlaceholder('');
-    setNewOptions('');
+  const handleAddOptions = () => {
+    if (currentTemplateIndex !== null) {
+      const updatedTemplates = [...templates];
+      const options = newOptions.split(',').map(option => option.trim());
+      const template = updatedTemplates[currentTemplateIndex];
+      template.examples[newPlaceholder] = options;
+      setTemplates(updatedTemplates);
+      setNewPlaceholder('');
+      setNewOptions('');
+    }
   };
+
 
   const exportToJson = () => {
     const dataStr = JSON.stringify({ I_statement_templates: templates }, null, 2);
-    const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+    const dataUri = 'data:application/json;charset=utf-8,' + encodeURIComponent(dataStr);
 
     const exportFileDefaultName = 'templates.json';
     const linkElement = document.createElement('a');
@@ -47,9 +54,8 @@ const TemplateBuilder: React.FC = () => {
         />
         <button onClick={handleAddTemplate}>Add Template</button>
       </div>
-      {templates.map((template, index) => (
-        <div key={index}>
-          <p>{template.template}</p>
+      {currentTemplateIndex !== null && (
+        <div>
           <input
             type="text"
             value={newPlaceholder}
@@ -62,7 +68,15 @@ const TemplateBuilder: React.FC = () => {
             onChange={(e) => setNewOptions(e.target.value)}
             placeholder="Enter options (comma-separated)"
           />
-          <button onClick={() => handleAddOptions(index)}>Add Options</button>
+          <button onClick={handleAddOptions}>Add Options</button>
+        </div>
+      )}
+      {templates.map((template, index) => (
+        <div key={index}>
+          <p>{template.template}</p>
+          {Object.entries(template.examples).map(([key, options]) => (
+            <p key={key}>{`${key}: ${options.join(', ')}`}</p>
+          ))}
         </div>
       ))}
       <button onClick={exportToJson}>Export to JSON</button>

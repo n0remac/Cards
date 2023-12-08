@@ -1,30 +1,12 @@
 package cards
 
 import (
+	"cards/database"
 	"cards/gen/proto/card"
 	"encoding/json"
-	"log"
-
 	"github.com/upper/db/v4"
-	"github.com/upper/db/v4/adapter/mysql"
 )
 
-var sess db.Session
-
-func init() {
-	var err error
-	var settings = mysql.ConnectionURL{
-		Database: `carddatabase`,
-		Host:     `localhost`,
-		User:     `root`,
-		Password: `password`,
-	}
-
-	sess, err = mysql.Open(settings)
-	if err != nil {
-		log.Fatalf("Failed to connect to database: %v", err)
-	}
-}
 
 type Card struct {
 	ID   int    `db:"id,omitempty"`
@@ -32,6 +14,8 @@ type Card struct {
 }
 
 func createCardInDB(card *card.Card) (*card.Card, error) {
+	sess := database.GetSession()
+
 	cardJSON, err := json.Marshal(card)
 	// if err != nil {
 	// 	return err
@@ -48,6 +32,7 @@ func createCardInDB(card *card.Card) (*card.Card, error) {
 }
 
 func getCardsFromDB() ([]*card.Card, error) {
+	sess := database.GetSession()
 	var cards []*card.Card
 
 	// Query the database for all card records
@@ -73,6 +58,7 @@ func getCardsFromDB() ([]*card.Card, error) {
 }
 
 func deleteCardFromDB(id int) error {
+	sess := database.GetSession()
 	// Delete the card with the given ID
 	res := sess.Collection("cards").Find(db.Cond{"id": id})
 	err := res.Delete()

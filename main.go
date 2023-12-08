@@ -3,7 +3,9 @@ package main
 //go:generate npx buf generate
 
 import (
+	"cards/biomes"
 	"cards/cards"
+	"cards/gen/proto/biome/biomeconnect"
 	"cards/gen/proto/card/cardconnect"
 	"context"
 	"fmt"
@@ -47,8 +49,10 @@ func main() {
 	apiRoot := http.NewServeMux()
 
 	cardService := &cards.CardService{}
+	biomeService := &biomes.BiomeService{}
 
 	apiRoot.Handle(cardconnect.NewCardServiceHandler(cardService, interceptors))
+	apiRoot.Handle(biomeconnect.NewBiomeServiceHandler(biomeService, interceptors))
 
 	reflector := grpcreflect.NewStaticReflector(
 		"card.CardService",

@@ -1,0 +1,53 @@
+syntax = "proto3";
+
+package biome;
+
+// Service definition
+service BiomeService {
+  rpc CreateBiome(CreateBiomeRequest) returns (CreateBiomeResponse);
+  rpc GetBiome(GetBiomeRequest) returns (GetBiomeResponse);
+  rpc GetBiomes(GetBiomesRequest) returns (GetBiomesResponse);
+}
+
+// Message definitions
+message Biome {
+  string name = 1;
+  string type = 2;
+  Characteristics characteristics = 3;
+}
+
+message Characteristics {
+  string climate = 1;
+  string vegetation = 2;
+  repeated string plants = 3;
+  repeated string wildlife = 4;
+  string precipitation = 5;
+}
+
+message Biomes {
+  repeated Biome biomes = 1;
+}
+
+message CreateBiomeRequest {
+  Biome biome = 1;
+}
+
+message CreateBiomeResponse {
+  Biome biome = 1;
+}
+
+message GetBiomeRequest {
+  string name = 1;
+}
+
+message GetBiomeResponse {
+  Biome biome = 1;
+}
+
+message GetBiomesRequest {}
+
+message GetBiomesResponse {
+  Biomes biomes = 1;
+}
+
+
