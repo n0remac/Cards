@@ -40,6 +40,9 @@ const (
 	BiomeServiceGetBiomeProcedure = "/biome.BiomeService/GetBiome"
 	// BiomeServiceGetBiomesProcedure is the fully-qualified name of the BiomeService's GetBiomes RPC.
 	BiomeServiceGetBiomesProcedure = "/biome.BiomeService/GetBiomes"
+	// BiomeServiceGenerateBiomeCardProcedure is the fully-qualified name of the BiomeService's
+	// GenerateBiomeCard RPC.
+	BiomeServiceGenerateBiomeCardProcedure = "/biome.BiomeService/GenerateBiomeCard"
 )
 
 // BiomeServiceClient is a client for the biome.BiomeService service.
@@ -47,6 +50,7 @@ type BiomeServiceClient interface {
 	CreateBiome(context.Context, *connect_go.Request[biome.CreateBiomeRequest]) (*connect_go.Response[biome.CreateBiomeResponse], error)
 	GetBiome(context.Context, *connect_go.Request[biome.GetBiomeRequest]) (*connect_go.Response[biome.GetBiomeResponse], error)
 	GetBiomes(context.Context, *connect_go.Request[biome.GetBiomesRequest]) (*connect_go.Response[biome.GetBiomesResponse], error)
+	GenerateBiomeCard(context.Context, *connect_go.Request[biome.Biome]) (*connect_go.Response[biome.CardResponse], error)
 }
 
 // NewBiomeServiceClient constructs a client for the biome.BiomeService service. By default, it uses
@@ -74,14 +78,20 @@ func NewBiomeServiceClient(httpClient connect_go.HTTPClient, baseURL string, opt
 			baseURL+BiomeServiceGetBiomesProcedure,
 			opts...,
 		),
+		generateBiomeCard: connect_go.NewClient[biome.Biome, biome.CardResponse](
+			httpClient,
+			baseURL+BiomeServiceGenerateBiomeCardProcedure,
+			opts...,
+		),
 	}
 }
 
 // biomeServiceClient implements BiomeServiceClient.
 type biomeServiceClient struct {
-	createBiome *connect_go.Client[biome.CreateBiomeRequest, biome.CreateBiomeResponse]
-	getBiome    *connect_go.Client[biome.GetBiomeRequest, biome.GetBiomeResponse]
-	getBiomes   *connect_go.Client[biome.GetBiomesRequest, biome.GetBiomesResponse]
+	createBiome       *connect_go.Client[biome.CreateBiomeRequest, biome.CreateBiomeResponse]
+	getBiome          *connect_go.Client[biome.GetBiomeRequest, biome.GetBiomeResponse]
+	getBiomes         *connect_go.Client[biome.GetBiomesRequest, biome.GetBiomesResponse]
+	generateBiomeCard *connect_go.Client[biome.Biome, biome.CardResponse]
 }
 
 // CreateBiome calls biome.BiomeService.CreateBiome.
@@ -99,11 +109,17 @@ func (c *biomeServiceClient) GetBiomes(ctx context.Context, req *connect_go.Requ
 	return c.getBiomes.CallUnary(ctx, req)
 }
 
+// GenerateBiomeCard calls biome.BiomeService.GenerateBiomeCard.
+func (c *biomeServiceClient) GenerateBiomeCard(ctx context.Context, req *connect_go.Request[biome.Biome]) (*connect_go.Response[biome.CardResponse], error) {
+	return c.generateBiomeCard.CallUnary(ctx, req)
+}
+
 // BiomeServiceHandler is an implementation of the biome.BiomeService service.
 type BiomeServiceHandler interface {
 	CreateBiome(context.Context, *connect_go.Request[biome.CreateBiomeRequest]) (*connect_go.Response[biome.CreateBiomeResponse], error)
 	GetBiome(context.Context, *connect_go.Request[biome.GetBiomeRequest]) (*connect_go.Response[biome.GetBiomeResponse], error)
 	GetBiomes(context.Context, *connect_go.Request[biome.GetBiomesRequest]) (*connect_go.Response[biome.GetBiomesResponse], error)
+	GenerateBiomeCard(context.Context, *connect_go.Request[biome.Biome]) (*connect_go.Response[biome.CardResponse], error)
 }
 
 // NewBiomeServiceHandler builds an HTTP handler from the service implementation. It returns the
@@ -127,6 +143,11 @@ func NewBiomeServiceHandler(svc BiomeServiceHandler, opts ...connect_go.HandlerO
 		svc.GetBiomes,
 		opts...,
 	)
+	biomeServiceGenerateBiomeCardHandler := connect_go.NewUnaryHandler(
+		BiomeServiceGenerateBiomeCardProcedure,
+		svc.GenerateBiomeCard,
+		opts...,
+	)
 	return "/biome.BiomeService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
 		case BiomeServiceCreateBiomeProcedure:
@@ -135,6 +156,8 @@ func NewBiomeServiceHandler(svc BiomeServiceHandler, opts ...connect_go.HandlerO
 			biomeServiceGetBiomeHandler.ServeHTTP(w, r)
 		case BiomeServiceGetBiomesProcedure:
 			biomeServiceGetBiomesHandler.ServeHTTP(w, r)
+		case BiomeServiceGenerateBiomeCardProcedure:
+			biomeServiceGenerateBiomeCardHandler.ServeHTTP(w, r)
 		default:
 			http.NotFound(w, r)
 		}
@@ -154,4 +177,8 @@ func (UnimplementedBiomeServiceHandler) GetBiome(context.Context, *connect_go.Re
 
 func (UnimplementedBiomeServiceHandler) GetBiomes(context.Context, *connect_go.Request[biome.GetBiomesRequest]) (*connect_go.Response[biome.GetBiomesResponse], error) {
 	return nil, connect_go.NewError(connect_go.CodeUnimplemented, errors.New("biome.BiomeService.GetBiomes is not implemented"))
+}
+
+func (UnimplementedBiomeServiceHandler) GenerateBiomeCard(context.Context, *connect_go.Request[biome.Biome]) (*connect_go.Response[biome.CardResponse], error) {
+	return nil, connect_go.NewError(connect_go.CodeUnimplemented, errors.New("biome.BiomeService.GenerateBiomeCard is not implemented"))
 }

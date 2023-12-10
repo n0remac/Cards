@@ -3,8 +3,8 @@ package main
 //go:generate npx buf generate
 
 import (
-	"cards/biomes"
-	"cards/cards"
+	"cards/biome"
+	"cards/card"
 	"cards/gen/proto/biome/biomeconnect"
 	"cards/gen/proto/card/cardconnect"
 	"context"
@@ -48,8 +48,8 @@ func main() {
 
 	apiRoot := http.NewServeMux()
 
-	cardService := &cards.CardService{}
-	biomeService := &biomes.BiomeService{}
+	cardService := &card.CardService{}
+	biomeService := &biome.BiomeService{}
 
 	apiRoot.Handle(cardconnect.NewCardServiceHandler(cardService, interceptors))
 	apiRoot.Handle(biomeconnect.NewBiomeServiceHandler(biomeService, interceptors))

@@ -1,0 +1,69 @@
+syntax = "proto3";
+
+package story;
+
+// Define the Scene message
+message Scene {
+    string id = 1;         // Unique identifier for each scene
+    string scene = 2;
+    string examples = 3;   // JSON string for examples
+}
+
+// Define the service with CRUD operations
+service StoryService {
+    rpc GetScenes(GetScenesRequest) returns (GetScenesResponse);
+    // Create a new scene
+    rpc CreateScene(CreateSceneRequest) returns (CreateSceneResponse);
+
+    // Read (get) a scene by ID
+    rpc GetScene(GetSceneRequest) returns (GetSceneResponse);
+
+    // Update an existing scene
+    rpc UpdateScene(UpdateSceneRequest) returns (UpdateSceneResponse);
+
+    // Delete a scene by ID
+    rpc DeleteScene(DeleteSceneRequest) returns (DeleteSceneResponse);
+}
+
+message GetScenesRequest{
+
+}
+message GetScenesResponse {
+    repeated Scene scenes = 1;
+}
+
+// Request and response messages for CreateScene
+message CreateSceneRequest {
+    Scene scene = 1;
+}
+
+message CreateSceneResponse {
+    Scene scene = 1;
+}
+
+// Request and response messages for GetScene
+message GetSceneRequest {
+    string id = 1;
+}
+
+message GetSceneResponse {
+    Scene scene = 1;
+}
+
+// Request and response messages for UpdateScene
+message UpdateSceneRequest {
+    Scene scene = 1;
+}
+
+message UpdateSceneResponse {
+    Scene scene = 1;
+}
+
+// Request and response messages for DeleteScene
+message DeleteSceneRequest {
+    string id = 1;
+}
+
+message DeleteSceneResponse {
+    // Optionally include a status or confirmation message
+}

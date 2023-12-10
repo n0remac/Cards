@@ -3,7 +3,7 @@
 /* eslint-disable */
 // @ts-nocheck
 
-import { CreateBiomeRequest, CreateBiomeResponse, GetBiomeRequest, GetBiomeResponse, GetBiomesRequest, GetBiomesResponse } from "./biome_pb.js";
+import { Biome, CardResponse, CreateBiomeRequest, CreateBiomeResponse, GetBiomeRequest, GetBiomeResponse, GetBiomesRequest, GetBiomesResponse } from "./biome_pb.js";
 import { MethodKind } from "@bufbuild/protobuf";
 
 /**
@@ -39,6 +39,15 @@ export const BiomeService = {
       name: "GetBiomes",
       I: GetBiomesRequest,
       O: GetBiomesResponse,
+      kind: MethodKind.Unary,
+    },
+    /**
+     * @generated from rpc biome.BiomeService.GenerateBiomeCard
+     */
+    generateBiomeCard: {
+      name: "GenerateBiomeCard",
+      I: Biome,
+      O: CardResponse,
       kind: MethodKind.Unary,
     },
   }

@@ -9,6 +9,43 @@ import { Message, proto3 } from "@bufbuild/protobuf";
 /**
  * Message definitions
  *
+ * @generated from message biome.CardResponse
+ */
+export class CardResponse extends Message<CardResponse> {
+  /**
+   * @generated from field: string data = 1;
+   */
+  data = "";
+
+  constructor(data?: PartialMessage<CardResponse>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "biome.CardResponse";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "data", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): CardResponse {
+    return new CardResponse().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): CardResponse {
+    return new CardResponse().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): CardResponse {
+    return new CardResponse().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: CardResponse | PlainMessage<CardResponse> | undefined, b: CardResponse | PlainMessage<CardResponse> | undefined): boolean {
+    return proto3.util.equals(CardResponse, a, b);
+  }
+}
+
+/**
  * @generated from message biome.Biome
  */
 export class Biome extends Message<Biome> {

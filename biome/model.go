@@ -1,4 +1,4 @@
-package biomes
+package biome
 
 import (
 	"cards/database"

@@ -1,4 +1,4 @@
-package cards
+package card
 
 import (
 	"cards/database"

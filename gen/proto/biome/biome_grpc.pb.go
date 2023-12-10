@@ -25,6 +25,7 @@ type BiomeServiceClient interface {
 	CreateBiome(ctx context.Context, in *CreateBiomeRequest, opts ...grpc.CallOption) (*CreateBiomeResponse, error)
 	GetBiome(ctx context.Context, in *GetBiomeRequest, opts ...grpc.CallOption) (*GetBiomeResponse, error)
 	GetBiomes(ctx context.Context, in *GetBiomesRequest, opts ...grpc.CallOption) (*GetBiomesResponse, error)
+	GenerateBiomeCard(ctx context.Context, in *Biome, opts ...grpc.CallOption) (*CardResponse, error)
 }
 
 type biomeServiceClient struct {
@@ -62,6 +63,15 @@ func (c *biomeServiceClient) GetBiomes(ctx context.Context, in *GetBiomesRequest
 	return out, nil
 }
 
+func (c *biomeServiceClient) GenerateBiomeCard(ctx context.Context, in *Biome, opts ...grpc.CallOption) (*CardResponse, error) {
+	out := new(CardResponse)
+	err := c.cc.Invoke(ctx, "/biome.BiomeService/GenerateBiomeCard", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // BiomeServiceServer is the server API for BiomeService service.
 // All implementations should embed UnimplementedBiomeServiceServer
 // for forward compatibility
@@ -69,6 +79,7 @@ type BiomeServiceServer interface {
 	CreateBiome(context.Context, *CreateBiomeRequest) (*CreateBiomeResponse, error)
 	GetBiome(context.Context, *GetBiomeRequest) (*GetBiomeResponse, error)
 	GetBiomes(context.Context, *GetBiomesRequest) (*GetBiomesResponse, error)
+	GenerateBiomeCard(context.Context, *Biome) (*CardResponse, error)
 }
 
 // UnimplementedBiomeServiceServer should be embedded to have forward compatible implementations.
@@ -83,6 +94,9 @@ func (UnimplementedBiomeServiceServer) GetBiome(context.Context, *GetBiomeReques
 }
 func (UnimplementedBiomeServiceServer) GetBiomes(context.Context, *GetBiomesRequest) (*GetBiomesResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetBiomes not implemented")
+}
+func (UnimplementedBiomeServiceServer) GenerateBiomeCard(context.Context, *Biome) (*CardResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GenerateBiomeCard not implemented")
 }
 
 // UnsafeBiomeServiceServer may be embedded to opt out of forward compatibility for this service.
@@ -150,6 +164,24 @@ func _BiomeService_GetBiomes_Handler(srv interface{}, ctx context.Context, dec f
 	return interceptor(ctx, in, info, handler)
 }
 
+func _BiomeService_GenerateBiomeCard_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(Biome)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(BiomeServiceServer).GenerateBiomeCard(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/biome.BiomeService/GenerateBiomeCard",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(BiomeServiceServer).GenerateBiomeCard(ctx, req.(*Biome))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // BiomeService_ServiceDesc is the grpc.ServiceDesc for BiomeService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -168,6 +200,10 @@ var BiomeService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetBiomes",
 			Handler:    _BiomeService_GetBiomes_Handler,
+		},
+		{
+			MethodName: "GenerateBiomeCard",
+			Handler:    _BiomeService_GenerateBiomeCard_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

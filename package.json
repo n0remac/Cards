@@ -4,8 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "cd frontend && node esbuild.mjs",
-    "build": "cd frontend && BUILD=true node esbuild.mjs"
+    "dev": "cd frontend && DEV=true node esbuild.mjs",
+    "build": "cd frontend && DEV=false node esbuild.mjs"
   },
   "author": "",
   "license": "ISC",
@@ -15,7 +15,10 @@
     "esbuild": "^0.19.5",
     "react-bootstrap": "^2.9.1",
     "react-dom": "^18.2.0",
-    "react-router-dom": "^6.20.1"
+    "react-router-dom": "^6.20.1",
+    "tailwindcss": "^3.3.5",
+    "@tailwindcss/typography": "^0.5.10",
+    "daisyui": "^4.4.19"
   },
   "devDependencies": {
     "@bufbuild/buf": "^1.27.0",

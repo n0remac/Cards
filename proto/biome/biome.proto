@@ -7,9 +7,15 @@ service BiomeService {
   rpc CreateBiome(CreateBiomeRequest) returns (CreateBiomeResponse);
   rpc GetBiome(GetBiomeRequest) returns (GetBiomeResponse);
   rpc GetBiomes(GetBiomesRequest) returns (GetBiomesResponse);
+
+  rpc GenerateBiomeCard(Biome) returns (CardResponse);
 }
 
 // Message definitions
+message CardResponse {
+  string data = 1;
+}
+
 message Biome {
   string name = 1;
   string type = 2;
@@ -49,5 +55,3 @@ message GetBiomesRequest {}
 message GetBiomesResponse {
   Biomes biomes = 1;
 }
-
-
