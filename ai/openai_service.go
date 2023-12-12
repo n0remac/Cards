@@ -2,18 +2,26 @@ package ai
 
 import (
 	"context"
-	"os"
-
+	"encoding/json"
 	"fmt"
 	"io"
 	"log"
 	"net/http"
+	"os"
 	"strings"
 
 	openai "github.com/sashabaranov/go-openai"
-
-	"regexp"
 )
+
+type Response struct {
+	Created int64  `json:"created"`
+	Data    []Data `json:"data"`
+}
+
+type Data struct {
+	RevisedPrompt string `json:"revised_prompt"`
+	URL           string `json:"url"`
+}
 
 func QueryToJSON(query string) (string, error) {
 	// Query AI
@@ -43,15 +51,22 @@ func GenerateImage(query string) (string, error) {
 		log.Fatal(err)
 	}
 	defer resp.Body.Close()
+
 	bodyText, err := io.ReadAll(resp.Body)
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Printf("%s\n", bodyText)
 
 	stringResp := string(bodyText)
 
-	return stringResp, nil
+	description, url, err := extractInfo(stringResp)
+	if err != nil {
+		fmt.Println(err)
+		return "", err
+	}
+	fmt.Println(url, description)
+
+	return url, nil
 
 }
 
@@ -79,15 +94,43 @@ func query_ai(query string) (string, error) {
 	return resp.Choices[0].Message.Content, nil
 }
 
-func extractJSON(text string) (string, error) {
-	// Regular expression to match JSON objects
-	re := regexp.MustCompile(`\{(?:[^{}]|(?R))*\}`)
-	matches := re.FindStringSubmatch(text)
+func DownloadImage(url, filePath string) error {
+	// Send a GET request to the URL
+	resp, err := http.Get(url)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
 
-	if len(matches) == 0 {
-		return "", fmt.Errorf("no JSON found in text")
+	// Check if the response status is OK
+	if resp.StatusCode != http.StatusOK {
+		return fmt.Errorf("bad status: %s", resp.Status)
 	}
 
-	// Return the first match
-	return matches[0], nil
+	// Create a file at the specified file path
+	file, err := os.Create(filePath)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+
+	// Copy the response body to the file
+	_, err = io.Copy(file, resp.Body)
+	return err
+}
+
+func extractInfo(jsonStr string) (string, string, error) {
+	var resp Response
+
+	err := json.Unmarshal([]byte(jsonStr), &resp)
+	if err != nil {
+		return "", "", err
+	}
+
+	if len(resp.Data) == 0 {
+		return "", "", fmt.Errorf("no data available")
+	}
+
+	data := resp.Data[0]
+	return data.RevisedPrompt, data.URL, nil
 }

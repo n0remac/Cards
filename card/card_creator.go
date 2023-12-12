@@ -33,5 +33,7 @@ func CreateRandomCharacter() (string, error) {
 	if err != nil {
 		return "", err
 	}
-	return ai.GenerateImage(characterString)
+	url, err := ai.GenerateImage(characterString)
+	ai.DownloadImage(url, "card_images/character.png")
+	return url, nil
 }
