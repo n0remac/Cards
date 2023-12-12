@@ -44,6 +44,7 @@ func loggingMiddleware(next http.Handler) http.Handler {
 }
 
 func main() {
+	card.CreateRandomCharacter()
 	interceptors := connect.WithInterceptors(NewLogInterceptor())
 
 	apiRoot := http.NewServeMux()

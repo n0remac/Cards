@@ -4,9 +4,14 @@ import (
 	"context"
 	"os"
 
+	"fmt"
+	"io"
+	"log"
+	"net/http"
+	"strings"
+
 	openai "github.com/sashabaranov/go-openai"
 
-	"fmt"
 	"regexp"
 )
 
@@ -17,16 +22,37 @@ func QueryToJSON(query string) (string, error) {
 		return "", err
 	}
 	return aiResponse, nil
+}
 
-	// fmt.Println(aiResponse)
+func GenerateImage(query string) (string, error) {
+	client := &http.Client{}
+	var data = strings.NewReader(fmt.Sprintf(`{
+		"model": "dall-e-3",
+		"prompt": "%s",
+		"n": 1,
+		"size": "1024x1024"
+	}`, query))
+	req, err := http.NewRequest("POST", "https://api.openai.com/v1/images/generations", data)
+	if err != nil {
+		log.Fatal(err)
+	}
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Authorization", "Bearer "+os.Getenv("OPENAI_API_KEY"))
+	resp, err := client.Do(req)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer resp.Body.Close()
+	bodyText, err := io.ReadAll(resp.Body)
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Printf("%s\n", bodyText)
 
-	// // Extract JSON from AI response
-	// json, err := extractJSON(aiResponse)
-	// if err != nil {
-	// 	return "", err
-	// }
+	stringResp := string(bodyText)
 
-	// return json, nil
+	return stringResp, nil
+
 }
 
 func query_ai(query string) (string, error) {
@@ -35,7 +61,7 @@ func query_ai(query string) (string, error) {
 	resp, err := client.CreateChatCompletion(
 		context.Background(),
 		openai.ChatCompletionRequest{
-			Model: openai.GPT3Dot5Turbo,
+			Model: openai.GPT4,
 			Messages: []openai.ChatCompletionMessage{
 				{
 					Role:    openai.ChatMessageRoleUser,
