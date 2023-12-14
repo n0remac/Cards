@@ -52,12 +52,12 @@ func (s *CardService) GenerateCards(ctx context.Context, req *connect.Request[ca
 	for i := 0; i < count; i++ {
 		fmt.Println("Generating Card: ", i)
 		c := &card.Card{}
-		url, description, err := CreateRandomCharacter()
+		name, description, err := CreateRandomCharacter()
 		if err != nil {
 			return nil, err
 		}
-		fmt.Println("url: ", url)
-		c.Name = url
+		fmt.Println("name: ", name)
+		c.Name = name
 		c.Description = description
 		newCard, err := createCard(c)
 		if err != nil {

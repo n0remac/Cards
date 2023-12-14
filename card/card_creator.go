@@ -36,5 +36,5 @@ func CreateRandomCharacter() (string, string, error) {
 	}
 	url, description, err := ai.GenerateImage(characterString)
 	ai.DownloadImage(url, fmt.Sprintf("card_images/%s.png", randomAnimal))
-	return url, description, nil
+	return randomAnimal, description, nil
 }
