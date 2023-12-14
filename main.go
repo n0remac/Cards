@@ -5,6 +5,7 @@ package main
 import (
 	"cards/biome"
 	"cards/card"
+	"cards/database"
 	"cards/gen/proto/biome/biomeconnect"
 	"cards/gen/proto/card/cardconnect"
 	"context"
@@ -44,11 +45,11 @@ func loggingMiddleware(next http.Handler) http.Handler {
 }
 
 func main() {
-	card.CreateRandomCharacter()
 	interceptors := connect.WithInterceptors(NewLogInterceptor())
 
 	apiRoot := http.NewServeMux()
 
+	database.InitDB()
 	cardService := &card.CardService{}
 	biomeService := &biome.BiomeService{}
 

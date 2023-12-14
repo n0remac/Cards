@@ -3,10 +3,9 @@ package card
 import (
 	"cards/gen/proto/card"
 	"context"
+	"fmt"
 
 	"github.com/bufbuild/connect-go"
-
-	"strconv"
 )
 
 type CardService struct {
@@ -18,7 +17,6 @@ func (s *CardService) GetCards(ctx context.Context, req *connect.Request[card.Ge
 	if err != nil {
 		return nil, err
 	}
-
 	return connect.NewResponse(&card.GetCardsResponse{
 		Cards: cards,
 	}), nil
@@ -36,14 +34,7 @@ func (s *CardService) NewCard(ctx context.Context, req *connect.Request[card.New
 }
 
 func (s *CardService) DeleteCard(ctx context.Context, req *connect.Request[card.DeleteCardRequest]) (*connect.Response[card.DeleteCardResponse], error) {
-	id := 0
-
-	id, e := strconv.Atoi(req.Msg.CardId)
-	if e != nil {
-		return nil, e
-	}
-
-	err := deleteCardFromDB(id)
+	err := deleteCardFromDB(req.Msg.CardId)
 	if err != nil {
 		return nil, err
 	}
@@ -54,13 +45,27 @@ func (s *CardService) DeleteCard(ctx context.Context, req *connect.Request[card.
 }
 
 func (s *CardService) GenerateCards(ctx context.Context, req *connect.Request[card.GenerateCardsRequest]) (*connect.Response[card.GenerateCardsResponse], error) {
-	// cards, err := biome.generateCards(req.Msg.UserId)
-	// if err != nil {
-	// 	return nil, err
-	// }
+	fmt.Println("Generating Cards")
+	count := int(req.Msg.Count)
+	cards := []*card.Card{}
+	fmt.Println("Generating Cards, Count: ", count)
+	for i := 0; i < count; i++ {
+		fmt.Println("Generating Card: ", i)
+		c := &card.Card{}
+		url, description, err := CreateRandomCharacter()
+		if err != nil {
+			return nil, err
+		}
+		fmt.Println("url: ", url)
+		c.Name = url
+		c.Description = description
+		newCard, err := createCard(c)
+		if err != nil {
+			return nil, err
+		}
+		cards = append(cards, newCard)
 
-	// return connect.NewResponse(&card.GenerateCardsResponse{
-	// 	Cards: cards,
-	// }), nil
-	return nil, nil
+	}
+
+	return connect.NewResponse(&card.GenerateCardsResponse{Cards: cards}), nil
 }

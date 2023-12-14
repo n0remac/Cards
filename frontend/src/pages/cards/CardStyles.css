@@ -1,0 +1,17 @@
+.card-container {
+    border: 2px solid black;
+    border-radius: 10px;
+  }
+  
+  .card-image {
+    border-bottom: 2px solid black;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+  }
+  
+  .card-description {
+    border-top: none;
+    border-bottom-left-radius: 10px;
+    border-bottom-right-radius: 10px;
+  }
+  

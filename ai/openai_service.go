@@ -32,7 +32,7 @@ func QueryToJSON(query string) (string, error) {
 	return aiResponse, nil
 }
 
-func GenerateImage(query string) (string, error) {
+func GenerateImage(query string) (string, string, error) {
 	client := &http.Client{}
 	var data = strings.NewReader(fmt.Sprintf(`{
 		"model": "dall-e-3",
@@ -62,11 +62,10 @@ func GenerateImage(query string) (string, error) {
 	description, url, err := extractInfo(stringResp)
 	if err != nil {
 		fmt.Println(err)
-		return "", err
+		return "", "", err
 	}
-	fmt.Println(url, description)
 
-	return url, nil
+	return url, description, nil
 
 }
 

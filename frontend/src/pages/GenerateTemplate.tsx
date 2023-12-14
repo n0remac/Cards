@@ -20,7 +20,6 @@ interface SceneTemplate {
   
 
 export const StoryTemplateForm: React.FC = () => {
-  const [selectedCard, setSelectedCard] = useState<Card | null>(null);
   const [selectedOptions, setSelectedOptions] = useState<{ [key: string]: string }>({});
   const [biomes, setBiomes] = useState<Biome[]>([]);
   const [selectedBiome, setSelectedBiome] = useState<Biome | null>(null);
@@ -37,23 +36,8 @@ export const StoryTemplateForm: React.FC = () => {
       } catch (error) {
         console.error("Error fetching biomes:", error);
       }
-      // Fetch a specific card or the first card from the list
+
       const scene = await biomeService.generateBiomeCard(biomes[0]);
-      console.log("Scene: ", scene);
-      // const card = fetchedCards.cards[0]; // Assuming you want the first card
-      // setSelectedCard(card);
-        
-      // console.log(card.description);
-      // // Assuming the card's description is in the format of your templates
-      // const template = parseTemplate(card.description);
-
-      // console.log('template:');
-      // console.log(template);
-
-      // Object.keys(template.examples).forEach((key) => {
-      //   setSelectedOptions(prev => ({ ...prev, [key]: template.examples[key][0] }));
-      // });
-
     })();
   }, []);
 

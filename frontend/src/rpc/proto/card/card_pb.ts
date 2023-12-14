@@ -96,9 +96,9 @@ export class DeleteCardRequest extends Message<DeleteCardRequest> {
   userId = "";
 
   /**
-   * @generated from field: string card_id = 2;
+   * @generated from field: int32 card_id = 2;
    */
-  cardId = "";
+  cardId = 0;
 
   constructor(data?: PartialMessage<DeleteCardRequest>) {
     super();
@@ -109,7 +109,7 @@ export class DeleteCardRequest extends Message<DeleteCardRequest> {
   static readonly typeName = "card.DeleteCardRequest";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
     { no: 1, name: "user_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 2, name: "card_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "card_id", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): DeleteCardRequest {
@@ -134,9 +134,9 @@ export class DeleteCardRequest extends Message<DeleteCardRequest> {
  */
 export class DeleteCardResponse extends Message<DeleteCardResponse> {
   /**
-   * @generated from field: string card_id = 1;
+   * @generated from field: int32 card_id = 1;
    */
-  cardId = "";
+  cardId = 0;
 
   constructor(data?: PartialMessage<DeleteCardResponse>) {
     super();
@@ -146,7 +146,7 @@ export class DeleteCardResponse extends Message<DeleteCardResponse> {
   static readonly runtime: typeof proto3 = proto3;
   static readonly typeName = "card.DeleteCardResponse";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 1, name: "card_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 1, name: "card_id", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): DeleteCardResponse {
@@ -334,6 +334,11 @@ export class Card extends Message<Card> {
    */
   description = "";
 
+  /**
+   * @generated from field: int32 id = 3;
+   */
+  id = 0;
+
   constructor(data?: PartialMessage<Card>) {
     super();
     proto3.util.initPartial(data, this);
@@ -344,6 +349,7 @@ export class Card extends Message<Card> {
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
     { no: 1, name: "name", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 2, name: "description", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 3, name: "id", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): Card {
