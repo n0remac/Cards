@@ -1,0 +1,867 @@
+[
+    {
+      "name": "Saharan Expanse",
+      "type": "Desert",
+      "characteristics": {
+        "climate": "Extremely hot, arid",
+        "vegetation": "Sparse, mainly drought-resistant shrubs",
+        "plants": [
+          "Date Palm",
+          "Desert Thistle",
+          "Acacia",
+          "Saharan Mustard"
+        ],
+        "wildlife": [
+          "Fennec Fox",
+          "Dromedary Camel",
+          "Desert Monitor",
+          "Saharan Cheetah"
+        ],
+        "precipitation": "Very low, occasional rain"
+      }
+    },
+    {
+      "name": "Gobi Wilderness",
+      "type": "Desert",
+      "characteristics": {
+        "climate": "Cold winters, hot summers",
+        "vegetation": "Limited grasses, shrubs",
+        "plants": [
+          "Saxaul Tree",
+          "Gobi Bearberry",
+          "Mongolian Khulan",
+          "Wild Onion"
+        ],
+        "wildlife": [
+          "Bactrian Camel",
+          "Snow Leopard",
+          "Gobi Bear",
+          "Mongolian Gazelle"
+        ],
+        "precipitation": "Low, mostly snow in winter"
+      }
+    },
+    {
+      "name": "Sonoran Sands",
+      "type": "Desert",
+      "characteristics": {
+        "climate": "Hot, with significant temperature variations",
+        "vegetation": "Diverse desert flora",
+        "plants": [
+          "Saguaro Cactus",
+          "Creosote Bush",
+          "Palo Verde",
+          "Ocotillo"
+        ],
+        "wildlife": [
+          "Coyote",
+          "Gila Monster",
+          "Roadrunner",
+          "Desert Bighorn Sheep"
+        ],
+        "precipitation": "Low, but higher than other deserts"
+      }
+    },
+    {
+      "name": "Atacama Plateau",
+      "type": "Desert",
+      "characteristics": {
+        "climate": "Dry, cool coastal desert",
+        "vegetation": "Very sparse, some grasses and mosses",
+        "plants": [
+          "Llareta",
+          "Tamarugo",
+          "Pampa Grass",
+          "Atacama Succulent"
+        ],
+        "wildlife": [
+          "Vicuña",
+          "Andean Fox",
+          "Humboldt Penguin",
+          "Peruvian Pelican"
+        ],
+        "precipitation": "Extremely low, foggy conditions"
+      }
+    },
+    {
+      "name": "Arabian Dunes",
+      "type": "Desert",
+      "characteristics": {
+        "climate": "Hot and dry",
+        "vegetation": "Scattered shrubs and grasses",
+        "plants": [
+          "Date Palm",
+          "Arabian Balsam",
+          "Desert Rose",
+          "Ghaf Tree"
+        ],
+        "wildlife": [
+          "Arabian Oryx",
+          "Sand Gazelle",
+          "Caracal",
+          "Arabian Wolf"
+        ],
+        "precipitation": "Minimal, occasional flash floods"
+      }
+    },
+    {
+      "name": "Amazon River Basin",
+      "type": "Freshwater",
+      "characteristics": {
+        "climate": "Tropical, humid",
+        "vegetation": "Diverse aquatic plants",
+        "plants": [
+          "Water Hyacinth",
+          "Amazon Sword Plant",
+          "Giant Water Lily",
+          "Duckweed"
+        ],
+        "wildlife": [
+          "Piranha",
+          "Amazon River Dolphin",
+          "Anaconda",
+          "Arapaima",
+          "Caiman"
+        ],
+        "precipitation": "High, frequent rainfall"
+      }
+    },
+    {
+      "name": "Mississippi River Wetlands",
+      "type": "Freshwater",
+      "characteristics": {
+        "climate": "Temperate, humid",
+        "vegetation": "Rich wetland flora",
+        "plants": [
+          "Cattail",
+          "Water Lily",
+          "Bald Cypress",
+          "Wild Rice"
+        ],
+        "wildlife": [
+          "American Alligator",
+          "Bald Eagle",
+          "Catfish",
+          "Beaver",
+          "Mallard Duck"
+        ],
+        "precipitation": "Moderate to high"
+      }
+    },
+    {
+      "name": "Great Lakes",
+      "type": "Freshwater",
+      "characteristics": {
+        "climate": "Varied, generally temperate",
+        "vegetation": "Diverse shoreline and aquatic plants",
+        "plants": [
+          "Bulrush",
+          "Wild Celery",
+          "Pickerelweed",
+          "Watermilfoil"
+        ],
+        "wildlife": [
+          "Lake Trout",
+          "Walleye",
+          "Freshwater Drum",
+          "Great Blue Heron",
+          "Muskellunge"
+        ],
+        "precipitation": "Varied, with significant snowfall in northern areas"
+      }
+    },
+    {
+      "name": "Nile River Delta",
+      "type": "Freshwater",
+      "characteristics": {
+        "climate": "Arid to semi-arid, Mediterranean near the delta",
+        "vegetation": "Diverse riverine and delta plants",
+        "plants": [
+          "Papyrus",
+          "Lotus",
+          "Date Palm",
+          "Reed"
+        ],
+        "wildlife": [
+          "Nile Crocodile",
+          "Hippopotamus",
+          "African Tigerfish",
+          "Egyptian Goose",
+          "Pelican"
+        ],
+        "precipitation": "Low, except in the delta region"
+      }
+    },
+    {
+      "name": "Yangtze River Basin",
+      "type": "Freshwater",
+      "characteristics": {
+        "climate": "Varied, from subtropical to temperate",
+        "vegetation": "Rich aquatic and riparian flora",
+        "plants": [
+          "Chinese Water Chestnut",
+          "Lotus",
+          "Water Bamboo",
+          "Reed"
+        ],
+        "wildlife": [
+          "Chinese Alligator",
+          "Yangtze River Dolphin",
+          "Chinese Paddlefish",
+          "Crane",
+          "Giant Salamander"
+        ],
+        "precipitation": "Moderate to high, with seasonal variations"
+      }
+    },
+    {
+      "name": "Serengeti Plains",
+      "type": "Grassland",
+      "characteristics": {
+        "climate": "Warm, semi-arid",
+        "vegetation": "Vast open grasslands with scattered trees",
+        "plants": [
+          "Acacia Trees",
+          "Savanna Grasses",
+          "Baobab",
+          "Wild Sisal"
+        ],
+        "wildlife": [
+          "African Elephant",
+          "Lion",
+          "Cheetah",
+          "Wildebeest",
+          "Zebra",
+          "Giraffe"
+        ],
+        "precipitation": "Seasonal, with a distinct wet and dry season"
+      }
+    },
+    {
+      "name": "North American Prairie",
+      "type": "Grassland",
+      "characteristics": {
+        "climate": "Temperate, with hot summers and cold winters",
+        "vegetation": "Tallgrass prairie, with few trees",
+        "plants": [
+          "Big Bluestem",
+          "Prairie Clover",
+          "Sunflowers",
+          "Indian Grass"
+        ],
+        "wildlife": [
+          "Bison",
+          "Prairie Dog",
+          "Coyote",
+          "Red-Tailed Hawk",
+          "Badger"
+        ],
+        "precipitation": "Moderate, with more rainfall in the east"
+      }
+    },
+    {
+      "name": "Asian Steppes",
+      "type": "Grassland",
+      "characteristics": {
+        "climate": "Continental, with extreme temperature variations",
+        "vegetation": "Sparse, short grasses",
+        "plants": [
+          "Feather Grass",
+          "Sagebrush",
+          "Mongolian Oak",
+          "Wild Onion"
+        ],
+        "wildlife": [
+          "Mongolian Horse",
+          "Snow Leopard",
+          "Siberian Ibex",
+          "Saiga Antelope",
+          "Wolf"
+        ],
+        "precipitation": "Low, mostly in the form of snow"
+      }
+    },
+    {
+      "name": "South American Pampas",
+      "type": "Grassland",
+      "characteristics": {
+        "climate": "Temperate, with mild and humid conditions",
+        "vegetation": "Tall grasses and fertile plains",
+        "plants": [
+          "Pampas Grass",
+          "Ombu Trees",
+          "Yerba Mate",
+          "Bluebell"
+        ],
+        "wildlife": [
+          "Guanaco",
+          "Rhea",
+          "Pampas Deer",
+          "Maned Wolf",
+          "Burrowing Owl"
+        ],
+        "precipitation": "Regular, with no dry season"
+      }
+    },
+    {
+      "name": "Australian Savanna",
+      "type": "Grassland",
+      "characteristics": {
+        "climate": "Tropical, with a distinct wet and dry season",
+        "vegetation": "Mixed woodland and grassland",
+        "plants": [
+          "Eucalyptus Trees",
+          "Spinifex Grass",
+          "Kangaroo Grass",
+          "Acacia"
+        ],
+        "wildlife": [
+          "Kangaroo",
+          "Emu",
+          "Dingo",
+          "Frilled Lizard",
+          "Wallaby"
+        ],
+        "precipitation": "Seasonal, with heavy rains in the wet season"
+      }
+    },
+    {
+      "name": "Himalayan Heights",
+      "type": "Mountain",
+      "characteristics": {
+        "climate": "Cold, alpine conditions",
+        "vegetation": "Sparse high-altitude flora",
+        "plants": [
+          "Rhododendron",
+          "Juniper",
+          "Alpine Tundra Grasses",
+          "Himalayan Blue Poppy"
+        ],
+        "wildlife": [
+          "Snow Leopard",
+          "Yak",
+          "Himalayan Tahr",
+          "Red Panda"
+        ],
+        "precipitation": "Varied, including heavy snowfall"
+      }
+    },
+    {
+      "name": "Rocky Mountain Range",
+      "type": "Mountain",
+      "characteristics": {
+        "climate": "Varied, from temperate to subalpine",
+        "vegetation": "Coniferous forests and alpine meadows",
+        "plants": [
+          "Ponderosa Pine",
+          "Aspen",
+          "Wildflowers",
+          "Engelmann Spruce"
+        ],
+        "wildlife": [
+          "Grizzly Bear",
+          "Mountain Goat",
+          "Elk",
+          "Bald Eagle"
+        ],
+        "precipitation": "Moderate, with significant snow in higher elevations"
+      }
+    },
+    {
+      "name": "Andean Peaks",
+      "type": "Mountain",
+      "characteristics": {
+        "climate": "Diverse, ranging from tropical in the foothills to glacial at peaks",
+        "vegetation": "Varied, including cloud forests and high-altitude grasslands",
+        "plants": [
+          "Páramo Grasses",
+          "Polylepis Trees",
+          "Orchids",
+          "Puya Raimondii"
+        ],
+        "wildlife": [
+          "Llama",
+          "Andean Condor",
+          "Vicuña",
+          "Spectacled Bear"
+        ],
+        "precipitation": "Varied, generally wetter in the lower altitudes"
+      }
+    },
+    {
+      "name": "Alps Wonderland",
+      "type": "Mountain",
+      "characteristics": {
+        "climate": "Cold, snowy winters and mild summers",
+        "vegetation": "Mixed forests and alpine meadows",
+        "plants": [
+          "Edelweiss",
+          "Alpine Aster",
+          "Mountain Pine",
+          "Gentian"
+        ],
+        "wildlife": [
+          "Ibex",
+          "Chamois",
+          "Marmot",
+          "Golden Eagle"
+        ],
+        "precipitation": "High, especially snowfall in winter"
+      }
+    },
+    {
+      "name": "Appalachian Highlands",
+      "type": "Mountain",
+      "characteristics": {
+        "climate": "Humid continental, varied temperatures",
+        "vegetation": "Deciduous forests and mixed woodlands",
+        "plants": [
+          "American Beech",
+          "Sugar Maple",
+          "Mountain Laurel",
+          "Rhododendron"
+        ],
+        "wildlife": [
+          "Black Bear",
+          "White-Tailed Deer",
+          "Bobcat",
+          "Peregrine Falcon"
+        ],
+        "precipitation": "Moderate to high, with significant humidity"
+      }
+    },
+    {
+      "name": "Coral Reef Lagoon",
+      "type": "Ocean",
+      "characteristics": {
+        "climate": "Warm tropical waters",
+        "vegetation": "Diverse coral formations",
+        "plants": [
+          "Staghorn Coral",
+          "Brain Coral",
+          "Sea Fan",
+          "Elkhorn Coral"
+        ],
+        "wildlife": [
+          "Clownfish",
+          "Green Sea Turtle",
+          "Moray Eel",
+          "Reef Shark"
+        ],
+        "precipitation": "N/A"
+      }
+    },
+    {
+      "name": "Arctic Ocean Depths",
+      "type": "Ocean",
+      "characteristics": {
+        "climate": "Frigid, icy waters",
+        "vegetation": "Limited due to cold temperatures",
+        "plants": [
+          "Arctic Kelp",
+          "Sea Lettuce",
+          "Ice Algae"
+        ],
+        "wildlife": [
+          "Polar Bear",
+          "Walrus",
+          "Beluga Whale",
+          "Narwhal"
+        ],
+        "precipitation": "N/A"
+      }
+    },
+    {
+      "name": "Open Pacific Expanse",
+      "type": "Ocean",
+      "characteristics": {
+        "climate": "Varied, from tropical to temperate",
+        "vegetation": "Open ocean plankton",
+        "plants": [
+          "Phytoplankton",
+          "Giant Kelp",
+          "Sargassum"
+        ],
+        "wildlife": [
+          "Blue Whale",
+          "Great White Shark",
+          "Manta Ray",
+          "Dolphin"
+        ],
+        "precipitation": "N/A"
+      }
+    },
+    {
+      "name": "Mariana Trench Abyss",
+      "type": "Ocean",
+      "characteristics": {
+        "climate": "Dark, high-pressure deep-sea environment",
+        "vegetation": "Sparse, mostly bioluminescent organisms",
+        "plants": [
+          "Deep-Sea Vent Algae",
+          "Bioluminescent Coral"
+        ],
+        "wildlife": [
+          "Giant Squid",
+          "Anglerfish",
+          "Vampire Squid",
+          "Gulper Eel"
+        ],
+        "precipitation": "N/A"
+      }
+    },
+    {
+      "name": "Sargasso Sea",
+      "type": "Ocean",
+      "characteristics": {
+        "climate": "Warm, subtropical waters",
+        "vegetation": "Unique floating seaweed",
+        "plants": [
+          "Sargassum",
+          "Floating Algae"
+        ],
+        "wildlife": [
+          "Eel",
+          "Sea Turtle",
+          "Flying Fish",
+          "Sargasso Fish"
+        ],
+        "precipitation": "N/A"
+      }
+    },
+    {
+      "name": "Emerald Canopy Rainforest",
+      "type": "Tropical Rainforest",
+      "characteristics": {
+        "climate": "Warm, consistently humid",
+        "vegetation": "Lush, multi-layered canopy and diverse underbrush",
+        "plants": [
+          "Bromeliads",
+          "Orchids",
+          "Ferns",
+          "Mahogany Trees"
+        ],
+        "wildlife": [
+          "Scarlet Macaw",
+          "Poison Dart Frog",
+          "Jaguar",
+          "Sloth",
+          "Toucan",
+          "Spider Monkey"
+        ],
+        "precipitation": "Frequent, heavy showers"
+      }
+    },
+    {
+      "name": "Misty Jungle",
+      "type": "Tropical Rainforest",
+      "characteristics": {
+        "climate": "Hot, moist, and stable year-round",
+        "vegetation": "Tall evergreens, thick vines, and broad-leaved plants",
+        "plants": [
+          "Mangrove Trees",
+          "Rafflesia",
+          "Bamboo",
+          "Rubber Trees"
+        ],
+        "wildlife": [
+          "Orangutan",
+          "Bengal Tiger",
+          "Hornbill",
+          "Pangolin",
+          "Leopard",
+          "Flying Fox"
+        ],
+        "precipitation": "Consistent, heavy downpours"
+      }
+    },
+    {
+      "name": "Equatorial Wilderness",
+      "type": "Tropical Rainforest",
+      "characteristics": {
+        "climate": "Equatorial, steamy",
+        "vegetation": "Vast array of epiphytes, ferns, and large trees",
+        "plants": [
+          "Teak Trees",
+          "Cacao",
+          "Passion Fruit Vines",
+          "Fig Trees"
+        ],
+        "wildlife": [
+          "Gorilla",
+          "Okapi",
+          "Congo Peafowl",
+          "Forest Elephant",
+          "Chimpanzee",
+          "Mandrill"
+        ],
+        "precipitation": "Year-round rain, with a short dry season"
+      }
+    },
+    {
+      "name": "Rainforest of the Dawn",
+      "type": "Tropical Rainforest",
+      "characteristics": {
+        "climate": "Hot, with high humidity",
+        "vegetation": "Dense foliage, towering trees, and a variety of ferns",
+        "plants": [
+          "Ceiba Trees",
+          "Vanilla Orchids",
+          "Heliconia",
+          "Cassava"
+        ],
+        "wildlife": [
+          "Harpy Eagle",
+          "Tapir",
+          "Howler Monkey",
+          "Butterfly",
+          "Jaguar",
+          "Red-Eyed Tree Frog"
+        ],
+        "precipitation": "Regular, intense rainfall"
+      }
+    },
+    {
+      "name": "Verdant Rainforest",
+      "type": "Tropical Rainforest",
+      "characteristics": {
+        "climate": "Warm, muggy, with little temperature variation",
+        "vegetation": "Emergent trees, thick undergrowth, and numerous lianas",
+        "plants": [
+          "Giant Water Lily",
+          "Cinchona",
+          "Açaí Palm",
+          "Strangler Fig"
+        ],
+        "wildlife": [
+          "Toucan",
+          "Capuchin Monkey",
+          "Anaconda",
+          "Iguana",
+          "Piranha",
+          "Jaguar"
+        ],
+        "precipitation": "High, with a distinct wet season"
+      }
+    },
+    {
+      "name": "Arctic Tundra",
+      "type": "Tundra",
+      "characteristics": {
+        "climate": "Extremely cold, with long winters and short summers",
+        "vegetation": "Low-growing plants, mosses, and lichens",
+        "plants": [
+          "Arctic Moss",
+          "Arctic Willow",
+          "Pasque Flower",
+          "Tufted Saxifrage"
+        ],
+        "wildlife": [
+          "Polar Bear",
+          "Arctic Fox",
+          "Caribou",
+          "Snowy Owl",
+          "Musk Ox"
+        ],
+        "precipitation": "Low, mostly snow"
+      }
+    },
+    {
+      "name": "Alpine Tundra",
+      "type": "Tundra",
+      "characteristics": {
+        "climate": "Cold, windy, with significant temperature variations",
+        "vegetation": "Grasses, dwarf shrubs, and alpine flowers",
+        "plants": [
+          "Alpine Bluebell",
+          "Mountain Avens",
+          "Edelweiss",
+          "Alpine Aster"
+        ],
+        "wildlife": [
+          "Mountain Goat",
+          "Pika",
+          "Alpine Marmot",
+          "Kea",
+          "Ibex"
+        ],
+        "precipitation": "Moderate, including snow and rainfall"
+      }
+    },
+    {
+      "name": "Siberian Tundra",
+      "type": "Tundra",
+      "characteristics": {
+        "climate": "Harsh, with extremely cold temperatures",
+        "vegetation": "Sparse, with hardy shrubs and permafrost",
+        "plants": [
+          "Siberian Dwarf Pine",
+          "Arctic Poppy",
+          "Lichen",
+          "Reindeer Moss"
+        ],
+        "wildlife": [
+          "Siberian Tiger",
+          "Reindeer",
+          "Arctic Hare",
+          "Lemming",
+          "Snowy Owl"
+        ],
+        "precipitation": "Low, primarily snow"
+      }
+    },
+    {
+      "name": "Canadian Tundra",
+      "type": "Tundra",
+      "characteristics": {
+        "climate": "Cold, with long winters and brief summers",
+        "vegetation": "Mosses, lichens, and small shrubs",
+        "plants": [
+          "Labrador Tea",
+          "Crowberry",
+          "Diamond-leaf Willow",
+          "Cloudberry"
+        ],
+        "wildlife": [
+          "Arctic Wolf",
+          "Polar Bear",
+          "Caribou",
+          "Arctic Fox",
+          "Ptarmigan"
+        ],
+        "precipitation": "Low, mostly in the form of snow"
+      }
+    },
+    {
+      "name": "Scandinavian Tundra",
+      "type": "Tundra",
+      "characteristics": {
+        "climate": "Subarctic, with short, cool summers and long winters",
+        "vegetation": "Hardy grasses, mosses, and dwarf shrubs",
+        "plants": [
+          "Mountain Bearberry",
+          "Scandinavian Angelica",
+          "Cloudberry",
+          "Moss Campion"
+        ],
+        "wildlife": [
+          "Reindeer",
+          "Arctic Fox",
+          "Lynx",
+          "Snowy Owl",
+          "Wolverine"
+        ],
+        "precipitation": "Moderate, mostly snow"
+      }
+    },
+    {
+      "name": "Everglades Marshland",
+      "type": "Wetlands",
+      "characteristics": {
+        "climate": "Tropical, humid",
+        "vegetation": "Diverse marsh vegetation",
+        "plants": [
+          "Sawgrass",
+          "Mangrove",
+          "Water Lily",
+          "Cypress Trees"
+        ],
+        "wildlife": [
+          "American Alligator",
+          "Florida Panther",
+          "Manatee",
+          "Wood Stork",
+          "Snail Kite"
+        ],
+        "precipitation": "High, with a distinct wet season"
+      }
+    },
+    {
+      "name": "Okavango Delta",
+      "type": "Wetlands",
+      "characteristics": {
+        "climate": "Subtropical, with seasonal flooding",
+        "vegetation": "Rich aquatic and floodplain flora",
+        "plants": [
+          "Papyrus",
+          "Water Lily",
+          "Reed Beds",
+          "Date Palm"
+        ],
+        "wildlife": [
+          "African Elephant",
+          "Hippopotamus",
+          "Lion",
+          "Crocodile",
+          "African Fish Eagle"
+        ],
+        "precipitation": "Moderate, largely influenced by seasonal floods"
+      }
+    },
+    {
+      "name": "Sundarbans Mangroves",
+      "type": "Wetlands",
+      "characteristics": {
+        "climate": "Tropical, humid",
+        "vegetation": "Dense mangrove forests",
+        "plants": [
+          "Sundari Tree",
+          "Mangrove Apple",
+          "Nypa Palm",
+          "Water Fern"
+        ],
+        "wildlife": [
+          "Bengal Tiger",
+          "Saltwater Crocodile",
+          "Ganges River Dolphin",
+          "Water Monitor",
+          "King Cobra"
+        ],
+        "precipitation": "High, with significant monsoon rains"
+      }
+    },
+    {
+      "name": "Pantanal Floodplain",
+      "type": "Wetlands",
+      "characteristics": {
+        "climate": "Tropical to subtropical",
+        "vegetation": "Vast flooded grasslands",
+        "plants": [
+          "Water Hyacinth",
+          "Giant Water Lily",
+          "Camalote",
+          "Buriti Palm"
+        ],
+        "wildlife": [
+          "Jaguar",
+          "Capybara",
+          "Anaconda",
+          "Hyacinth Macaw",
+          "Caiman"
+        ],
+        "precipitation": "High, with seasonal flooding"
+      }
+    },
+    {
+      "name": "Danube Delta",
+      "type": "Wetlands",
+      "characteristics": {
+        "climate": "Continental, with wet and dry seasons",
+        "vegetation": "Diverse wetland ecosystems",
+        "plants": [
+          "Reed Beds",
+          "Willow Trees",
+          "Water Chestnut",
+          "Floating Pennywort"
+        ],
+        "wildlife": [
+          "European Otter",
+          "White Pelican",
+          "Sturgeon",
+          "Dalmatian Pelican",
+          "Wild Cat"
+        ],
+        "precipitation": "Moderate, influenced by river flow and seasonal variations"
+      }
+    }
+  ]

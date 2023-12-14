@@ -1,38 +1,40 @@
-package cards
+package card
 
 import (
+	"cards/database"
 	"cards/gen/proto/card"
 	"encoding/json"
-	"log"
+	"fmt"
 
 	"github.com/upper/db/v4"
-	"github.com/upper/db/v4/adapter/mysql"
 )
-
-var sess db.Session
-
-func init() {
-	var err error
-	var settings = mysql.ConnectionURL{
-		Database: `carddatabase`,
-		Host:     `localhost`,
-		User:     `root`,
-		Password: `password`,
-	}
-
-	sess, err = mysql.Open(settings)
-	if err != nil {
-		log.Fatalf("Failed to connect to database: %v", err)
-	}
-}
 
 type Card struct {
 	ID   int    `db:"id,omitempty"`
 	Data string `db:"data"`
 }
 
+func createCard(c *card.Card) (*card.Card, error) {
+	sess := database.GetSession()
+
+	// Create a new card record
+	cJSON, _ := json.Marshal(c)
+
+	newCard := Card{
+		Data: string(cJSON),
+	}
+
+	_, err := sess.Collection("cards").Insert(newCard)
+	if err != nil {
+		return nil, err
+	}
+	return c, err
+}
+
 func createCardInDB(card *card.Card) (*card.Card, error) {
-	cardJSON, err := json.Marshal(card)
+	sess := database.GetSession()
+
+	cardJSON, _ := json.Marshal(card)
 	// if err != nil {
 	// 	return err
 	// }
@@ -43,11 +45,13 @@ func createCardInDB(card *card.Card) (*card.Card, error) {
 	}
 
 	// Insert the new card into the database
-	_, err = sess.Collection("cards").Insert(newCard)
+	result, err := sess.Collection("cards").Insert(newCard)
+	fmt.Println("result: ", result)
 	return card, err
 }
 
 func getCardsFromDB() ([]*card.Card, error) {
+	sess := database.GetSession()
 	var cards []*card.Card
 
 	// Query the database for all card records
@@ -62,17 +66,20 @@ func getCardsFromDB() ([]*card.Card, error) {
 	// Convert the JSON data back into card structs
 	for _, dbCard := range dbCards {
 		var c card.Card
+		id := dbCard.ID
 		err := json.Unmarshal([]byte(dbCard.Data), &c)
 		if err != nil {
 			return nil, err
 		}
+		c.Id = int32(id)
 		cards = append(cards, &c)
 	}
 
 	return cards, nil
 }
 
-func deleteCardFromDB(id int) error {
+func deleteCardFromDB(id int32) error {
+	sess := database.GetSession()
 	// Delete the card with the given ID
 	res := sess.Collection("cards").Find(db.Cond{"id": id})
 	err := res.Delete()
