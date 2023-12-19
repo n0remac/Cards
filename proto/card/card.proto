@@ -7,6 +7,8 @@ service CardService {
   rpc NewCard(NewCardRequest) returns (NewCardResponse);
   rpc DeleteCard(DeleteCardRequest) returns (DeleteCardResponse);
   rpc GenerateCards(GenerateCardsRequest) returns (GenerateCardsResponse);
+  rpc CreateCardTemplate(CreateCardTemplateRequest) returns (CreateCardTemplateResponse);
+  rpc CreateCard(CreateCardRequest) returns (CreateCardResponse);
 }
 
 message GenerateCardsRequest {
@@ -44,8 +46,37 @@ message NewCardResponse {
   Card card = 1;
 }
 
+message CreateCardRequest {
+  Card card = 1;
+  string prompt = 2;
+}
+
+message CreateCardResponse {
+  Card card = 1;
+}
+
 message Card {
-  string name = 1;
-  string description = 2;
-  int32 id = 3;
+  int32 id = 1;
+  string name = 2;
+  string biome = 3;
+  string element = 4;
+  string animal = 5;
+  string description = 6;
+  string img_url = 7;
+}
+
+message CardTemplate {
+  string template = 1;
+  repeated string animals = 2;
+  repeated string elements = 3;
+  repeated string descriptions = 4;
+}
+
+message CreateCardTemplateRequest {
+  CardTemplate card_template = 1;
+  string biome = 2;
+}
+
+message CreateCardTemplateResponse {
+  CardTemplate card_template = 1;
 }

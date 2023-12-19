@@ -1,0 +1,28 @@
+{
+    "name": "Coral Reef Lagoon",
+    "type": "Ocean",
+    "characteristics": {
+        "climate": "Warm tropical waters",
+        "vegetation": "Diverse coral formations",
+        "plants": [
+            "Staghorn Coral",
+            "Brain Coral",
+            "Sea Fan",
+            "Elkhorn Coral"
+        ],
+        "wildlife": [
+            "Clownfish",
+            "Green Sea Turtle",
+            "Moray Eel",
+            "Reef Shark"
+        ],
+        "precipitation": "N/A",
+        "elements": [
+            "Water Flowing lifeblood of the world, master of adaptation and change.",
+            "Life Sacred breath of existence, master of growth and healing.",
+            "Coral Sea's precious gift, symbol of life and beauty in diversity.",
+            "Pearl Lustrous gem of the ocean, symbol of rarity and purity.",
+            "Aquamarine Stone of the sea, keeper of calming energies, and bringer of peace."
+        ]
+    }
+}

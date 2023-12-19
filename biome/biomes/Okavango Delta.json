@@ -1,0 +1,29 @@
+{
+    "name": "Okavango Delta",
+    "type": "Wetlands",
+    "characteristics": {
+        "climate": "Subtropical, with seasonal flooding",
+        "vegetation": "Rich aquatic and floodplain flora",
+        "plants": [
+            "Papyrus",
+            "Water Lily",
+            "Reed Beds",
+            "Date Palm"
+        ],
+        "wildlife": [
+            "African Elephant",
+            "Hippopotamus",
+            "Lion",
+            "Crocodile",
+            "African Fish Eagle"
+        ],
+        "precipitation": "Moderate, largely influenced by seasonal floods",
+        "elements": [
+            "Water Flowing lifeblood of the world, master of adaptation and change.",
+            "Earth Immovable foundation, embodying strength and permanence.",
+            "Wood Silent witness of time, carrier of life's cycle of growth and decay.",
+            "Life Sacred breath of existence, master of growth and healing.",
+            "Storm Chaotic fusion of wind, water, and lightning, bringer of change."
+        ]
+    }
+}

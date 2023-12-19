@@ -1,0 +1,29 @@
+{
+    "name": "Everglades Marshland",
+    "type": "Wetlands",
+    "characteristics": {
+        "climate": "Tropical, humid",
+        "vegetation": "Diverse marsh vegetation",
+        "plants": [
+            "Sawgrass",
+            "Mangrove",
+            "Water Lily",
+            "Cypress Trees"
+        ],
+        "wildlife": [
+            "American Alligator",
+            "Florida Panther",
+            "Manatee",
+            "Wood Stork",
+            "Snail Kite"
+        ],
+        "precipitation": "High, with a distinct wet season",
+        "elements": [
+            "Water Flowing lifeblood of the world, master of adaptation and change.",
+            "Wood Silent witness of time, carrier of life's cycle of growth and decay.",
+            "Earth Immovable foundation, embodying strength and permanence.",
+            "Life Sacred breath of existence, master of growth and healing.",
+            "Air Invisible force of life, carrier of whispers and secrets."
+        ]
+    }
+}

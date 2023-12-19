@@ -1,0 +1,31 @@
+{
+    "name": "Serengeti Plains",
+    "type": "Grassland",
+    "characteristics": {
+        "climate": "Warm, semi-arid",
+        "vegetation": "Vast open grasslands with scattered trees",
+        "plants": [
+            "Acacia Trees",
+            "Savanna Grasses",
+            "Baobab",
+            "Wild Sisal"
+        ],
+        "wildlife": [
+            "African Elephant",
+            "Lion",
+            "Cheetah",
+            "Wildebeest",
+            "Zebra",
+            "Giraffe"
+        ],
+        "precipitation": "Seasonal, with a distinct wet and dry season",
+        "elements": [
+            "Earth Immovable foundation, embodying strength and permanence.",
+            "Wood Silent witness of time, carrier of life's cycle of growth and decay.",
+            "Sunstone Stone of joy, the light inspirer, and the harnesser of the sun's energy.",
+            "Fire Dancing harbinger of warmth and destruction, the embodiment of passion.",
+            "Adventure The call of the wild, the spirit of exploration and discovery.",
+            "Endurance The slow and steady healer, and the nurturer's stone."
+        ]
+    }
+}

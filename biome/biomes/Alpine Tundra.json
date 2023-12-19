@@ -1,0 +1,31 @@
+{
+    "name": "Alpine Tundra",
+    "type": "Tundra",
+    "characteristics": {
+        "climate": "Cold, windy, with significant temperature variations",
+        "vegetation": "Grasses, dwarf shrubs, and alpine flowers",
+        "plants": [
+            "Alpine Bluebell",
+            "Mountain Avens",
+            "Edelweiss",
+            "Alpine Aster"
+        ],
+        "wildlife": [
+            "Mountain Goat",
+            "Pika",
+            "Alpine Marmot",
+            "Kea",
+            "Ibex"
+        ],
+        "precipitation": "Moderate, including snow and rainfall",
+        "elements": [
+            "Ice Frozen essence of winter, wielder of chilling touch and frostbite.",
+            "Air Invisible force of life, carrier of whispers and secrets.",
+            "Earth Immovable foundation, embodying strength and permanence.",
+            "Wood Silent witness of time, carrier of life's cycle of growth and decay.",
+            "Water Flowing lifeblood of the world, master of adaptation and change.",
+            "Storm Chaotic fusion of wind, water, and lightning, bringer of change.",
+            "Iron Unyielding resilience, testament to strength and endurance."
+        ]
+    }
+}

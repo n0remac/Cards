@@ -1,0 +1,31 @@
+{
+    "name": "Australian Savanna",
+    "type": "Grassland",
+    "characteristics": {
+        "climate": "Tropical, with a distinct wet and dry season",
+        "vegetation": "Mixed woodland and grassland",
+        "plants": [
+            "Eucalyptus Trees",
+            "Spinifex Grass",
+            "Kangaroo Grass",
+            "Acacia"
+        ],
+        "wildlife": [
+            "Kangaroo",
+            "Emu",
+            "Dingo",
+            "Frilled Lizard",
+            "Wallaby"
+        ],
+        "precipitation": "Seasonal, with heavy rains in the wet season",
+        "elements": [
+            "Fire Dancing harbinger of warmth and destruction, the embodiment of passion.",
+            "Earth Immovable foundation, embodying strength and permanence.",
+            "Wood Silent witness of time, carrier of life's cycle of growth and decay.",
+            "Water Flowing lifeblood of the world, master of adaptation and change.",
+            "Sunstone Stone of joy, the light inspirer, and the harnesser of the sun's energy.",
+            "Jade Stone of harmony, longevity, and nurturing energy.",
+            "Air Invisible force of life, carrier of whispers and secrets."
+        ]
+    }
+}

@@ -1,0 +1,32 @@
+{
+    "name": "Mississippi River Wetlands",
+    "type": "Freshwater",
+    "characteristics": {
+        "climate": "Temperate, humid",
+        "vegetation": "Rich wetland flora",
+        "plants": [
+            "Cattail",
+            "Water Lily",
+            "Bald Cypress",
+            "Wild Rice"
+        ],
+        "wildlife": [
+            "American Alligator",
+            "Bald Eagle",
+            "Catfish",
+            "Beaver",
+            "Mallard Duck"
+        ],
+        "precipitation": "Moderate to high",
+        "elements": [
+            "Water Flowing lifeblood of the world, master of adaptation and change.",
+            "Earth Immovable foundation, embodying strength and permanence.",
+            "Wood Silent witness of time, carrier of life's cycle of growth and decay.",
+            "Life Sacred breath of existence, master of growth and healing.",
+            "Jade Stone of harmony, longevity, and nurturing energy.",
+            "Coral Sea's precious gift, symbol of life and beauty in diversity.",
+            "Turquoise Sacred stone, spiritual companion, and the symbol of wisdom and protection.",
+            "Pearl Lustrous gem of the ocean, symbol of rarity and purity."
+        ]
+    }
+}

@@ -23,6 +23,41 @@ type Data struct {
 	URL           string `json:"url"`
 }
 
+func ExtendBiomes() error {
+	queries, err := ElementQuery()
+	if err != nil {
+		return err
+	}
+
+	for _, query := range queries {
+		aiResponse, err := query_ai(query["query"])
+		if err != nil {
+			return err
+		}
+		saveJSON(fmt.Sprintf("biome/biomes/%s.json", query["name"]), []byte(aiResponse))
+		fmt.Println(aiResponse)
+	}
+
+	return nil
+}
+
+func saveJSON(filename string, data []byte) error {
+	file, err := os.Create(filename)
+	if err != nil {
+		fmt.Println("error creating file:", err)
+		return err
+	}
+	defer file.Close()
+
+	_, err = io.Copy(file, strings.NewReader(string(data)))
+	if err != nil {
+		fmt.Println("error copying data to file:", err)
+		return err
+	}
+
+	return nil
+}
+
 func QueryToJSON(query string) (string, error) {
 	// Query AI
 	aiResponse, err := query_ai(query)
@@ -58,7 +93,7 @@ func GenerateImage(query string) (string, string, error) {
 	}
 
 	stringResp := string(bodyText)
-
+	fmt.Println(stringResp)
 	description, url, err := extractInfo(stringResp)
 	if err != nil {
 		fmt.Println(err)

@@ -1,0 +1,35 @@
+{
+    "name": "Canadian Tundra",
+    "type": "Tundra",
+    "characteristics": {
+        "climate": "Cold, with long winters and brief summers",
+        "vegetation": "Mosses, lichens, and small shrubs",
+        "plants": [
+            "Labrador Tea",
+            "Crowberry",
+            "Diamond-leaf Willow",
+            "Cloudberry"
+        ],
+        "wildlife": [
+            "Arctic Wolf",
+            "Polar Bear",
+            "Caribou",
+            "Arctic Fox",
+            "Ptarmigan"
+        ],
+        "precipitation": "Low, mostly in the form of snow",
+        "elements": [
+            "Ice Frozen essence of winter, wielder of chilling touch and frostbite.",
+            "Air Invisible force of life, carrier of whispers and secrets.",
+            "Earth Immovable foundation, embodying strength and permanence.",
+            "Water Flowing lifeblood of the world, master of adaptation and change.",
+            "Diamond Invincible brilliance, symbol of power, love, and the eternal.",
+            "Wood Silent witness of time, carrier of life's cycle of growth and decay.",
+            "Jade Stone of harmony, longevity, and nurturing energy.",
+            "Patience Master of time, the quiet endurance waiting for the right moment.",
+            "Resilience The phoenix rising, the ability to recover from adversity.",
+            "Freedom Untamed wind, the spirit that cannot be caged.",
+            "Strength Unyielding resolve, the power to overcome all obstacles."
+        ]
+    }
+}

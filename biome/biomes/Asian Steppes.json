@@ -1,0 +1,29 @@
+{
+    "name": "Asian Steppes",
+    "type": "Grassland",
+    "characteristics": {
+        "climate": "Continental, with extreme temperature variations",
+        "vegetation": "Sparse, short grasses",
+        "plants": [
+            "Feather Grass",
+            "Sagebrush",
+            "Mongolian Oak",
+            "Wild Onion"
+        ],
+        "wildlife": [
+            "Mongolian Horse",
+            "Snow Leopard",
+            "Siberian Ibex",
+            "Saiga Antelope",
+            "Wolf"
+        ],
+        "precipitation": "Low, mostly in the form of snow",
+        "elements": [
+            "Earth Immovable foundation, embodying strength and permanence.",
+            "Wind Invisible force of life, carrier of whispers and secrets.",
+            "Life Sacred breath of existence, master of growth and healing.",
+            "Ice Frozen essence of winter, wielder of chilling touch and frostbite.",
+            "Wood Silent witness of time, carrier of life's cycle of growth and decay."
+        ]
+    }
+}

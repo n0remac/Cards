@@ -46,7 +46,7 @@ export const DisplayCards = () => {
       <h1 className="text-2xl font-bold mb-4">All Cards</h1>
       
       <div className="flex flex-wrap justify-center">
-        {cards.map((card) => (
+        {cards.toReversed().map((card) => (
           <CardComponent key={card.id} card={card} handleDelete={handleDelete} />
         ))}
       </div>

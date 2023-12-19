@@ -1,0 +1,29 @@
+{
+    "name": "Appalachian Highlands",
+    "type": "Mountain",
+    "characteristics": {
+        "climate": "Humid continental, varied temperatures",
+        "vegetation": "Deciduous forests and mixed woodlands",
+        "plants": [
+            "American Beech",
+            "Sugar Maple",
+            "Mountain Laurel",
+            "Rhododendron"
+        ],
+        "wildlife": [
+            "Black Bear",
+            "White-Tailed Deer",
+            "Bobcat",
+            "Peregrine Falcon"
+        ],
+        "precipitation": "Moderate to high, with significant humidity",
+        "elements": [
+            "Air Invisible force of life, carrier of whispers and secrets.",
+            "Earth Immovable foundation, embodying strength and permanence.",
+            "Water Flowing lifeblood of the world, master of adaptation and change.",
+            "Wood Silent witness of time, carrier of life's cycle of growth and decay.",
+            "Emerald Gem of renewal and hope, harnessing the verdant energy of life.",
+            "Jade Stone of harmony, longevity, and nurturing energy."
+        ]
+    }
+}

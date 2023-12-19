@@ -1,0 +1,29 @@
+{
+    "name": "Scandinavian Tundra",
+    "type": "Tundra",
+    "characteristics": {
+        "climate": "Subarctic, with short, cool summers and long winters",
+        "elements": [
+            "Ice",
+            "Air",
+            "Earth",
+            "Water",
+            "Snow"
+        ],
+        "vegetation": "Hardy grasses, mosses, and dwarf shrubs",
+        "plants": [
+            "Mountain Bearberry",
+            "Scandinavian Angelica",
+            "Cloudberry",
+            "Moss Campion"
+        ],
+        "wildlife": [
+            "Reindeer",
+            "Arctic Fox",
+            "Lynx",
+            "Snowy Owl",
+            "Wolverine"
+        ],
+        "precipitation": "Moderate, mostly snow"
+    }
+}

@@ -26,6 +26,8 @@ type CardServiceClient interface {
 	NewCard(ctx context.Context, in *NewCardRequest, opts ...grpc.CallOption) (*NewCardResponse, error)
 	DeleteCard(ctx context.Context, in *DeleteCardRequest, opts ...grpc.CallOption) (*DeleteCardResponse, error)
 	GenerateCards(ctx context.Context, in *GenerateCardsRequest, opts ...grpc.CallOption) (*GenerateCardsResponse, error)
+	CreateCardTemplate(ctx context.Context, in *CreateCardTemplateRequest, opts ...grpc.CallOption) (*CreateCardTemplateResponse, error)
+	CreateCard(ctx context.Context, in *CreateCardRequest, opts ...grpc.CallOption) (*CreateCardResponse, error)
 }
 
 type cardServiceClient struct {
@@ -72,6 +74,24 @@ func (c *cardServiceClient) GenerateCards(ctx context.Context, in *GenerateCards
 	return out, nil
 }
 
+func (c *cardServiceClient) CreateCardTemplate(ctx context.Context, in *CreateCardTemplateRequest, opts ...grpc.CallOption) (*CreateCardTemplateResponse, error) {
+	out := new(CreateCardTemplateResponse)
+	err := c.cc.Invoke(ctx, "/card.CardService/CreateCardTemplate", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *cardServiceClient) CreateCard(ctx context.Context, in *CreateCardRequest, opts ...grpc.CallOption) (*CreateCardResponse, error) {
+	out := new(CreateCardResponse)
+	err := c.cc.Invoke(ctx, "/card.CardService/CreateCard", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // CardServiceServer is the server API for CardService service.
 // All implementations should embed UnimplementedCardServiceServer
 // for forward compatibility
@@ -80,6 +100,8 @@ type CardServiceServer interface {
 	NewCard(context.Context, *NewCardRequest) (*NewCardResponse, error)
 	DeleteCard(context.Context, *DeleteCardRequest) (*DeleteCardResponse, error)
 	GenerateCards(context.Context, *GenerateCardsRequest) (*GenerateCardsResponse, error)
+	CreateCardTemplate(context.Context, *CreateCardTemplateRequest) (*CreateCardTemplateResponse, error)
+	CreateCard(context.Context, *CreateCardRequest) (*CreateCardResponse, error)
 }
 
 // UnimplementedCardServiceServer should be embedded to have forward compatible implementations.
@@ -97,6 +119,12 @@ func (UnimplementedCardServiceServer) DeleteCard(context.Context, *DeleteCardReq
 }
 func (UnimplementedCardServiceServer) GenerateCards(context.Context, *GenerateCardsRequest) (*GenerateCardsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GenerateCards not implemented")
+}
+func (UnimplementedCardServiceServer) CreateCardTemplate(context.Context, *CreateCardTemplateRequest) (*CreateCardTemplateResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreateCardTemplate not implemented")
+}
+func (UnimplementedCardServiceServer) CreateCard(context.Context, *CreateCardRequest) (*CreateCardResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreateCard not implemented")
 }
 
 // UnsafeCardServiceServer may be embedded to opt out of forward compatibility for this service.
@@ -182,6 +210,42 @@ func _CardService_GenerateCards_Handler(srv interface{}, ctx context.Context, de
 	return interceptor(ctx, in, info, handler)
 }
 
+func _CardService_CreateCardTemplate_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateCardTemplateRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CardServiceServer).CreateCardTemplate(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/card.CardService/CreateCardTemplate",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CardServiceServer).CreateCardTemplate(ctx, req.(*CreateCardTemplateRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _CardService_CreateCard_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateCardRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CardServiceServer).CreateCard(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/card.CardService/CreateCard",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CardServiceServer).CreateCard(ctx, req.(*CreateCardRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // CardService_ServiceDesc is the grpc.ServiceDesc for CardService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -204,6 +268,14 @@ var CardService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GenerateCards",
 			Handler:    _CardService_GenerateCards_Handler,
+		},
+		{
+			MethodName: "CreateCardTemplate",
+			Handler:    _CardService_CreateCardTemplate_Handler,
+		},
+		{
+			MethodName: "CreateCard",
+			Handler:    _CardService_CreateCard_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

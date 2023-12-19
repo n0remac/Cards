@@ -1,0 +1,30 @@
+{
+    "name": "Amazon River Basin",
+    "type": "Freshwater",
+    "characteristics": {
+        "climate": "Tropical, humid",
+        "vegetation": "Diverse aquatic plants",
+        "plants": [
+            "Water Hyacinth",
+            "Amazon Sword Plant",
+            "Giant Water Lily",
+            "Duckweed"
+        ],
+        "wildlife": [
+            "Piranha",
+            "Amazon River Dolphin",
+            "Anaconda",
+            "Arapaima",
+            "Caiman"
+        ],
+        "precipitation": "High, frequent rainfall",
+        "elements": [
+            "Water Flowing lifeblood of the world, master of adaptation and change.",
+            "Earth Immovable foundation, embodying strength and permanence.",
+            "Wood Silent witness of time, carrier of life's cycle of growth and decay.",
+            "Life Sacred breath of existence, master of growth and healing.",
+            "Jade Stone of harmony, longevity, and nurturing energy.",
+            "Rain Chaotic fusion of wind, water, and lightning, bringer of change."
+        ]
+    }
+}

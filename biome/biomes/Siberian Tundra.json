@@ -1,0 +1,29 @@
+{
+    "name": "Siberian Tundra",
+    "type": "Tundra",
+    "characteristics": {
+        "climate": "Harsh, with extremely cold temperatures",
+        "vegetation": "Sparse, with hardy shrubs and permafrost",
+        "plants": [
+            "Siberian Dwarf Pine",
+            "Arctic Poppy",
+            "Lichen",
+            "Reindeer Moss"
+        ],
+        "wildlife": [
+            "Siberian Tiger",
+            "Reindeer",
+            "Arctic Hare",
+            "Lemming",
+            "Snowy Owl"
+        ],
+        "precipitation": "Low, primarily snow",
+        "elements": [
+            "Ice Frozen essence of winter, wielder of chilling touch and frostbite.",
+            "Time Unstoppable flow, the weaver of destiny and the shaper of reality.",
+            "Patience Master of time, the quiet endurance waiting for the right moment.",
+            "Resilience The phoenix rising, the ability to recover from adversity.",
+            "Wood Silent witness of time, carrier of life's cycle of growth and decay."
+        ]
+    }
+}

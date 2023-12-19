@@ -21,6 +21,7 @@ type Characteristics struct {
 	Plants        []string `json:"plants"`
 	Wildlife      []string `json:"wildlife"`
 	Precipitation string   `json:"precipitation"`
+	Elements      []string `json:"elements"`
 }
 
 func createBiomeInDB(biome *biome.Biome) (*biome.Biome, error) {

@@ -1,0 +1,29 @@
+{
+    "name": "Pantanal Floodplain",
+    "type": "Wetlands",
+    "characteristics": {
+        "climate": "Tropical to subtropical",
+        "vegetation": "Vast flooded grasslands",
+        "plants": [
+            "Water Hyacinth",
+            "Giant Water Lily",
+            "Camalote",
+            "Buriti Palm"
+        ],
+        "wildlife": [
+            "Jaguar",
+            "Capybara",
+            "Anaconda",
+            "Hyacinth Macaw",
+            "Caiman"
+        ],
+        "precipitation": "High, with seasonal flooding",
+        "elements": [
+            "Water Flowing lifeblood of the world, master of adaptation and change.",
+            "Earth Immovable foundation, embodying strength and permanence.",
+            "Wood Silent witness of time, carrier of life's cycle of growth and decay.",
+            "Life Sacred breath of existence, master of growth and healing.",
+            "Storm Chaotic fusion of wind, water, and lightning, bringer of change."
+        ]
+    }
+}

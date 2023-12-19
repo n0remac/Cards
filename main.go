@@ -45,6 +45,7 @@ func loggingMiddleware(next http.Handler) http.Handler {
 }
 
 func main() {
+
 	interceptors := connect.WithInterceptors(NewLogInterceptor())
 
 	apiRoot := http.NewServeMux()

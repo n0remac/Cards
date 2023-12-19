@@ -1,0 +1,29 @@
+{
+    "name": "Yangtze River Basin",
+    "type": "Freshwater",
+    "characteristics": {
+        "climate": "Varied, from subtropical to temperate",
+        "vegetation": "Rich aquatic and riparian flora",
+        "plants": [
+            "Chinese Water Chestnut",
+            "Lotus",
+            "Water Bamboo",
+            "Reed"
+        ],
+        "wildlife": [
+            "Chinese Alligator",
+            "Yangtze River Dolphin",
+            "Chinese Paddlefish",
+            "Crane",
+            "Giant Salamander"
+        ],
+        "precipitation": "Moderate to high, with seasonal variations",
+        "elements": [
+            "Water Flowing lifeblood of the world, master of adaptation and change.",
+            "Wood Silent witness of time, carrier of life's cycle of growth and decay.",
+            "Life Sacred breath of existence, master of growth and healing.",
+            "Storm Chaotic fusion of wind, water, and lightning, bringer of change.",
+            "Earth Immovable foundation, embodying strength and permanence."
+        ]
+    }
+}

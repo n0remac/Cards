@@ -1,0 +1,28 @@
+{
+    "name": "Great Lakes",
+    "type": "Freshwater",
+    "characteristics": {
+        "climate": "Varied, generally temperate",
+        "vegetation": "Diverse shoreline and aquatic plants",
+        "plants": [
+            "Bulrush",
+            "Wild Celery",
+            "Pickerelweed",
+            "Watermilfoil"
+        ],
+        "wildlife": [
+            "Lake Trout",
+            "Walleye",
+            "Freshwater Drum",
+            "Great Blue Heron",
+            "Muskellunge"
+        ],
+        "precipitation": "Varied, with significant snowfall in northern areas",
+        "elements": [
+            "Water Flowing lifeblood of the world, master of adaptation and change.]",
+            "Earth Immovable foundation, embodying strength and permanence.",
+            "Air Invisible force of life, carrier of whispers and secrets",
+            "Ice Frozen essence of winter, wielder of chilling touch and frostbite."
+        ]
+    }
+}

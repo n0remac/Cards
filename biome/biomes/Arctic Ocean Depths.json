@@ -1,0 +1,25 @@
+{
+    "name": "Arctic Ocean Depths",
+    "type": "Ocean",
+    "characteristics": {
+        "climate": "Frigid, icy waters",
+        "vegetation": "Limited due to cold temperatures",
+        "plants": [
+            "Arctic Kelp",
+            "Sea Lettuce",
+            "Ice Algae"
+        ],
+        "wildlife": [
+            "Polar Bear",
+            "Walrus",
+            "Beluga Whale",
+            "Narwhal"
+        ],
+        "precipitation": "N/A",
+        "elements": [
+            "Ice Frozen essence of winter, wielder of chilling touch and frostbite.",
+            "Water Flowing lifeblood of the world, master of adaptation and change.",
+            "Air Invisible force of life, carrier of whispers and secrets."
+        ]
+    }
+}

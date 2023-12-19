@@ -1,0 +1,32 @@
+{
+    "name": "North American Prairie",
+    "type": "Grassland",
+    "characteristics": {
+        "climate": "Temperate, with hot summers and cold winters",
+        "vegetation": "Tallgrass prairie, with few trees",
+        "plants": [
+            "Big Bluestem",
+            "Prairie Clover",
+            "Sunflowers",
+            "Indian Grass"
+        ],
+        "wildlife": [
+            "Bison",
+            "Prairie Dog",
+            "Coyote",
+            "Red-Tailed Hawk",
+            "Badger"
+        ],
+        "precipitation": "Moderate, with more rainfall in the east",
+        "elements": [
+            "Earth Immovable foundation, embodying strength and permanence.",
+            "Air Invisible force of life, carrier of whispers and secrets.",
+            "Sunstone Stone of joy, the light inspirer, and the harnesser of the sun's energy.",
+            "Water Flowing lifeblood of the world, master of adaptation and change.",
+            "Wood Silent witness of time, carrier of life's cycle of growth and decay.",
+            "Life Sacred breath of existence, master of growth and healing.",
+            "Freedom Untamed wind, the spirit that cannot be caged.",
+            "Peridot Gem of sun's tears, harbinger of growth, prosperity, and psychological clarity."
+        ]
+    }
+}

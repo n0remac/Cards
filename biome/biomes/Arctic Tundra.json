@@ -1,0 +1,29 @@
+{
+    "name": "Arctic Tundra",
+    "type": "Tundra",
+    "characteristics": {
+        "climate": "Extremely cold, with long winters and short summers",
+        "vegetation": "Low-growing plants, mosses, and lichens",
+        "plants": [
+            "Arctic Moss",
+            "Arctic Willow",
+            "Pasque Flower",
+            "Tufted Saxifrage"
+        ],
+        "wildlife": [
+            "Polar Bear",
+            "Arctic Fox",
+            "Caribou",
+            "Snowy Owl",
+            "Musk Ox"
+        ],
+        "precipitation": "Low, mostly snow",
+        "elements": [
+            "Ice Frozen essence of winter, wielder of chilling touch and frostbite.",
+            "Air Invisible force of life, carrier of whispers and secrets.",
+            "Earth Immovable foundation, embodying strength and permanence.",
+            "Snow: Pristine velvet of winter, symbol of purity and transformation.",
+            "Cold: Inescapable chill, the biting force of winter and preservation."
+        ]
+    }
+}

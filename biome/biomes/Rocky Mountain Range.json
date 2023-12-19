@@ -1,0 +1,32 @@
+{
+    "name": "Rocky Mountain Range",
+    "type": "Mountain",
+    "characteristics": {
+        "climate": "Varied, from temperate to subalpine",
+        "vegetation": "Coniferous forests and alpine meadows",
+        "plants": [
+            "Ponderosa Pine",
+            "Aspen",
+            "Wildflowers",
+            "Engelmann Spruce"
+        ],
+        "wildlife": [
+            "Grizzly Bear",
+            "Mountain Goat",
+            "Elk",
+            "Bald Eagle"
+        ],
+        "precipitation": "Moderate, with significant snow in higher elevations",
+        "elements": [
+            "Earth Immovable foundation, embodying strength and permanence.",
+            "Air Invisible force of life, carrier of whispers and secrets.",
+            "Ice Frozen essence of winter, wielder of chilling touch and frostbite.",
+            "Water Flowing lifeblood of the world, master of adaptation and change.",
+            "Wood Silent witness of time, carrier of life's cycle of growth and decay.",
+            "Iron Unyielding resilience, testament to strength and endurance.",
+            "Strength Unyielding resolve, the power to overcome all obstacles.",
+            "Resilience The phoenix rising, the ability to recover from adversity.",
+            "Adventure The call of the wild, the spirit of exploration and discovery."
+        ]
+    }
+}

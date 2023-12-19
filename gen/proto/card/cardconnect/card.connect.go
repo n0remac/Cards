@@ -42,6 +42,11 @@ const (
 	// CardServiceGenerateCardsProcedure is the fully-qualified name of the CardService's GenerateCards
 	// RPC.
 	CardServiceGenerateCardsProcedure = "/card.CardService/GenerateCards"
+	// CardServiceCreateCardTemplateProcedure is the fully-qualified name of the CardService's
+	// CreateCardTemplate RPC.
+	CardServiceCreateCardTemplateProcedure = "/card.CardService/CreateCardTemplate"
+	// CardServiceCreateCardProcedure is the fully-qualified name of the CardService's CreateCard RPC.
+	CardServiceCreateCardProcedure = "/card.CardService/CreateCard"
 )
 
 // CardServiceClient is a client for the card.CardService service.
@@ -50,6 +55,8 @@ type CardServiceClient interface {
 	NewCard(context.Context, *connect_go.Request[card.NewCardRequest]) (*connect_go.Response[card.NewCardResponse], error)
 	DeleteCard(context.Context, *connect_go.Request[card.DeleteCardRequest]) (*connect_go.Response[card.DeleteCardResponse], error)
 	GenerateCards(context.Context, *connect_go.Request[card.GenerateCardsRequest]) (*connect_go.Response[card.GenerateCardsResponse], error)
+	CreateCardTemplate(context.Context, *connect_go.Request[card.CreateCardTemplateRequest]) (*connect_go.Response[card.CreateCardTemplateResponse], error)
+	CreateCard(context.Context, *connect_go.Request[card.CreateCardRequest]) (*connect_go.Response[card.CreateCardResponse], error)
 }
 
 // NewCardServiceClient constructs a client for the card.CardService service. By default, it uses
@@ -82,15 +89,27 @@ func NewCardServiceClient(httpClient connect_go.HTTPClient, baseURL string, opts
 			baseURL+CardServiceGenerateCardsProcedure,
 			opts...,
 		),
+		createCardTemplate: connect_go.NewClient[card.CreateCardTemplateRequest, card.CreateCardTemplateResponse](
+			httpClient,
+			baseURL+CardServiceCreateCardTemplateProcedure,
+			opts...,
+		),
+		createCard: connect_go.NewClient[card.CreateCardRequest, card.CreateCardResponse](
+			httpClient,
+			baseURL+CardServiceCreateCardProcedure,
+			opts...,
+		),
 	}
 }
 
 // cardServiceClient implements CardServiceClient.
 type cardServiceClient struct {
-	getCards      *connect_go.Client[card.GetCardsRequest, card.GetCardsResponse]
-	newCard       *connect_go.Client[card.NewCardRequest, card.NewCardResponse]
-	deleteCard    *connect_go.Client[card.DeleteCardRequest, card.DeleteCardResponse]
-	generateCards *connect_go.Client[card.GenerateCardsRequest, card.GenerateCardsResponse]
+	getCards           *connect_go.Client[card.GetCardsRequest, card.GetCardsResponse]
+	newCard            *connect_go.Client[card.NewCardRequest, card.NewCardResponse]
+	deleteCard         *connect_go.Client[card.DeleteCardRequest, card.DeleteCardResponse]
+	generateCards      *connect_go.Client[card.GenerateCardsRequest, card.GenerateCardsResponse]
+	createCardTemplate *connect_go.Client[card.CreateCardTemplateRequest, card.CreateCardTemplateResponse]
+	createCard         *connect_go.Client[card.CreateCardRequest, card.CreateCardResponse]
 }
 
 // GetCards calls card.CardService.GetCards.
@@ -113,12 +132,24 @@ func (c *cardServiceClient) GenerateCards(ctx context.Context, req *connect_go.R
 	return c.generateCards.CallUnary(ctx, req)
 }
 
+// CreateCardTemplate calls card.CardService.CreateCardTemplate.
+func (c *cardServiceClient) CreateCardTemplate(ctx context.Context, req *connect_go.Request[card.CreateCardTemplateRequest]) (*connect_go.Response[card.CreateCardTemplateResponse], error) {
+	return c.createCardTemplate.CallUnary(ctx, req)
+}
+
+// CreateCard calls card.CardService.CreateCard.
+func (c *cardServiceClient) CreateCard(ctx context.Context, req *connect_go.Request[card.CreateCardRequest]) (*connect_go.Response[card.CreateCardResponse], error) {
+	return c.createCard.CallUnary(ctx, req)
+}
+
 // CardServiceHandler is an implementation of the card.CardService service.
 type CardServiceHandler interface {
 	GetCards(context.Context, *connect_go.Request[card.GetCardsRequest]) (*connect_go.Response[card.GetCardsResponse], error)
 	NewCard(context.Context, *connect_go.Request[card.NewCardRequest]) (*connect_go.Response[card.NewCardResponse], error)
 	DeleteCard(context.Context, *connect_go.Request[card.DeleteCardRequest]) (*connect_go.Response[card.DeleteCardResponse], error)
 	GenerateCards(context.Context, *connect_go.Request[card.GenerateCardsRequest]) (*connect_go.Response[card.GenerateCardsResponse], error)
+	CreateCardTemplate(context.Context, *connect_go.Request[card.CreateCardTemplateRequest]) (*connect_go.Response[card.CreateCardTemplateResponse], error)
+	CreateCard(context.Context, *connect_go.Request[card.CreateCardRequest]) (*connect_go.Response[card.CreateCardResponse], error)
 }
 
 // NewCardServiceHandler builds an HTTP handler from the service implementation. It returns the path
@@ -147,6 +178,16 @@ func NewCardServiceHandler(svc CardServiceHandler, opts ...connect_go.HandlerOpt
 		svc.GenerateCards,
 		opts...,
 	)
+	cardServiceCreateCardTemplateHandler := connect_go.NewUnaryHandler(
+		CardServiceCreateCardTemplateProcedure,
+		svc.CreateCardTemplate,
+		opts...,
+	)
+	cardServiceCreateCardHandler := connect_go.NewUnaryHandler(
+		CardServiceCreateCardProcedure,
+		svc.CreateCard,
+		opts...,
+	)
 	return "/card.CardService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
 		case CardServiceGetCardsProcedure:
@@ -157,6 +198,10 @@ func NewCardServiceHandler(svc CardServiceHandler, opts ...connect_go.HandlerOpt
 			cardServiceDeleteCardHandler.ServeHTTP(w, r)
 		case CardServiceGenerateCardsProcedure:
 			cardServiceGenerateCardsHandler.ServeHTTP(w, r)
+		case CardServiceCreateCardTemplateProcedure:
+			cardServiceCreateCardTemplateHandler.ServeHTTP(w, r)
+		case CardServiceCreateCardProcedure:
+			cardServiceCreateCardHandler.ServeHTTP(w, r)
 		default:
 			http.NotFound(w, r)
 		}
@@ -180,4 +225,12 @@ func (UnimplementedCardServiceHandler) DeleteCard(context.Context, *connect_go.R
 
 func (UnimplementedCardServiceHandler) GenerateCards(context.Context, *connect_go.Request[card.GenerateCardsRequest]) (*connect_go.Response[card.GenerateCardsResponse], error) {
 	return nil, connect_go.NewError(connect_go.CodeUnimplemented, errors.New("card.CardService.GenerateCards is not implemented"))
+}
+
+func (UnimplementedCardServiceHandler) CreateCardTemplate(context.Context, *connect_go.Request[card.CreateCardTemplateRequest]) (*connect_go.Response[card.CreateCardTemplateResponse], error) {
+	return nil, connect_go.NewError(connect_go.CodeUnimplemented, errors.New("card.CardService.CreateCardTemplate is not implemented"))
+}
+
+func (UnimplementedCardServiceHandler) CreateCard(context.Context, *connect_go.Request[card.CreateCardRequest]) (*connect_go.Response[card.CreateCardResponse], error) {
+	return nil, connect_go.NewError(connect_go.CodeUnimplemented, errors.New("card.CardService.CreateCard is not implemented"))
 }

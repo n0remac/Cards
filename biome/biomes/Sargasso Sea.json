@@ -1,0 +1,28 @@
+{
+    "name": "Sargasso Sea",
+    "type": "Ocean",
+    "characteristics": {
+        "climate": "Warm, subtropical waters",
+        "vegetation": "Unique floating seaweed",
+        "plants": [
+            "Sargassum",
+            "Floating Algae"
+        ],
+        "wildlife": [
+            "Eel",
+            "Sea Turtle",
+            "Flying Fish",
+            "Sargasso Fish"
+        ],
+        "precipitation": "N/A",
+        "elements": [
+            "Water Flowing lifeblood of the world, master of adaptation and change.",
+            "Life Sacred breath of existence, master of growth and healing.",
+            "Ether The cosmic force, bridge between the physical and spiritual realms.",
+            "Space Vast canvas of existence, the silent holder of celestial bodies.",
+            "Coral Sea's precious gift, symbol of life and beauty in diversity.",
+            "Pearl Lustrous gem of the ocean, symbol of rarity and purity.",
+            "Aquamarine Stone of the sea, keeper of calming energies, and bringer of peace."
+        ]
+    }
+}

@@ -1,0 +1,31 @@
+{
+    "name": "Rainforest of the Dawn",
+    "type": "Tropical Rainforest",
+    "characteristics": {
+        "climate": "Hot, with high humidity",
+        "vegetation": "Dense foliage, towering trees, and a variety of ferns",
+        "plants": [
+            "Ceiba Trees",
+            "Vanilla Orchids",
+            "Heliconia",
+            "Cassava"
+        ],
+        "wildlife": [
+            "Harpy Eagle",
+            "Tapir",
+            "Howler Monkey",
+            "Butterfly",
+            "Jaguar",
+            "Red-Eyed Tree Frog"
+        ],
+        "precipitation": "Regular, intense rainfall",
+        "elements": [
+            "Water Flowing lifeblood of the world, master of adaptation and change.",
+            "Wood Silent witness of time, carrier of life's cycle of growth and decay.",
+            "Earth Immovable foundation, embodying strength and permanence.",
+            "Air Invisible force of life, carrier of whispers and secrets.",
+            "Life Sacred breath of existence, master of growth and healing.",
+            "Emerald Gem of renewal and hope, harnessing the verdant energy of life."
+        ]
+    }
+}

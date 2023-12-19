@@ -4,11 +4,88 @@ import (
 	"cards/gen/proto/biome"
 	"encoding/json"
 	"fmt"
+	"io"
+	"os"
 )
 
 type Scene struct {
 	scene    string
 	examples map[string][]string
+}
+
+type Element struct {
+	Element     string `json:"element"`
+	Description string `json:"description"`
+}
+
+type Biomes []biome.Biome
+
+func ElementQuery() ([]map[string]string, error) {
+	elements, err := ParseElements("ai/elements.json")
+	if err != nil {
+		fmt.Println("error parsing elements:", err)
+		return nil, err
+	}
+
+	biomes, err := ParseBiomes("ai/biomes.json")
+	if err != nil {
+		return nil, err
+	}
+
+	var queries []map[string]string
+	for _, b := range biomes {
+		stringBiome, err := json.Marshal(b)
+		if err != nil {
+			fmt.Println("error marshalling biome")
+			return nil, err
+		}
+
+		query := fmt.Sprintf(`Taking elements from this list: %s Return the following biome with an elements section added to the charictaristics. Choose elements from the previous list that match the following biome:\n%s`, elements, stringBiome)
+
+		queries = append(queries, map[string]string{"name": b.Name, "query": query})
+	}
+
+	return queries, nil
+}
+
+func ParseBiomes(filename string) (Biomes, error) {
+	var biomes Biomes
+
+	file, err := os.Open(filename)
+	if err != nil {
+		return nil, err
+	}
+	defer file.Close()
+
+	byteValue, err := io.ReadAll(file)
+	if err != nil {
+		return nil, err
+	}
+
+	err = json.Unmarshal(byteValue, &biomes)
+	if err != nil {
+		return nil, err
+	}
+
+	return biomes, nil
+}
+
+func ParseElements(filename string) ([]Element, error) {
+	var elements []Element
+
+	jsonData, err := os.ReadFile(filename)
+	if err != nil {
+		fmt.Println("Error reading JSON file:", err)
+		return nil, err
+	}
+	// Unmarshal the json
+	err = json.Unmarshal(jsonData, &elements)
+	if err != nil {
+		fmt.Println("Error unmarshalling JSON:", err)
+		return nil, err
+	}
+
+	return elements, nil
 }
 
 func StoryQuery(b biome.Biome) (string, error) {

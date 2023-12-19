@@ -7,6 +7,7 @@ import BiomeSelector from '@/pages/Biomes';
 import {StoryTemplateForm} from '@/pages/GenerateTemplate';
 import { GenerateCards } from './pages/cards/GenerateCards';
 import { DisplayCards } from './pages/cards/Cards';
+import { CreateCard } from './pages/cards/CreateCard';
 
 
 export default function App() {
@@ -16,10 +17,10 @@ export default function App() {
                 <nav>
                     <ul style={{ listStyleType: 'none', margin: 0, padding: 0, overflow: 'hidden', backgroundColor: '#333' }}>
                         <li style={{ float: 'left' }}>
-                            <Link to="/" style={{ display: 'block', color: 'white', textAlign: 'center', padding: '14px 16px', textDecoration: 'none' }}>Home</Link>
+                            <Link to="/cards/generate" style={{ display: 'block', color: 'white', textAlign: 'center', padding: '14px 16px', textDecoration: 'none' }}>Generate Cards</Link>
                         </li>
                         <li style={{ float: 'left' }}>
-                            <Link to="/cards/generate" style={{ display: 'block', color: 'white', textAlign: 'center', padding: '14px 16px', textDecoration: 'none' }}>Generate Cards</Link>
+                            <Link to="/cards/create" style={{ display: 'block', color: 'white', textAlign: 'center', padding: '14px 16px', textDecoration: 'none' }}>Create Card</Link>
                         </li>
                         <li style={{ float: 'left' }}>
                             <Link to="/cards" style={{ display: 'block', color: 'white', textAlign: 'center', padding: '14px 16px', textDecoration: 'none' }}>All Cards</Link>
@@ -43,6 +44,7 @@ export default function App() {
                     <Route path="/" element={<Demo />} />
                     <Route path="/cards/generate" element={<GenerateCards />} />
                     <Route path="/cards/" element={<DisplayCards />} />
+                    <Route path="/cards/create" element={<CreateCard />} />
                     <Route path="/template" element={<TemplateForm />} />
                     <Route path="/template/builder" element={<TemplateBuilder />} />
                     <Route path="/story" element={<StoryTemplateForm />} />

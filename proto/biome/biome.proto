@@ -28,6 +28,7 @@ message Characteristics {
   repeated string plants = 3;
   repeated string wildlife = 4;
   string precipitation = 5;
+  repeated string elements = 6;
 }
 
 message Biomes {

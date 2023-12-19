@@ -51,14 +51,12 @@ func (s *CardService) GenerateCards(ctx context.Context, req *connect.Request[ca
 	fmt.Println("Generating Cards, Count: ", count)
 	for i := 0; i < count; i++ {
 		fmt.Println("Generating Card: ", i)
-		c := &card.Card{}
-		name, description, err := CreateRandomCharacter()
+
+		c, err := CreateRandomCharacter()
 		if err != nil {
 			return nil, err
 		}
-		fmt.Println("name: ", name)
-		c.Name = name
-		c.Description = description
+
 		newCard, err := createCard(c)
 		if err != nil {
 			return nil, err
@@ -68,4 +66,34 @@ func (s *CardService) GenerateCards(ctx context.Context, req *connect.Request[ca
 	}
 
 	return connect.NewResponse(&card.GenerateCardsResponse{Cards: cards}), nil
+}
+
+func (s *CardService) CreateCardTemplate(ctx context.Context, req *connect.Request[card.CreateCardTemplateRequest]) (*connect.Response[card.CreateCardTemplateResponse], error) {
+	cardTemplateResponse, err := CardTemplateFromBiome(req.Msg.Biome)
+	if err != nil {
+		return nil, err
+	}
+
+	return connect.NewResponse(cardTemplateResponse), nil
+}
+
+func (s *CardService) CreateCard(ctx context.Context, req *connect.Request[card.CreateCardRequest]) (*connect.Response[card.CreateCardResponse], error) {
+	fmt.Println("CreateCard")
+	newCard, err := CreateCardFromPrompt(req.Msg.Card, req.Msg.Prompt)
+	if err != nil {
+		fmt.Println("error creating card from prompt: ", err)
+		return nil, err
+	}
+
+	newCard, err = createCard(newCard)
+	if err != nil {
+		fmt.Println("error creating card: ", err)
+		return nil, err
+	}
+
+	fmt.Println("newCard: ", newCard)
+
+	return connect.NewResponse(&card.CreateCardResponse{
+		Card: newCard,
+	}), nil
 }

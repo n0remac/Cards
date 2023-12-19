@@ -1,0 +1,31 @@
+{
+    "name": "Equatorial Wilderness",
+    "type": "Tropical Rainforest",
+    "characteristics": {
+        "climate": "Equatorial, steamy",
+        "vegetation": "Vast array of epiphytes, ferns, and large trees",
+        "plants": [
+            "Teak Trees",
+            "Cacao",
+            "Passion Fruit Vines",
+            "Fig Trees"
+        ],
+        "wildlife": [
+            "Gorilla",
+            "Okapi",
+            "Congo Peafowl",
+            "Forest Elephant",
+            "Chimpanzee",
+            "Mandrill"
+        ],
+        "precipitation": "Year-round rain, with a short dry season",
+        "elements": [
+            "Water Flowing lifeblood of the world, master of adaptation and change.",
+            "Earth Immovable foundation, embodying strength and permanence.",
+            "Wood Silent witness of time, carrier of life's cycle of growth and decay.",
+            "Life Sacred breath of existence, master of growth and healing.",
+            "Jade Stone of harmony, longevity, and nurturing energy.",
+            "Emerald Gem of renewal and hope, harnessing the verdant energy of life."
+        ]
+    }
+}

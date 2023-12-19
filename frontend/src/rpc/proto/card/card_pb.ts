@@ -321,23 +321,123 @@ export class NewCardResponse extends Message<NewCardResponse> {
 }
 
 /**
+ * @generated from message card.CreateCardRequest
+ */
+export class CreateCardRequest extends Message<CreateCardRequest> {
+  /**
+   * @generated from field: card.Card card = 1;
+   */
+  card?: Card;
+
+  /**
+   * @generated from field: string prompt = 2;
+   */
+  prompt = "";
+
+  constructor(data?: PartialMessage<CreateCardRequest>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "card.CreateCardRequest";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "card", kind: "message", T: Card },
+    { no: 2, name: "prompt", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): CreateCardRequest {
+    return new CreateCardRequest().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): CreateCardRequest {
+    return new CreateCardRequest().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): CreateCardRequest {
+    return new CreateCardRequest().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: CreateCardRequest | PlainMessage<CreateCardRequest> | undefined, b: CreateCardRequest | PlainMessage<CreateCardRequest> | undefined): boolean {
+    return proto3.util.equals(CreateCardRequest, a, b);
+  }
+}
+
+/**
+ * @generated from message card.CreateCardResponse
+ */
+export class CreateCardResponse extends Message<CreateCardResponse> {
+  /**
+   * @generated from field: card.Card card = 1;
+   */
+  card?: Card;
+
+  constructor(data?: PartialMessage<CreateCardResponse>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "card.CreateCardResponse";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "card", kind: "message", T: Card },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): CreateCardResponse {
+    return new CreateCardResponse().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): CreateCardResponse {
+    return new CreateCardResponse().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): CreateCardResponse {
+    return new CreateCardResponse().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: CreateCardResponse | PlainMessage<CreateCardResponse> | undefined, b: CreateCardResponse | PlainMessage<CreateCardResponse> | undefined): boolean {
+    return proto3.util.equals(CreateCardResponse, a, b);
+  }
+}
+
+/**
  * @generated from message card.Card
  */
 export class Card extends Message<Card> {
   /**
-   * @generated from field: string name = 1;
+   * @generated from field: int32 id = 1;
+   */
+  id = 0;
+
+  /**
+   * @generated from field: string name = 2;
    */
   name = "";
 
   /**
-   * @generated from field: string description = 2;
+   * @generated from field: string biome = 3;
+   */
+  biome = "";
+
+  /**
+   * @generated from field: string element = 4;
+   */
+  element = "";
+
+  /**
+   * @generated from field: string animal = 5;
+   */
+  animal = "";
+
+  /**
+   * @generated from field: string description = 6;
    */
   description = "";
 
   /**
-   * @generated from field: int32 id = 3;
+   * @generated from field: string img_url = 7;
    */
-  id = 0;
+  imgUrl = "";
 
   constructor(data?: PartialMessage<Card>) {
     super();
@@ -347,9 +447,13 @@ export class Card extends Message<Card> {
   static readonly runtime: typeof proto3 = proto3;
   static readonly typeName = "card.Card";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 1, name: "name", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 2, name: "description", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 3, name: "id", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
+    { no: 1, name: "id", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
+    { no: 2, name: "name", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 3, name: "biome", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 4, name: "element", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 5, name: "animal", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 6, name: "description", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 7, name: "img_url", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): Card {
@@ -366,6 +470,141 @@ export class Card extends Message<Card> {
 
   static equals(a: Card | PlainMessage<Card> | undefined, b: Card | PlainMessage<Card> | undefined): boolean {
     return proto3.util.equals(Card, a, b);
+  }
+}
+
+/**
+ * @generated from message card.CardTemplate
+ */
+export class CardTemplate extends Message<CardTemplate> {
+  /**
+   * @generated from field: string template = 1;
+   */
+  template = "";
+
+  /**
+   * @generated from field: repeated string animals = 2;
+   */
+  animals: string[] = [];
+
+  /**
+   * @generated from field: repeated string elements = 3;
+   */
+  elements: string[] = [];
+
+  /**
+   * @generated from field: repeated string descriptions = 4;
+   */
+  descriptions: string[] = [];
+
+  constructor(data?: PartialMessage<CardTemplate>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "card.CardTemplate";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "template", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "animals", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
+    { no: 3, name: "elements", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
+    { no: 4, name: "descriptions", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): CardTemplate {
+    return new CardTemplate().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): CardTemplate {
+    return new CardTemplate().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): CardTemplate {
+    return new CardTemplate().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: CardTemplate | PlainMessage<CardTemplate> | undefined, b: CardTemplate | PlainMessage<CardTemplate> | undefined): boolean {
+    return proto3.util.equals(CardTemplate, a, b);
+  }
+}
+
+/**
+ * @generated from message card.CreateCardTemplateRequest
+ */
+export class CreateCardTemplateRequest extends Message<CreateCardTemplateRequest> {
+  /**
+   * @generated from field: card.CardTemplate card_template = 1;
+   */
+  cardTemplate?: CardTemplate;
+
+  /**
+   * @generated from field: string biome = 2;
+   */
+  biome = "";
+
+  constructor(data?: PartialMessage<CreateCardTemplateRequest>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "card.CreateCardTemplateRequest";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "card_template", kind: "message", T: CardTemplate },
+    { no: 2, name: "biome", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): CreateCardTemplateRequest {
+    return new CreateCardTemplateRequest().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): CreateCardTemplateRequest {
+    return new CreateCardTemplateRequest().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): CreateCardTemplateRequest {
+    return new CreateCardTemplateRequest().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: CreateCardTemplateRequest | PlainMessage<CreateCardTemplateRequest> | undefined, b: CreateCardTemplateRequest | PlainMessage<CreateCardTemplateRequest> | undefined): boolean {
+    return proto3.util.equals(CreateCardTemplateRequest, a, b);
+  }
+}
+
+/**
+ * @generated from message card.CreateCardTemplateResponse
+ */
+export class CreateCardTemplateResponse extends Message<CreateCardTemplateResponse> {
+  /**
+   * @generated from field: card.CardTemplate card_template = 1;
+   */
+  cardTemplate?: CardTemplate;
+
+  constructor(data?: PartialMessage<CreateCardTemplateResponse>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "card.CreateCardTemplateResponse";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "card_template", kind: "message", T: CardTemplate },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): CreateCardTemplateResponse {
+    return new CreateCardTemplateResponse().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): CreateCardTemplateResponse {
+    return new CreateCardTemplateResponse().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): CreateCardTemplateResponse {
+    return new CreateCardTemplateResponse().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: CreateCardTemplateResponse | PlainMessage<CreateCardTemplateResponse> | undefined, b: CreateCardTemplateResponse | PlainMessage<CreateCardTemplateResponse> | undefined): boolean {
+    return proto3.util.equals(CreateCardTemplateResponse, a, b);
   }
 }
 

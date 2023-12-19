@@ -1,0 +1,30 @@
+{
+    "name": "Sundarbans Mangroves",
+    "type": "Wetlands",
+    "characteristics": {
+        "climate": "Tropical, humid",
+        "vegetation": "Dense mangrove forests",
+        "plants": [
+            "Sundari Tree",
+            "Mangrove Apple",
+            "Nypa Palm",
+            "Water Fern"
+        ],
+        "wildlife": [
+            "Bengal Tiger",
+            "Saltwater Crocodile",
+            "Ganges River Dolphin",
+            "Water Monitor",
+            "King Cobra"
+        ],
+        "precipitation": "High, with significant monsoon rains",
+        "elements": [
+            "Water Flowing lifeblood of the world, master of adaptation and change.",
+            "Air Invisible force of life, carrier of whispers and secrets.",
+            "Earth Immovable foundation, embodying strength and permanence.",
+            "Wood Silent witness of time, carrier of life's cycle of growth and decay.",
+            "Life Sacred breath of existence, master of growth and healing.",
+            "Storm Chaotic fusion of wind, water, and lightning, bringer of change."
+        ]
+    }
+}
