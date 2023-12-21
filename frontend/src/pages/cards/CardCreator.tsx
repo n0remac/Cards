@@ -6,7 +6,7 @@ import { CreateCardTemplateRequest, CardTemplate, Card, CreateCardRequest} from 
 
 
 
-export const CreateCard: React.FC<{}> = () => {  
+export const CardCreator: React.FC<{}> = () => {  
   const [biomes, setBiomes] = useState<Biome[]>([]);
   const [cardTemplate, setCardTemplate] = useState<CardTemplate | null>(null);
   const [selectedOptions, setSelectedOptions] = useState<{ [key: string]: string }>({});
