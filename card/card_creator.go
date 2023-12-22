@@ -96,6 +96,7 @@ func CreateCardFromPrompt(newCard *card.Card, prompt string) (*card.Card, error)
 	newCard.Description = description
 	newCard.ImgUrl = localPath
 	newCard.Name = fmt.Sprintf("%s-%s", newCard.Element, newCard.Animal)
+
 	ai.DownloadImage(url, localPath)
 	return newCard, nil
 
@@ -136,6 +137,7 @@ func constructCard(animal string, element string, biome string, description stri
 	newCard.Element = element
 	newCard.Biome = biome
 	newCard.Description = fmt.Sprintf("A %s-%s from %s. The background depicts %s", element, animal, biome, description)
+	newCard.Name = fmt.Sprintf("%s-%s", element, animal)
 
 	return newCard, nil
 }

@@ -8,6 +8,7 @@ import {StoryTemplateForm} from '@/pages/GenerateTemplate';
 import { GenerateCards } from './pages/cards/GenerateCards';
 import { DisplayCards } from './pages/cards/Cards';
 import { CreateCard } from './pages/cards/CreateCard';
+import { CombineCards } from './pages/cards/CombineCards';
 
 
 export default function App() {
@@ -16,6 +17,9 @@ export default function App() {
             <div>
                 <nav>
                     <ul style={{ listStyleType: 'none', margin: 0, padding: 0, overflow: 'hidden', backgroundColor: '#333' }}>
+                        <li style={{ float: 'left' }}>
+                            <Link to="/cards/combine" style={{ display: 'block', color: 'white', textAlign: 'center', padding: '14px 16px', textDecoration: 'none' }}>Combine Cards</Link>
+                        </li>
                         <li style={{ float: 'left' }}>
                             <Link to="/cards/generate" style={{ display: 'block', color: 'white', textAlign: 'center', padding: '14px 16px', textDecoration: 'none' }}>Generate Cards</Link>
                         </li>
@@ -49,6 +53,7 @@ export default function App() {
                     <Route path="/template/builder" element={<TemplateBuilder />} />
                     <Route path="/story" element={<StoryTemplateForm />} />
                     <Route path="/biomes" element={<BiomeSelector />} />
+                    <Route path="/cards/combine" element={<CombineCards />} />
                 </Routes>
             </div>
         </Router>

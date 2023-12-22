@@ -21,6 +21,9 @@ export const CardComponent: React.FC<CardComponentProps> = ({ card, handleDelete
         </div>
         <div className="p-2">
           <p className="text-gray-700 text-base">
+            {card.element} - {card.animal}
+          </p>
+          <p className="text-gray-700 text-base">
             {card.description}
           </p>
         </div>
