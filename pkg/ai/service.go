@@ -34,7 +34,7 @@ func ExtendBiomes() error {
 		if err != nil {
 			return err
 		}
-		saveJSON(fmt.Sprintf("biome/biomes/%s.json", query["name"]), []byte(aiResponse))
+		saveJSON(fmt.Sprintf("pkg/biome/biomes/%s.json", query["name"]), []byte(aiResponse))
 		fmt.Println(aiResponse)
 	}
 

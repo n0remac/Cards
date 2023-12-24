@@ -9,6 +9,8 @@ import { GenerateCards } from './pages/cards/GenerateCards';
 import { DisplayCards } from './pages/cards/Cards';
 import { CreateCard } from './pages/cards/CreateCard';
 import { CombineCards } from './pages/cards/CombineCards';
+import Login from './pages/user/Login';
+import Register from './pages/user/Register';
 
 
 export default function App() {
@@ -41,6 +43,13 @@ export default function App() {
                         <li style={{ float: 'left' }}>
                             <Link to="/biomes" style={{ display: 'block', color: 'white', textAlign: 'center', padding: '14px 16px', textDecoration: 'none' }}>Biome Selector</Link>
                         </li>
+                        <li style={{ float: 'right' }}>
+                            <Link to="/login" style={{ display: 'block', color: 'white', textAlign: 'center', padding: '14px 16px', textDecoration: 'none' }}>Login</Link>
+                        </li>
+                        <li style={{ float: 'right' }}>
+                            <Link to="/register" style={{ display: 'block', color: 'white', textAlign: 'center', padding: '14px 16px', textDecoration: 'none' }}>Register</Link>
+                        </li>
+                        
                     </ul>
                 </nav>
 
@@ -54,6 +63,8 @@ export default function App() {
                     <Route path="/story" element={<StoryTemplateForm />} />
                     <Route path="/biomes" element={<BiomeSelector />} />
                     <Route path="/cards/combine" element={<CombineCards />} />
+                    <Route path="/login" element={<Login />} />
+                    <Route path="/register" element={<Register />} />
                 </Routes>
             </div>
         </Router>

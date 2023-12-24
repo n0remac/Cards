@@ -3,11 +3,13 @@ package main
 //go:generate npx buf generate
 
 import (
-	"cards/biome"
-	"cards/card"
-	"cards/database"
 	"cards/gen/proto/biome/biomeconnect"
 	"cards/gen/proto/card/cardconnect"
+	"cards/gen/proto/user/userconnect"
+	"cards/pkg/biome"
+	"cards/pkg/card"
+	"cards/pkg/database"
+	"cards/pkg/user"
 	"context"
 	"fmt"
 	"log/slog"
@@ -53,12 +55,14 @@ func main() {
 	database.InitDB()
 	cardService := &card.CardService{}
 	biomeService := &biome.BiomeService{}
+	userService := &user.UserService{}
 
-	imageServer := http.FileServer(http.Dir("./card_images"))
+	imageServer := http.FileServer(http.Dir("./pkg/card_images"))
 	apiRoot.Handle("/card_images/", http.StripPrefix("/card_images/", imageServer))
 
 	apiRoot.Handle(cardconnect.NewCardServiceHandler(cardService, interceptors))
 	apiRoot.Handle(biomeconnect.NewBiomeServiceHandler(biomeService, interceptors))
+	apiRoot.Handle(userconnect.NewUserServiceHandler(userService, interceptors))
 
 	reflector := grpcreflect.NewStaticReflector(
 		"card.CardService",

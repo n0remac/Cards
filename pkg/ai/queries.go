@@ -21,13 +21,13 @@ type Element struct {
 type Biomes []biome.Biome
 
 func ElementQuery() ([]map[string]string, error) {
-	elements, err := ParseElements("ai/elements.json")
+	elements, err := ParseElements("pkg/ai/elements.json")
 	if err != nil {
 		fmt.Println("error parsing elements:", err)
 		return nil, err
 	}
 
-	biomes, err := ParseBiomes("ai/biomes.json")
+	biomes, err := ParseBiomes("pkg/ai/biomes.json")
 	if err != nil {
 		return nil, err
 	}

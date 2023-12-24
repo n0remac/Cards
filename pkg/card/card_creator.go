@@ -1,8 +1,8 @@
 package card
 
 import (
-	"cards/ai"
-	"cards/biome"
+	"cards/pkg/ai"
+	"cards/pkg/biome"
 	"cards/gen/proto/card"
 	"fmt"
 	"math/rand"
@@ -30,7 +30,7 @@ import (
 func CardTemplateFromBiome(b string) (*card.CreateCardTemplateResponse, error) {
 	cardTemplateResponse := &card.CreateCardTemplateResponse{}
 
-	filenames, err := getFileNames("biome/biomes")
+	filenames, err := getFileNames("pkg/biome/biomes")
 	if err != nil {
 		fmt.Println("error getting filenames:", err)
 		return cardTemplateResponse, err
@@ -81,7 +81,11 @@ func CreateRandomCharacter() (*card.Card, error) {
 	newCard.ImgUrl = url
 	newCard.Description = description
 
-	ai.DownloadImage(url, fmt.Sprintf("card_images/%s-%s.png", newCard.Element, newCard.Animal))
+	err = ai.DownloadImage(url, fmt.Sprintf("pkg/card_images/%s-%s.png", newCard.Element, newCard.Animal))
+	if err != nil {
+		fmt.Println("error downloading image:", err)
+		return newCard, err
+	}
 	return newCard, nil
 }
 
@@ -92,7 +96,7 @@ func CreateCardFromPrompt(newCard *card.Card, prompt string) (*card.Card, error)
 		return nil, err
 	}
 
-	localPath = fmt.Sprintf("card_images/%s-%s.png", newCard.Element, newCard.Animal)
+	localPath = fmt.Sprintf("pkg/card_images/%s-%s.png", newCard.Element, newCard.Animal)
 	newCard.Description = description
 	newCard.ImgUrl = localPath
 	newCard.Name = fmt.Sprintf("%s-%s", newCard.Element, newCard.Animal)
@@ -105,7 +109,7 @@ func CreateCardFromPrompt(newCard *card.Card, prompt string) (*card.Card, error)
 func getRandomCharacter() (*card.Card, error) {
 	newCard := &card.Card{}
 
-	filenames, err := getFileNames("biome/biomes")
+	filenames, err := getFileNames("pkg/biome/biomes")
 	if err != nil {
 		fmt.Println("error getting filenames:", err)
 		return newCard, err

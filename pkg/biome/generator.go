@@ -1,7 +1,7 @@
 package biome
 
 import (
-	"cards/ai"
+	"cards/pkg/ai"
 	"cards/gen/proto/biome"
 	"fmt"
 )

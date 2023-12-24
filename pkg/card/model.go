@@ -1,7 +1,7 @@
 package card
 
 import (
-	"cards/database"
+	"cards/pkg/database"
 	"cards/gen/proto/card"
 	"encoding/json"
 	"fmt"

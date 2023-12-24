@@ -1,7 +1,7 @@
 package biome
 
 import (
-	"cards/database"
+	"cards/pkg/database"
 	"cards/gen/proto/biome"
 
 	"encoding/json"

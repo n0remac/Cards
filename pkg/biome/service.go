@@ -27,7 +27,7 @@ func (s *BiomeService) GetBiome(ctx context.Context, req *connect.Request[biome.
 }
 
 func (s *BiomeService) GetBiomes(ctx context.Context, req *connect.Request[biome.GetBiomesRequest]) (*connect.Response[biome.GetBiomesResponse], error) {
-	biomes, err := LoadBiomesFromJSON("biome/biomes.json")
+	biomes, err := LoadBiomesFromJSON("pkg/biome/biomes.json")
 	if err != nil {
 		return nil, err
 	}
@@ -41,7 +41,6 @@ func (s *BiomeService) GetBiomes(ctx context.Context, req *connect.Request[biome
 		Biomes: biomesMessage,
 	}), nil
 }
-
 
 func (s *BiomeService) GenerateBiomeCard(ctx context.Context, req *connect.Request[biome.Biome]) (*connect.Response[biome.CardResponse], error) {
 	story, err := generateTemplate(*req.Msg)
