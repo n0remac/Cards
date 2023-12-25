@@ -4,38 +4,46 @@ import (
 	"cards/gen/proto/user"
 	"context"
 	"fmt"
+	"time"
 
 	"github.com/bufbuild/connect-go"
 	"golang.org/x/crypto/bcrypt"
+	"github.com/dgrijalva/jwt-go"
 )
 
 type UserService struct {
 	// Add any fields if needed
 }
 
+var jwtKey = []byte("your_secret_key") // Replace with a secure key
+
 func (s *UserService) Login(ctx context.Context, req *connect.Request[user.LoginRequest]) (*connect.Response[user.LoginResponse], error) {
-	u, err := getUserFromDBByUsername(req.Msg.Username)
-	if err != nil {
-		return nil, err
-	}
-	fmt.Println("User:", u)
-	
+    u, err := getUserFromDBByUsername(req.Msg.Username)
+    if err != nil {
+        return nil, err
+    }
 
-	passHashStatus, err := checkPasswordHash(req.Msg.Password, u.Password)
-	if err != nil {
-		fmt.Println("Error checking password hash:", err)
-		return nil, connect.NewError(connect.CodeUnauthenticated, fmt.Errorf("authentication failed"))
-	}
+    passHashStatus, err := checkPasswordHash(req.Msg.Password, u.Password)
+    if err != nil || !passHashStatus {
+        return nil, connect.NewError(connect.CodeUnauthenticated, fmt.Errorf("invalid username or password"))
+    }
 
-	if !passHashStatus {
-		fmt.Println("Password is incorrect")
-		return nil, connect.NewError(connect.CodeUnauthenticated, fmt.Errorf("invalid username or password"))
-	}
+    // Create JWT token
+    token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
+        "username": u.Username,
+        "exp":      time.Now().Add(time.Hour * 24).Unix(),
+    })
 
-	return connect.NewResponse(&user.LoginResponse{
-		Token: "token", // Generate a real token here
-	}), nil
+    tokenString, err := token.SignedString(jwtKey)
+    if err != nil {
+        return nil, connect.NewError(connect.CodeInternal, fmt.Errorf("failed to sign token"))
+    }
+
+    return connect.NewResponse(&user.LoginResponse{
+        Token: tokenString,
+    }), nil
 }
+
 
 func (s *UserService) CreateUser(ctx context.Context, req *connect.Request[user.CreateUserRequest]) (*connect.Response[user.CreateUserResponse], error) {
 	newUser, err := createUser(req.Msg.User)

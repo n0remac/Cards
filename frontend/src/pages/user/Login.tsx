@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { userService } from '../../service'; // Adjust the import path as needed
-import { LoginRequest, User } from '../../rpc/proto/user/user_pb'; // Adjust as per your proto definitions
+import { userService } from '../../service';
+import { LoginRequest } from '../../rpc/proto/user/user_pb';
 
 export const Login = () => {
     const [username, setUsername] = useState('');
@@ -15,13 +15,14 @@ export const Login = () => {
         request.password = password;
 
         try {
-            const response = await userService.login(request, {}); // Replace loginUser with your actual login function
+            const response = await userService.login(request, {});
+            const token = response.token;
+            localStorage.setItem('userToken', token); // Store the token
             setLoginStatus('Login successful');
-            // Additional logic after successful login (e.g., redirect or token storage)
+            // Redirect or perform additional actions
         } catch (error) {
             console.error('Error logging in:', error);
             setLoginStatus('Login failed');
-            // Additional error handling
         }
     };
 
