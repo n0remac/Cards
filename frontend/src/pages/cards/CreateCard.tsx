@@ -1,9 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { cardService } from '../../service'; 
+import { cardService, biomeService } from '../../service'; 
 import { Biome } from '../../rpc/proto/biome/biome_pb';
-import { biomeService } from '../../service';
 import { CreateCardTemplateRequest, CardTemplate, Card, CreateCardRequest} from '../../rpc/proto/card/card_pb';
-
 
 
 export const CreateCard: React.FC<{}> = () => {  

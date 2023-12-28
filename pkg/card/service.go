@@ -4,6 +4,7 @@ import (
 	"cards/gen/proto/card"
 	"context"
 	"fmt"
+	"math/rand"
 
 	"github.com/bufbuild/connect-go"
 )
@@ -51,8 +52,9 @@ func (s *CardService) GenerateCards(ctx context.Context, req *connect.Request[ca
 	fmt.Println("Generating Cards, Count: ", count)
 	for i := 0; i < count; i++ {
 		fmt.Println("Generating Card: ", i)
+		r := rand.Intn(10)
 
-		c, err := CreateRandomCharacter()
+		c, err := CreateRandomCharacter(r > 7)
 		if err != nil {
 			return nil, err
 		}
@@ -96,4 +98,36 @@ func (s *CardService) CreateCard(ctx context.Context, req *connect.Request[card.
 	return connect.NewResponse(&card.CreateCardResponse{
 		Card: newCard,
 	}), nil
+}
+
+func (s *CardService) GenerateDeck(ctx context.Context, req *connect.Request[card.GenerateDeckRequest]) (*connect.Response[card.GenerateDeckResponse], error) {
+	fmt.Println("Generating Deck")
+	numCards := int(req.Msg.NumCards)
+	biomeName := req.Msg.Biome
+
+	deck := card.Deck{}
+
+	for i := 0; i < numCards; i++ {
+		fmt.Println("Generating Card: ", i)
+		c, err := OrganismFromBiome(biomeName, rand.Intn(10) > 5)
+		newCard, err := createCard(c)
+		if err != nil {
+			fmt.Println("There was an error creating the card", err)
+			return nil, err
+		}
+		deck.Cards = append(deck.Cards, newCard)
+	}
+	createDeckInDB(&deck)
+	return connect.NewResponse(&card.GenerateDeckResponse{Deck: &deck}), nil
+}
+
+func (s *CardService) GetDecks(ctx context.Context, req *connect.Request[card.GetDecksRequest]) (*connect.Response[card.GetDecksResponse], error) {
+	fmt.Println("Getting Decks")
+	userId := req.Msg.UserId
+
+	decks, err := getDecksFromDB(userId)
+	if err != nil {
+		return nil, err
+	}
+	return connect.NewResponse(&card.GetDecksResponse{Decks: decks}), nil
 }

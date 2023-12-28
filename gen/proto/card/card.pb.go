@@ -20,508 +20,7 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-type GenerateCardsRequest struct {
-	state         protoimpl.MessageState
-	sizeCache     protoimpl.SizeCache
-	unknownFields protoimpl.UnknownFields
-
-	UserId string `protobuf:"bytes,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
-	Count  int32  `protobuf:"varint,2,opt,name=count,proto3" json:"count,omitempty"`
-}
-
-func (x *GenerateCardsRequest) Reset() {
-	*x = GenerateCardsRequest{}
-	if protoimpl.UnsafeEnabled {
-		mi := &file_proto_card_card_proto_msgTypes[0]
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		ms.StoreMessageInfo(mi)
-	}
-}
-
-func (x *GenerateCardsRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*GenerateCardsRequest) ProtoMessage() {}
-
-func (x *GenerateCardsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_card_card_proto_msgTypes[0]
-	if protoimpl.UnsafeEnabled && x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use GenerateCardsRequest.ProtoReflect.Descriptor instead.
-func (*GenerateCardsRequest) Descriptor() ([]byte, []int) {
-	return file_proto_card_card_proto_rawDescGZIP(), []int{0}
-}
-
-func (x *GenerateCardsRequest) GetUserId() string {
-	if x != nil {
-		return x.UserId
-	}
-	return ""
-}
-
-func (x *GenerateCardsRequest) GetCount() int32 {
-	if x != nil {
-		return x.Count
-	}
-	return 0
-}
-
-type GenerateCardsResponse struct {
-	state         protoimpl.MessageState
-	sizeCache     protoimpl.SizeCache
-	unknownFields protoimpl.UnknownFields
-
-	Cards []*Card `protobuf:"bytes,1,rep,name=cards,proto3" json:"cards,omitempty"`
-}
-
-func (x *GenerateCardsResponse) Reset() {
-	*x = GenerateCardsResponse{}
-	if protoimpl.UnsafeEnabled {
-		mi := &file_proto_card_card_proto_msgTypes[1]
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		ms.StoreMessageInfo(mi)
-	}
-}
-
-func (x *GenerateCardsResponse) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*GenerateCardsResponse) ProtoMessage() {}
-
-func (x *GenerateCardsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_card_card_proto_msgTypes[1]
-	if protoimpl.UnsafeEnabled && x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use GenerateCardsResponse.ProtoReflect.Descriptor instead.
-func (*GenerateCardsResponse) Descriptor() ([]byte, []int) {
-	return file_proto_card_card_proto_rawDescGZIP(), []int{1}
-}
-
-func (x *GenerateCardsResponse) GetCards() []*Card {
-	if x != nil {
-		return x.Cards
-	}
-	return nil
-}
-
-type DeleteCardRequest struct {
-	state         protoimpl.MessageState
-	sizeCache     protoimpl.SizeCache
-	unknownFields protoimpl.UnknownFields
-
-	UserId string `protobuf:"bytes,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
-	CardId int32  `protobuf:"varint,2,opt,name=card_id,json=cardId,proto3" json:"card_id,omitempty"`
-}
-
-func (x *DeleteCardRequest) Reset() {
-	*x = DeleteCardRequest{}
-	if protoimpl.UnsafeEnabled {
-		mi := &file_proto_card_card_proto_msgTypes[2]
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		ms.StoreMessageInfo(mi)
-	}
-}
-
-func (x *DeleteCardRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*DeleteCardRequest) ProtoMessage() {}
-
-func (x *DeleteCardRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_card_card_proto_msgTypes[2]
-	if protoimpl.UnsafeEnabled && x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use DeleteCardRequest.ProtoReflect.Descriptor instead.
-func (*DeleteCardRequest) Descriptor() ([]byte, []int) {
-	return file_proto_card_card_proto_rawDescGZIP(), []int{2}
-}
-
-func (x *DeleteCardRequest) GetUserId() string {
-	if x != nil {
-		return x.UserId
-	}
-	return ""
-}
-
-func (x *DeleteCardRequest) GetCardId() int32 {
-	if x != nil {
-		return x.CardId
-	}
-	return 0
-}
-
-type DeleteCardResponse struct {
-	state         protoimpl.MessageState
-	sizeCache     protoimpl.SizeCache
-	unknownFields protoimpl.UnknownFields
-
-	CardId int32 `protobuf:"varint,1,opt,name=card_id,json=cardId,proto3" json:"card_id,omitempty"`
-}
-
-func (x *DeleteCardResponse) Reset() {
-	*x = DeleteCardResponse{}
-	if protoimpl.UnsafeEnabled {
-		mi := &file_proto_card_card_proto_msgTypes[3]
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		ms.StoreMessageInfo(mi)
-	}
-}
-
-func (x *DeleteCardResponse) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*DeleteCardResponse) ProtoMessage() {}
-
-func (x *DeleteCardResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_card_card_proto_msgTypes[3]
-	if protoimpl.UnsafeEnabled && x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use DeleteCardResponse.ProtoReflect.Descriptor instead.
-func (*DeleteCardResponse) Descriptor() ([]byte, []int) {
-	return file_proto_card_card_proto_rawDescGZIP(), []int{3}
-}
-
-func (x *DeleteCardResponse) GetCardId() int32 {
-	if x != nil {
-		return x.CardId
-	}
-	return 0
-}
-
-type GetCardsRequest struct {
-	state         protoimpl.MessageState
-	sizeCache     protoimpl.SizeCache
-	unknownFields protoimpl.UnknownFields
-
-	UserId string `protobuf:"bytes,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
-}
-
-func (x *GetCardsRequest) Reset() {
-	*x = GetCardsRequest{}
-	if protoimpl.UnsafeEnabled {
-		mi := &file_proto_card_card_proto_msgTypes[4]
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		ms.StoreMessageInfo(mi)
-	}
-}
-
-func (x *GetCardsRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*GetCardsRequest) ProtoMessage() {}
-
-func (x *GetCardsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_card_card_proto_msgTypes[4]
-	if protoimpl.UnsafeEnabled && x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use GetCardsRequest.ProtoReflect.Descriptor instead.
-func (*GetCardsRequest) Descriptor() ([]byte, []int) {
-	return file_proto_card_card_proto_rawDescGZIP(), []int{4}
-}
-
-func (x *GetCardsRequest) GetUserId() string {
-	if x != nil {
-		return x.UserId
-	}
-	return ""
-}
-
-type GetCardsResponse struct {
-	state         protoimpl.MessageState
-	sizeCache     protoimpl.SizeCache
-	unknownFields protoimpl.UnknownFields
-
-	Cards []*Card `protobuf:"bytes,1,rep,name=cards,proto3" json:"cards,omitempty"`
-}
-
-func (x *GetCardsResponse) Reset() {
-	*x = GetCardsResponse{}
-	if protoimpl.UnsafeEnabled {
-		mi := &file_proto_card_card_proto_msgTypes[5]
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		ms.StoreMessageInfo(mi)
-	}
-}
-
-func (x *GetCardsResponse) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*GetCardsResponse) ProtoMessage() {}
-
-func (x *GetCardsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_card_card_proto_msgTypes[5]
-	if protoimpl.UnsafeEnabled && x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use GetCardsResponse.ProtoReflect.Descriptor instead.
-func (*GetCardsResponse) Descriptor() ([]byte, []int) {
-	return file_proto_card_card_proto_rawDescGZIP(), []int{5}
-}
-
-func (x *GetCardsResponse) GetCards() []*Card {
-	if x != nil {
-		return x.Cards
-	}
-	return nil
-}
-
-type NewCardRequest struct {
-	state         protoimpl.MessageState
-	sizeCache     protoimpl.SizeCache
-	unknownFields protoimpl.UnknownFields
-
-	UserId string `protobuf:"bytes,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
-	Card   *Card  `protobuf:"bytes,2,opt,name=card,proto3" json:"card,omitempty"`
-}
-
-func (x *NewCardRequest) Reset() {
-	*x = NewCardRequest{}
-	if protoimpl.UnsafeEnabled {
-		mi := &file_proto_card_card_proto_msgTypes[6]
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		ms.StoreMessageInfo(mi)
-	}
-}
-
-func (x *NewCardRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*NewCardRequest) ProtoMessage() {}
-
-func (x *NewCardRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_card_card_proto_msgTypes[6]
-	if protoimpl.UnsafeEnabled && x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use NewCardRequest.ProtoReflect.Descriptor instead.
-func (*NewCardRequest) Descriptor() ([]byte, []int) {
-	return file_proto_card_card_proto_rawDescGZIP(), []int{6}
-}
-
-func (x *NewCardRequest) GetUserId() string {
-	if x != nil {
-		return x.UserId
-	}
-	return ""
-}
-
-func (x *NewCardRequest) GetCard() *Card {
-	if x != nil {
-		return x.Card
-	}
-	return nil
-}
-
-type NewCardResponse struct {
-	state         protoimpl.MessageState
-	sizeCache     protoimpl.SizeCache
-	unknownFields protoimpl.UnknownFields
-
-	Card *Card `protobuf:"bytes,1,opt,name=card,proto3" json:"card,omitempty"`
-}
-
-func (x *NewCardResponse) Reset() {
-	*x = NewCardResponse{}
-	if protoimpl.UnsafeEnabled {
-		mi := &file_proto_card_card_proto_msgTypes[7]
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		ms.StoreMessageInfo(mi)
-	}
-}
-
-func (x *NewCardResponse) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*NewCardResponse) ProtoMessage() {}
-
-func (x *NewCardResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_card_card_proto_msgTypes[7]
-	if protoimpl.UnsafeEnabled && x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use NewCardResponse.ProtoReflect.Descriptor instead.
-func (*NewCardResponse) Descriptor() ([]byte, []int) {
-	return file_proto_card_card_proto_rawDescGZIP(), []int{7}
-}
-
-func (x *NewCardResponse) GetCard() *Card {
-	if x != nil {
-		return x.Card
-	}
-	return nil
-}
-
-type CreateCardRequest struct {
-	state         protoimpl.MessageState
-	sizeCache     protoimpl.SizeCache
-	unknownFields protoimpl.UnknownFields
-
-	Card   *Card  `protobuf:"bytes,1,opt,name=card,proto3" json:"card,omitempty"`
-	Prompt string `protobuf:"bytes,2,opt,name=prompt,proto3" json:"prompt,omitempty"`
-}
-
-func (x *CreateCardRequest) Reset() {
-	*x = CreateCardRequest{}
-	if protoimpl.UnsafeEnabled {
-		mi := &file_proto_card_card_proto_msgTypes[8]
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		ms.StoreMessageInfo(mi)
-	}
-}
-
-func (x *CreateCardRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*CreateCardRequest) ProtoMessage() {}
-
-func (x *CreateCardRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_card_card_proto_msgTypes[8]
-	if protoimpl.UnsafeEnabled && x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use CreateCardRequest.ProtoReflect.Descriptor instead.
-func (*CreateCardRequest) Descriptor() ([]byte, []int) {
-	return file_proto_card_card_proto_rawDescGZIP(), []int{8}
-}
-
-func (x *CreateCardRequest) GetCard() *Card {
-	if x != nil {
-		return x.Card
-	}
-	return nil
-}
-
-func (x *CreateCardRequest) GetPrompt() string {
-	if x != nil {
-		return x.Prompt
-	}
-	return ""
-}
-
-type CreateCardResponse struct {
-	state         protoimpl.MessageState
-	sizeCache     protoimpl.SizeCache
-	unknownFields protoimpl.UnknownFields
-
-	Card *Card `protobuf:"bytes,1,opt,name=card,proto3" json:"card,omitempty"`
-}
-
-func (x *CreateCardResponse) Reset() {
-	*x = CreateCardResponse{}
-	if protoimpl.UnsafeEnabled {
-		mi := &file_proto_card_card_proto_msgTypes[9]
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		ms.StoreMessageInfo(mi)
-	}
-}
-
-func (x *CreateCardResponse) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*CreateCardResponse) ProtoMessage() {}
-
-func (x *CreateCardResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_card_card_proto_msgTypes[9]
-	if protoimpl.UnsafeEnabled && x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use CreateCardResponse.ProtoReflect.Descriptor instead.
-func (*CreateCardResponse) Descriptor() ([]byte, []int) {
-	return file_proto_card_card_proto_rawDescGZIP(), []int{9}
-}
-
-func (x *CreateCardResponse) GetCard() *Card {
-	if x != nil {
-		return x.Card
-	}
-	return nil
-}
-
+// Card related messages and services
 type Card struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -532,14 +31,16 @@ type Card struct {
 	Biome       string `protobuf:"bytes,3,opt,name=biome,proto3" json:"biome,omitempty"`
 	Element     string `protobuf:"bytes,4,opt,name=element,proto3" json:"element,omitempty"`
 	Animal      string `protobuf:"bytes,5,opt,name=animal,proto3" json:"animal,omitempty"`
-	Description string `protobuf:"bytes,6,opt,name=description,proto3" json:"description,omitempty"`
-	ImgUrl      string `protobuf:"bytes,7,opt,name=img_url,json=imgUrl,proto3" json:"img_url,omitempty"`
+	Plant       string `protobuf:"bytes,6,opt,name=plant,proto3" json:"plant,omitempty"`
+	Description string `protobuf:"bytes,7,opt,name=description,proto3" json:"description,omitempty"`
+	ImgUrl      string `protobuf:"bytes,8,opt,name=img_url,json=imgUrl,proto3" json:"img_url,omitempty"`
+	Player      string `protobuf:"bytes,9,opt,name=player,proto3" json:"player,omitempty"`
 }
 
 func (x *Card) Reset() {
 	*x = Card{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_proto_card_card_proto_msgTypes[10]
+		mi := &file_proto_card_card_proto_msgTypes[0]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -552,7 +53,7 @@ func (x *Card) String() string {
 func (*Card) ProtoMessage() {}
 
 func (x *Card) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_card_card_proto_msgTypes[10]
+	mi := &file_proto_card_card_proto_msgTypes[0]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -565,7 +66,7 @@ func (x *Card) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Card.ProtoReflect.Descriptor instead.
 func (*Card) Descriptor() ([]byte, []int) {
-	return file_proto_card_card_proto_rawDescGZIP(), []int{10}
+	return file_proto_card_card_proto_rawDescGZIP(), []int{0}
 }
 
 func (x *Card) GetId() int32 {
@@ -603,6 +104,13 @@ func (x *Card) GetAnimal() string {
 	return ""
 }
 
+func (x *Card) GetPlant() string {
+	if x != nil {
+		return x.Plant
+	}
+	return ""
+}
+
 func (x *Card) GetDescription() string {
 	if x != nil {
 		return x.Description
@@ -617,6 +125,13 @@ func (x *Card) GetImgUrl() string {
 	return ""
 }
 
+func (x *Card) GetPlayer() string {
+	if x != nil {
+		return x.Player
+	}
+	return ""
+}
+
 type CardTemplate struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -624,14 +139,15 @@ type CardTemplate struct {
 
 	Template     string   `protobuf:"bytes,1,opt,name=template,proto3" json:"template,omitempty"`
 	Animals      []string `protobuf:"bytes,2,rep,name=animals,proto3" json:"animals,omitempty"`
-	Elements     []string `protobuf:"bytes,3,rep,name=elements,proto3" json:"elements,omitempty"`
-	Descriptions []string `protobuf:"bytes,4,rep,name=descriptions,proto3" json:"descriptions,omitempty"`
+	Plants       []string `protobuf:"bytes,3,rep,name=plants,proto3" json:"plants,omitempty"`
+	Elements     []string `protobuf:"bytes,4,rep,name=elements,proto3" json:"elements,omitempty"`
+	Descriptions []string `protobuf:"bytes,5,rep,name=descriptions,proto3" json:"descriptions,omitempty"`
 }
 
 func (x *CardTemplate) Reset() {
 	*x = CardTemplate{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_proto_card_card_proto_msgTypes[11]
+		mi := &file_proto_card_card_proto_msgTypes[1]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -644,7 +160,7 @@ func (x *CardTemplate) String() string {
 func (*CardTemplate) ProtoMessage() {}
 
 func (x *CardTemplate) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_card_card_proto_msgTypes[11]
+	mi := &file_proto_card_card_proto_msgTypes[1]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -657,7 +173,7 @@ func (x *CardTemplate) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CardTemplate.ProtoReflect.Descriptor instead.
 func (*CardTemplate) Descriptor() ([]byte, []int) {
-	return file_proto_card_card_proto_rawDescGZIP(), []int{11}
+	return file_proto_card_card_proto_rawDescGZIP(), []int{1}
 }
 
 func (x *CardTemplate) GetTemplate() string {
@@ -674,6 +190,13 @@ func (x *CardTemplate) GetAnimals() []string {
 	return nil
 }
 
+func (x *CardTemplate) GetPlants() []string {
+	if x != nil {
+		return x.Plants
+	}
+	return nil
+}
+
 func (x *CardTemplate) GetElements() []string {
 	if x != nil {
 		return x.Elements
@@ -684,6 +207,508 @@ func (x *CardTemplate) GetElements() []string {
 func (x *CardTemplate) GetDescriptions() []string {
 	if x != nil {
 		return x.Descriptions
+	}
+	return nil
+}
+
+type GenerateCardsRequest struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	UserId string `protobuf:"bytes,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+	Count  int32  `protobuf:"varint,2,opt,name=count,proto3" json:"count,omitempty"`
+}
+
+func (x *GenerateCardsRequest) Reset() {
+	*x = GenerateCardsRequest{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_proto_card_card_proto_msgTypes[2]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *GenerateCardsRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GenerateCardsRequest) ProtoMessage() {}
+
+func (x *GenerateCardsRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_card_card_proto_msgTypes[2]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GenerateCardsRequest.ProtoReflect.Descriptor instead.
+func (*GenerateCardsRequest) Descriptor() ([]byte, []int) {
+	return file_proto_card_card_proto_rawDescGZIP(), []int{2}
+}
+
+func (x *GenerateCardsRequest) GetUserId() string {
+	if x != nil {
+		return x.UserId
+	}
+	return ""
+}
+
+func (x *GenerateCardsRequest) GetCount() int32 {
+	if x != nil {
+		return x.Count
+	}
+	return 0
+}
+
+type GenerateCardsResponse struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Cards []*Card `protobuf:"bytes,1,rep,name=cards,proto3" json:"cards,omitempty"`
+}
+
+func (x *GenerateCardsResponse) Reset() {
+	*x = GenerateCardsResponse{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_proto_card_card_proto_msgTypes[3]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *GenerateCardsResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GenerateCardsResponse) ProtoMessage() {}
+
+func (x *GenerateCardsResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_card_card_proto_msgTypes[3]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GenerateCardsResponse.ProtoReflect.Descriptor instead.
+func (*GenerateCardsResponse) Descriptor() ([]byte, []int) {
+	return file_proto_card_card_proto_rawDescGZIP(), []int{3}
+}
+
+func (x *GenerateCardsResponse) GetCards() []*Card {
+	if x != nil {
+		return x.Cards
+	}
+	return nil
+}
+
+type DeleteCardRequest struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	UserId string `protobuf:"bytes,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+	CardId int32  `protobuf:"varint,2,opt,name=card_id,json=cardId,proto3" json:"card_id,omitempty"`
+}
+
+func (x *DeleteCardRequest) Reset() {
+	*x = DeleteCardRequest{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_proto_card_card_proto_msgTypes[4]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *DeleteCardRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DeleteCardRequest) ProtoMessage() {}
+
+func (x *DeleteCardRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_card_card_proto_msgTypes[4]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DeleteCardRequest.ProtoReflect.Descriptor instead.
+func (*DeleteCardRequest) Descriptor() ([]byte, []int) {
+	return file_proto_card_card_proto_rawDescGZIP(), []int{4}
+}
+
+func (x *DeleteCardRequest) GetUserId() string {
+	if x != nil {
+		return x.UserId
+	}
+	return ""
+}
+
+func (x *DeleteCardRequest) GetCardId() int32 {
+	if x != nil {
+		return x.CardId
+	}
+	return 0
+}
+
+type DeleteCardResponse struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	CardId int32 `protobuf:"varint,1,opt,name=card_id,json=cardId,proto3" json:"card_id,omitempty"`
+}
+
+func (x *DeleteCardResponse) Reset() {
+	*x = DeleteCardResponse{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_proto_card_card_proto_msgTypes[5]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *DeleteCardResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DeleteCardResponse) ProtoMessage() {}
+
+func (x *DeleteCardResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_card_card_proto_msgTypes[5]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DeleteCardResponse.ProtoReflect.Descriptor instead.
+func (*DeleteCardResponse) Descriptor() ([]byte, []int) {
+	return file_proto_card_card_proto_rawDescGZIP(), []int{5}
+}
+
+func (x *DeleteCardResponse) GetCardId() int32 {
+	if x != nil {
+		return x.CardId
+	}
+	return 0
+}
+
+type GetCardsRequest struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	UserId string `protobuf:"bytes,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+}
+
+func (x *GetCardsRequest) Reset() {
+	*x = GetCardsRequest{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_proto_card_card_proto_msgTypes[6]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *GetCardsRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetCardsRequest) ProtoMessage() {}
+
+func (x *GetCardsRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_card_card_proto_msgTypes[6]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetCardsRequest.ProtoReflect.Descriptor instead.
+func (*GetCardsRequest) Descriptor() ([]byte, []int) {
+	return file_proto_card_card_proto_rawDescGZIP(), []int{6}
+}
+
+func (x *GetCardsRequest) GetUserId() string {
+	if x != nil {
+		return x.UserId
+	}
+	return ""
+}
+
+type GetCardsResponse struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Cards []*Card `protobuf:"bytes,1,rep,name=cards,proto3" json:"cards,omitempty"`
+}
+
+func (x *GetCardsResponse) Reset() {
+	*x = GetCardsResponse{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_proto_card_card_proto_msgTypes[7]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *GetCardsResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetCardsResponse) ProtoMessage() {}
+
+func (x *GetCardsResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_card_card_proto_msgTypes[7]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetCardsResponse.ProtoReflect.Descriptor instead.
+func (*GetCardsResponse) Descriptor() ([]byte, []int) {
+	return file_proto_card_card_proto_rawDescGZIP(), []int{7}
+}
+
+func (x *GetCardsResponse) GetCards() []*Card {
+	if x != nil {
+		return x.Cards
+	}
+	return nil
+}
+
+type NewCardRequest struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	UserId string `protobuf:"bytes,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+	Card   *Card  `protobuf:"bytes,2,opt,name=card,proto3" json:"card,omitempty"`
+}
+
+func (x *NewCardRequest) Reset() {
+	*x = NewCardRequest{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_proto_card_card_proto_msgTypes[8]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *NewCardRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*NewCardRequest) ProtoMessage() {}
+
+func (x *NewCardRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_card_card_proto_msgTypes[8]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use NewCardRequest.ProtoReflect.Descriptor instead.
+func (*NewCardRequest) Descriptor() ([]byte, []int) {
+	return file_proto_card_card_proto_rawDescGZIP(), []int{8}
+}
+
+func (x *NewCardRequest) GetUserId() string {
+	if x != nil {
+		return x.UserId
+	}
+	return ""
+}
+
+func (x *NewCardRequest) GetCard() *Card {
+	if x != nil {
+		return x.Card
+	}
+	return nil
+}
+
+type NewCardResponse struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Card *Card `protobuf:"bytes,1,opt,name=card,proto3" json:"card,omitempty"`
+}
+
+func (x *NewCardResponse) Reset() {
+	*x = NewCardResponse{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_proto_card_card_proto_msgTypes[9]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *NewCardResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*NewCardResponse) ProtoMessage() {}
+
+func (x *NewCardResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_card_card_proto_msgTypes[9]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use NewCardResponse.ProtoReflect.Descriptor instead.
+func (*NewCardResponse) Descriptor() ([]byte, []int) {
+	return file_proto_card_card_proto_rawDescGZIP(), []int{9}
+}
+
+func (x *NewCardResponse) GetCard() *Card {
+	if x != nil {
+		return x.Card
+	}
+	return nil
+}
+
+type CreateCardRequest struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Card   *Card  `protobuf:"bytes,1,opt,name=card,proto3" json:"card,omitempty"`
+	Prompt string `protobuf:"bytes,2,opt,name=prompt,proto3" json:"prompt,omitempty"`
+}
+
+func (x *CreateCardRequest) Reset() {
+	*x = CreateCardRequest{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_proto_card_card_proto_msgTypes[10]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *CreateCardRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CreateCardRequest) ProtoMessage() {}
+
+func (x *CreateCardRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_card_card_proto_msgTypes[10]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CreateCardRequest.ProtoReflect.Descriptor instead.
+func (*CreateCardRequest) Descriptor() ([]byte, []int) {
+	return file_proto_card_card_proto_rawDescGZIP(), []int{10}
+}
+
+func (x *CreateCardRequest) GetCard() *Card {
+	if x != nil {
+		return x.Card
+	}
+	return nil
+}
+
+func (x *CreateCardRequest) GetPrompt() string {
+	if x != nil {
+		return x.Prompt
+	}
+	return ""
+}
+
+type CreateCardResponse struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Card *Card `protobuf:"bytes,1,opt,name=card,proto3" json:"card,omitempty"`
+}
+
+func (x *CreateCardResponse) Reset() {
+	*x = CreateCardResponse{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_proto_card_card_proto_msgTypes[11]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *CreateCardResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CreateCardResponse) ProtoMessage() {}
+
+func (x *CreateCardResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_card_card_proto_msgTypes[11]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CreateCardResponse.ProtoReflect.Descriptor instead.
+func (*CreateCardResponse) Descriptor() ([]byte, []int) {
+	return file_proto_card_card_proto_rawDescGZIP(), []int{11}
+}
+
+func (x *CreateCardResponse) GetCard() *Card {
+	if x != nil {
+		return x.Card
 	}
 	return nil
 }
@@ -790,113 +815,807 @@ func (x *CreateCardTemplateResponse) GetCardTemplate() *CardTemplate {
 	return nil
 }
 
+type Deck struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Cards  []*Card `protobuf:"bytes,1,rep,name=cards,proto3" json:"cards,omitempty"`
+	UserId string  `protobuf:"bytes,2,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+}
+
+func (x *Deck) Reset() {
+	*x = Deck{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_proto_card_card_proto_msgTypes[14]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *Deck) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Deck) ProtoMessage() {}
+
+func (x *Deck) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_card_card_proto_msgTypes[14]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use Deck.ProtoReflect.Descriptor instead.
+func (*Deck) Descriptor() ([]byte, []int) {
+	return file_proto_card_card_proto_rawDescGZIP(), []int{14}
+}
+
+func (x *Deck) GetCards() []*Card {
+	if x != nil {
+		return x.Cards
+	}
+	return nil
+}
+
+func (x *Deck) GetUserId() string {
+	if x != nil {
+		return x.UserId
+	}
+	return ""
+}
+
+type GenerateDeckRequest struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	NumCards int32  `protobuf:"varint,1,opt,name=num_cards,json=numCards,proto3" json:"num_cards,omitempty"`
+	Biome    string `protobuf:"bytes,2,opt,name=biome,proto3" json:"biome,omitempty"`
+	UserId   string `protobuf:"bytes,3,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+}
+
+func (x *GenerateDeckRequest) Reset() {
+	*x = GenerateDeckRequest{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_proto_card_card_proto_msgTypes[15]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *GenerateDeckRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GenerateDeckRequest) ProtoMessage() {}
+
+func (x *GenerateDeckRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_card_card_proto_msgTypes[15]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GenerateDeckRequest.ProtoReflect.Descriptor instead.
+func (*GenerateDeckRequest) Descriptor() ([]byte, []int) {
+	return file_proto_card_card_proto_rawDescGZIP(), []int{15}
+}
+
+func (x *GenerateDeckRequest) GetNumCards() int32 {
+	if x != nil {
+		return x.NumCards
+	}
+	return 0
+}
+
+func (x *GenerateDeckRequest) GetBiome() string {
+	if x != nil {
+		return x.Biome
+	}
+	return ""
+}
+
+func (x *GenerateDeckRequest) GetUserId() string {
+	if x != nil {
+		return x.UserId
+	}
+	return ""
+}
+
+type GenerateDeckResponse struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Deck *Deck `protobuf:"bytes,1,opt,name=deck,proto3" json:"deck,omitempty"`
+}
+
+func (x *GenerateDeckResponse) Reset() {
+	*x = GenerateDeckResponse{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_proto_card_card_proto_msgTypes[16]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *GenerateDeckResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GenerateDeckResponse) ProtoMessage() {}
+
+func (x *GenerateDeckResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_card_card_proto_msgTypes[16]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GenerateDeckResponse.ProtoReflect.Descriptor instead.
+func (*GenerateDeckResponse) Descriptor() ([]byte, []int) {
+	return file_proto_card_card_proto_rawDescGZIP(), []int{16}
+}
+
+func (x *GenerateDeckResponse) GetDeck() *Deck {
+	if x != nil {
+		return x.Deck
+	}
+	return nil
+}
+
+type CreateDeckRequest struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Deck *Deck `protobuf:"bytes,1,opt,name=deck,proto3" json:"deck,omitempty"`
+}
+
+func (x *CreateDeckRequest) Reset() {
+	*x = CreateDeckRequest{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_proto_card_card_proto_msgTypes[17]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *CreateDeckRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CreateDeckRequest) ProtoMessage() {}
+
+func (x *CreateDeckRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_card_card_proto_msgTypes[17]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CreateDeckRequest.ProtoReflect.Descriptor instead.
+func (*CreateDeckRequest) Descriptor() ([]byte, []int) {
+	return file_proto_card_card_proto_rawDescGZIP(), []int{17}
+}
+
+func (x *CreateDeckRequest) GetDeck() *Deck {
+	if x != nil {
+		return x.Deck
+	}
+	return nil
+}
+
+type CreateDeckResponse struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Deck *Deck `protobuf:"bytes,1,opt,name=deck,proto3" json:"deck,omitempty"`
+}
+
+func (x *CreateDeckResponse) Reset() {
+	*x = CreateDeckResponse{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_proto_card_card_proto_msgTypes[18]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *CreateDeckResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CreateDeckResponse) ProtoMessage() {}
+
+func (x *CreateDeckResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_card_card_proto_msgTypes[18]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CreateDeckResponse.ProtoReflect.Descriptor instead.
+func (*CreateDeckResponse) Descriptor() ([]byte, []int) {
+	return file_proto_card_card_proto_rawDescGZIP(), []int{18}
+}
+
+func (x *CreateDeckResponse) GetDeck() *Deck {
+	if x != nil {
+		return x.Deck
+	}
+	return nil
+}
+
+type GetDeckRequest struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Deck *Deck `protobuf:"bytes,1,opt,name=deck,proto3" json:"deck,omitempty"`
+}
+
+func (x *GetDeckRequest) Reset() {
+	*x = GetDeckRequest{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_proto_card_card_proto_msgTypes[19]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *GetDeckRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetDeckRequest) ProtoMessage() {}
+
+func (x *GetDeckRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_card_card_proto_msgTypes[19]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetDeckRequest.ProtoReflect.Descriptor instead.
+func (*GetDeckRequest) Descriptor() ([]byte, []int) {
+	return file_proto_card_card_proto_rawDescGZIP(), []int{19}
+}
+
+func (x *GetDeckRequest) GetDeck() *Deck {
+	if x != nil {
+		return x.Deck
+	}
+	return nil
+}
+
+type GetDeckResponse struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Deck *Deck `protobuf:"bytes,1,opt,name=deck,proto3" json:"deck,omitempty"`
+}
+
+func (x *GetDeckResponse) Reset() {
+	*x = GetDeckResponse{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_proto_card_card_proto_msgTypes[20]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *GetDeckResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetDeckResponse) ProtoMessage() {}
+
+func (x *GetDeckResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_card_card_proto_msgTypes[20]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetDeckResponse.ProtoReflect.Descriptor instead.
+func (*GetDeckResponse) Descriptor() ([]byte, []int) {
+	return file_proto_card_card_proto_rawDescGZIP(), []int{20}
+}
+
+func (x *GetDeckResponse) GetDeck() *Deck {
+	if x != nil {
+		return x.Deck
+	}
+	return nil
+}
+
+type GetDecksRequest struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	UserId string `protobuf:"bytes,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+}
+
+func (x *GetDecksRequest) Reset() {
+	*x = GetDecksRequest{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_proto_card_card_proto_msgTypes[21]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *GetDecksRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetDecksRequest) ProtoMessage() {}
+
+func (x *GetDecksRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_card_card_proto_msgTypes[21]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetDecksRequest.ProtoReflect.Descriptor instead.
+func (*GetDecksRequest) Descriptor() ([]byte, []int) {
+	return file_proto_card_card_proto_rawDescGZIP(), []int{21}
+}
+
+func (x *GetDecksRequest) GetUserId() string {
+	if x != nil {
+		return x.UserId
+	}
+	return ""
+}
+
+type GetDecksResponse struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Decks []*Deck `protobuf:"bytes,1,rep,name=decks,proto3" json:"decks,omitempty"`
+}
+
+func (x *GetDecksResponse) Reset() {
+	*x = GetDecksResponse{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_proto_card_card_proto_msgTypes[22]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *GetDecksResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetDecksResponse) ProtoMessage() {}
+
+func (x *GetDecksResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_card_card_proto_msgTypes[22]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetDecksResponse.ProtoReflect.Descriptor instead.
+func (*GetDecksResponse) Descriptor() ([]byte, []int) {
+	return file_proto_card_card_proto_rawDescGZIP(), []int{22}
+}
+
+func (x *GetDecksResponse) GetDecks() []*Deck {
+	if x != nil {
+		return x.Decks
+	}
+	return nil
+}
+
+type UpdateDeckRequest struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Deck *Deck `protobuf:"bytes,1,opt,name=deck,proto3" json:"deck,omitempty"`
+}
+
+func (x *UpdateDeckRequest) Reset() {
+	*x = UpdateDeckRequest{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_proto_card_card_proto_msgTypes[23]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *UpdateDeckRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UpdateDeckRequest) ProtoMessage() {}
+
+func (x *UpdateDeckRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_card_card_proto_msgTypes[23]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UpdateDeckRequest.ProtoReflect.Descriptor instead.
+func (*UpdateDeckRequest) Descriptor() ([]byte, []int) {
+	return file_proto_card_card_proto_rawDescGZIP(), []int{23}
+}
+
+func (x *UpdateDeckRequest) GetDeck() *Deck {
+	if x != nil {
+		return x.Deck
+	}
+	return nil
+}
+
+type UpdateDeckResponse struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Deck *Deck `protobuf:"bytes,1,opt,name=deck,proto3" json:"deck,omitempty"`
+}
+
+func (x *UpdateDeckResponse) Reset() {
+	*x = UpdateDeckResponse{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_proto_card_card_proto_msgTypes[24]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *UpdateDeckResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UpdateDeckResponse) ProtoMessage() {}
+
+func (x *UpdateDeckResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_card_card_proto_msgTypes[24]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UpdateDeckResponse.ProtoReflect.Descriptor instead.
+func (*UpdateDeckResponse) Descriptor() ([]byte, []int) {
+	return file_proto_card_card_proto_rawDescGZIP(), []int{24}
+}
+
+func (x *UpdateDeckResponse) GetDeck() *Deck {
+	if x != nil {
+		return x.Deck
+	}
+	return nil
+}
+
+type DeleteDeckRequest struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Deck *Deck `protobuf:"bytes,1,opt,name=deck,proto3" json:"deck,omitempty"`
+}
+
+func (x *DeleteDeckRequest) Reset() {
+	*x = DeleteDeckRequest{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_proto_card_card_proto_msgTypes[25]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *DeleteDeckRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DeleteDeckRequest) ProtoMessage() {}
+
+func (x *DeleteDeckRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_card_card_proto_msgTypes[25]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DeleteDeckRequest.ProtoReflect.Descriptor instead.
+func (*DeleteDeckRequest) Descriptor() ([]byte, []int) {
+	return file_proto_card_card_proto_rawDescGZIP(), []int{25}
+}
+
+func (x *DeleteDeckRequest) GetDeck() *Deck {
+	if x != nil {
+		return x.Deck
+	}
+	return nil
+}
+
+type DeleteDeckResponse struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Deck *Deck `protobuf:"bytes,1,opt,name=deck,proto3" json:"deck,omitempty"`
+}
+
+func (x *DeleteDeckResponse) Reset() {
+	*x = DeleteDeckResponse{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_proto_card_card_proto_msgTypes[26]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *DeleteDeckResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DeleteDeckResponse) ProtoMessage() {}
+
+func (x *DeleteDeckResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_card_card_proto_msgTypes[26]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DeleteDeckResponse.ProtoReflect.Descriptor instead.
+func (*DeleteDeckResponse) Descriptor() ([]byte, []int) {
+	return file_proto_card_card_proto_rawDescGZIP(), []int{26}
+}
+
+func (x *DeleteDeckResponse) GetDeck() *Deck {
+	if x != nil {
+		return x.Deck
+	}
+	return nil
+}
+
 var File_proto_card_card_proto protoreflect.FileDescriptor
 
 var file_proto_card_card_proto_rawDesc = []byte{
 	0x0a, 0x15, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2f, 0x63, 0x61, 0x72, 0x64, 0x2f, 0x63, 0x61, 0x72,
-	0x64, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x12, 0x04, 0x63, 0x61, 0x72, 0x64, 0x22, 0x45, 0x0a,
-	0x14, 0x47, 0x65, 0x6e, 0x65, 0x72, 0x61, 0x74, 0x65, 0x43, 0x61, 0x72, 0x64, 0x73, 0x52, 0x65,
+	0x64, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x12, 0x04, 0x63, 0x61, 0x72, 0x64, 0x22, 0xdb, 0x01,
+	0x0a, 0x04, 0x43, 0x61, 0x72, 0x64, 0x12, 0x0e, 0x0a, 0x02, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01,
+	0x28, 0x05, 0x52, 0x02, 0x69, 0x64, 0x12, 0x12, 0x0a, 0x04, 0x6e, 0x61, 0x6d, 0x65, 0x18, 0x02,
+	0x20, 0x01, 0x28, 0x09, 0x52, 0x04, 0x6e, 0x61, 0x6d, 0x65, 0x12, 0x14, 0x0a, 0x05, 0x62, 0x69,
+	0x6f, 0x6d, 0x65, 0x18, 0x03, 0x20, 0x01, 0x28, 0x09, 0x52, 0x05, 0x62, 0x69, 0x6f, 0x6d, 0x65,
+	0x12, 0x18, 0x0a, 0x07, 0x65, 0x6c, 0x65, 0x6d, 0x65, 0x6e, 0x74, 0x18, 0x04, 0x20, 0x01, 0x28,
+	0x09, 0x52, 0x07, 0x65, 0x6c, 0x65, 0x6d, 0x65, 0x6e, 0x74, 0x12, 0x16, 0x0a, 0x06, 0x61, 0x6e,
+	0x69, 0x6d, 0x61, 0x6c, 0x18, 0x05, 0x20, 0x01, 0x28, 0x09, 0x52, 0x06, 0x61, 0x6e, 0x69, 0x6d,
+	0x61, 0x6c, 0x12, 0x14, 0x0a, 0x05, 0x70, 0x6c, 0x61, 0x6e, 0x74, 0x18, 0x06, 0x20, 0x01, 0x28,
+	0x09, 0x52, 0x05, 0x70, 0x6c, 0x61, 0x6e, 0x74, 0x12, 0x20, 0x0a, 0x0b, 0x64, 0x65, 0x73, 0x63,
+	0x72, 0x69, 0x70, 0x74, 0x69, 0x6f, 0x6e, 0x18, 0x07, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0b, 0x64,
+	0x65, 0x73, 0x63, 0x72, 0x69, 0x70, 0x74, 0x69, 0x6f, 0x6e, 0x12, 0x17, 0x0a, 0x07, 0x69, 0x6d,
+	0x67, 0x5f, 0x75, 0x72, 0x6c, 0x18, 0x08, 0x20, 0x01, 0x28, 0x09, 0x52, 0x06, 0x69, 0x6d, 0x67,
+	0x55, 0x72, 0x6c, 0x12, 0x16, 0x0a, 0x06, 0x70, 0x6c, 0x61, 0x79, 0x65, 0x72, 0x18, 0x09, 0x20,
+	0x01, 0x28, 0x09, 0x52, 0x06, 0x70, 0x6c, 0x61, 0x79, 0x65, 0x72, 0x22, 0x9c, 0x01, 0x0a, 0x0c,
+	0x43, 0x61, 0x72, 0x64, 0x54, 0x65, 0x6d, 0x70, 0x6c, 0x61, 0x74, 0x65, 0x12, 0x1a, 0x0a, 0x08,
+	0x74, 0x65, 0x6d, 0x70, 0x6c, 0x61, 0x74, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x08,
+	0x74, 0x65, 0x6d, 0x70, 0x6c, 0x61, 0x74, 0x65, 0x12, 0x18, 0x0a, 0x07, 0x61, 0x6e, 0x69, 0x6d,
+	0x61, 0x6c, 0x73, 0x18, 0x02, 0x20, 0x03, 0x28, 0x09, 0x52, 0x07, 0x61, 0x6e, 0x69, 0x6d, 0x61,
+	0x6c, 0x73, 0x12, 0x16, 0x0a, 0x06, 0x70, 0x6c, 0x61, 0x6e, 0x74, 0x73, 0x18, 0x03, 0x20, 0x03,
+	0x28, 0x09, 0x52, 0x06, 0x70, 0x6c, 0x61, 0x6e, 0x74, 0x73, 0x12, 0x1a, 0x0a, 0x08, 0x65, 0x6c,
+	0x65, 0x6d, 0x65, 0x6e, 0x74, 0x73, 0x18, 0x04, 0x20, 0x03, 0x28, 0x09, 0x52, 0x08, 0x65, 0x6c,
+	0x65, 0x6d, 0x65, 0x6e, 0x74, 0x73, 0x12, 0x22, 0x0a, 0x0c, 0x64, 0x65, 0x73, 0x63, 0x72, 0x69,
+	0x70, 0x74, 0x69, 0x6f, 0x6e, 0x73, 0x18, 0x05, 0x20, 0x03, 0x28, 0x09, 0x52, 0x0c, 0x64, 0x65,
+	0x73, 0x63, 0x72, 0x69, 0x70, 0x74, 0x69, 0x6f, 0x6e, 0x73, 0x22, 0x45, 0x0a, 0x14, 0x47, 0x65,
+	0x6e, 0x65, 0x72, 0x61, 0x74, 0x65, 0x43, 0x61, 0x72, 0x64, 0x73, 0x52, 0x65, 0x71, 0x75, 0x65,
+	0x73, 0x74, 0x12, 0x17, 0x0a, 0x07, 0x75, 0x73, 0x65, 0x72, 0x5f, 0x69, 0x64, 0x18, 0x01, 0x20,
+	0x01, 0x28, 0x09, 0x52, 0x06, 0x75, 0x73, 0x65, 0x72, 0x49, 0x64, 0x12, 0x14, 0x0a, 0x05, 0x63,
+	0x6f, 0x75, 0x6e, 0x74, 0x18, 0x02, 0x20, 0x01, 0x28, 0x05, 0x52, 0x05, 0x63, 0x6f, 0x75, 0x6e,
+	0x74, 0x22, 0x39, 0x0a, 0x15, 0x47, 0x65, 0x6e, 0x65, 0x72, 0x61, 0x74, 0x65, 0x43, 0x61, 0x72,
+	0x64, 0x73, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x20, 0x0a, 0x05, 0x63, 0x61,
+	0x72, 0x64, 0x73, 0x18, 0x01, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x0a, 0x2e, 0x63, 0x61, 0x72, 0x64,
+	0x2e, 0x43, 0x61, 0x72, 0x64, 0x52, 0x05, 0x63, 0x61, 0x72, 0x64, 0x73, 0x22, 0x45, 0x0a, 0x11,
+	0x44, 0x65, 0x6c, 0x65, 0x74, 0x65, 0x43, 0x61, 0x72, 0x64, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73,
+	0x74, 0x12, 0x17, 0x0a, 0x07, 0x75, 0x73, 0x65, 0x72, 0x5f, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01,
+	0x28, 0x09, 0x52, 0x06, 0x75, 0x73, 0x65, 0x72, 0x49, 0x64, 0x12, 0x17, 0x0a, 0x07, 0x63, 0x61,
+	0x72, 0x64, 0x5f, 0x69, 0x64, 0x18, 0x02, 0x20, 0x01, 0x28, 0x05, 0x52, 0x06, 0x63, 0x61, 0x72,
+	0x64, 0x49, 0x64, 0x22, 0x2d, 0x0a, 0x12, 0x44, 0x65, 0x6c, 0x65, 0x74, 0x65, 0x43, 0x61, 0x72,
+	0x64, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x17, 0x0a, 0x07, 0x63, 0x61, 0x72,
+	0x64, 0x5f, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x05, 0x52, 0x06, 0x63, 0x61, 0x72, 0x64,
+	0x49, 0x64, 0x22, 0x2a, 0x0a, 0x0f, 0x47, 0x65, 0x74, 0x43, 0x61, 0x72, 0x64, 0x73, 0x52, 0x65,
 	0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x17, 0x0a, 0x07, 0x75, 0x73, 0x65, 0x72, 0x5f, 0x69, 0x64,
-	0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x06, 0x75, 0x73, 0x65, 0x72, 0x49, 0x64, 0x12, 0x14,
-	0x0a, 0x05, 0x63, 0x6f, 0x75, 0x6e, 0x74, 0x18, 0x02, 0x20, 0x01, 0x28, 0x05, 0x52, 0x05, 0x63,
-	0x6f, 0x75, 0x6e, 0x74, 0x22, 0x39, 0x0a, 0x15, 0x47, 0x65, 0x6e, 0x65, 0x72, 0x61, 0x74, 0x65,
-	0x43, 0x61, 0x72, 0x64, 0x73, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x20, 0x0a,
-	0x05, 0x63, 0x61, 0x72, 0x64, 0x73, 0x18, 0x01, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x0a, 0x2e, 0x63,
-	0x61, 0x72, 0x64, 0x2e, 0x43, 0x61, 0x72, 0x64, 0x52, 0x05, 0x63, 0x61, 0x72, 0x64, 0x73, 0x22,
-	0x45, 0x0a, 0x11, 0x44, 0x65, 0x6c, 0x65, 0x74, 0x65, 0x43, 0x61, 0x72, 0x64, 0x52, 0x65, 0x71,
-	0x75, 0x65, 0x73, 0x74, 0x12, 0x17, 0x0a, 0x07, 0x75, 0x73, 0x65, 0x72, 0x5f, 0x69, 0x64, 0x18,
-	0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x06, 0x75, 0x73, 0x65, 0x72, 0x49, 0x64, 0x12, 0x17, 0x0a,
-	0x07, 0x63, 0x61, 0x72, 0x64, 0x5f, 0x69, 0x64, 0x18, 0x02, 0x20, 0x01, 0x28, 0x05, 0x52, 0x06,
-	0x63, 0x61, 0x72, 0x64, 0x49, 0x64, 0x22, 0x2d, 0x0a, 0x12, 0x44, 0x65, 0x6c, 0x65, 0x74, 0x65,
-	0x43, 0x61, 0x72, 0x64, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x17, 0x0a, 0x07,
-	0x63, 0x61, 0x72, 0x64, 0x5f, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x05, 0x52, 0x06, 0x63,
-	0x61, 0x72, 0x64, 0x49, 0x64, 0x22, 0x2a, 0x0a, 0x0f, 0x47, 0x65, 0x74, 0x43, 0x61, 0x72, 0x64,
-	0x73, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x17, 0x0a, 0x07, 0x75, 0x73, 0x65, 0x72,
-	0x5f, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x06, 0x75, 0x73, 0x65, 0x72, 0x49,
-	0x64, 0x22, 0x34, 0x0a, 0x10, 0x47, 0x65, 0x74, 0x43, 0x61, 0x72, 0x64, 0x73, 0x52, 0x65, 0x73,
-	0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x20, 0x0a, 0x05, 0x63, 0x61, 0x72, 0x64, 0x73, 0x18, 0x01,
-	0x20, 0x03, 0x28, 0x0b, 0x32, 0x0a, 0x2e, 0x63, 0x61, 0x72, 0x64, 0x2e, 0x43, 0x61, 0x72, 0x64,
-	0x52, 0x05, 0x63, 0x61, 0x72, 0x64, 0x73, 0x22, 0x49, 0x0a, 0x0e, 0x4e, 0x65, 0x77, 0x43, 0x61,
-	0x72, 0x64, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x17, 0x0a, 0x07, 0x75, 0x73, 0x65,
-	0x72, 0x5f, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x06, 0x75, 0x73, 0x65, 0x72,
-	0x49, 0x64, 0x12, 0x1e, 0x0a, 0x04, 0x63, 0x61, 0x72, 0x64, 0x18, 0x02, 0x20, 0x01, 0x28, 0x0b,
+	0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x06, 0x75, 0x73, 0x65, 0x72, 0x49, 0x64, 0x22, 0x34,
+	0x0a, 0x10, 0x47, 0x65, 0x74, 0x43, 0x61, 0x72, 0x64, 0x73, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e,
+	0x73, 0x65, 0x12, 0x20, 0x0a, 0x05, 0x63, 0x61, 0x72, 0x64, 0x73, 0x18, 0x01, 0x20, 0x03, 0x28,
+	0x0b, 0x32, 0x0a, 0x2e, 0x63, 0x61, 0x72, 0x64, 0x2e, 0x43, 0x61, 0x72, 0x64, 0x52, 0x05, 0x63,
+	0x61, 0x72, 0x64, 0x73, 0x22, 0x49, 0x0a, 0x0e, 0x4e, 0x65, 0x77, 0x43, 0x61, 0x72, 0x64, 0x52,
+	0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x17, 0x0a, 0x07, 0x75, 0x73, 0x65, 0x72, 0x5f, 0x69,
+	0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x06, 0x75, 0x73, 0x65, 0x72, 0x49, 0x64, 0x12,
+	0x1e, 0x0a, 0x04, 0x63, 0x61, 0x72, 0x64, 0x18, 0x02, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x0a, 0x2e,
+	0x63, 0x61, 0x72, 0x64, 0x2e, 0x43, 0x61, 0x72, 0x64, 0x52, 0x04, 0x63, 0x61, 0x72, 0x64, 0x22,
+	0x31, 0x0a, 0x0f, 0x4e, 0x65, 0x77, 0x43, 0x61, 0x72, 0x64, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e,
+	0x73, 0x65, 0x12, 0x1e, 0x0a, 0x04, 0x63, 0x61, 0x72, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b,
 	0x32, 0x0a, 0x2e, 0x63, 0x61, 0x72, 0x64, 0x2e, 0x43, 0x61, 0x72, 0x64, 0x52, 0x04, 0x63, 0x61,
-	0x72, 0x64, 0x22, 0x31, 0x0a, 0x0f, 0x4e, 0x65, 0x77, 0x43, 0x61, 0x72, 0x64, 0x52, 0x65, 0x73,
+	0x72, 0x64, 0x22, 0x4b, 0x0a, 0x11, 0x43, 0x72, 0x65, 0x61, 0x74, 0x65, 0x43, 0x61, 0x72, 0x64,
+	0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x1e, 0x0a, 0x04, 0x63, 0x61, 0x72, 0x64, 0x18,
+	0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x0a, 0x2e, 0x63, 0x61, 0x72, 0x64, 0x2e, 0x43, 0x61, 0x72,
+	0x64, 0x52, 0x04, 0x63, 0x61, 0x72, 0x64, 0x12, 0x16, 0x0a, 0x06, 0x70, 0x72, 0x6f, 0x6d, 0x70,
+	0x74, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x06, 0x70, 0x72, 0x6f, 0x6d, 0x70, 0x74, 0x22,
+	0x34, 0x0a, 0x12, 0x43, 0x72, 0x65, 0x61, 0x74, 0x65, 0x43, 0x61, 0x72, 0x64, 0x52, 0x65, 0x73,
 	0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x1e, 0x0a, 0x04, 0x63, 0x61, 0x72, 0x64, 0x18, 0x01, 0x20,
 	0x01, 0x28, 0x0b, 0x32, 0x0a, 0x2e, 0x63, 0x61, 0x72, 0x64, 0x2e, 0x43, 0x61, 0x72, 0x64, 0x52,
-	0x04, 0x63, 0x61, 0x72, 0x64, 0x22, 0x4b, 0x0a, 0x11, 0x43, 0x72, 0x65, 0x61, 0x74, 0x65, 0x43,
-	0x61, 0x72, 0x64, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x1e, 0x0a, 0x04, 0x63, 0x61,
-	0x72, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x0a, 0x2e, 0x63, 0x61, 0x72, 0x64, 0x2e,
-	0x43, 0x61, 0x72, 0x64, 0x52, 0x04, 0x63, 0x61, 0x72, 0x64, 0x12, 0x16, 0x0a, 0x06, 0x70, 0x72,
-	0x6f, 0x6d, 0x70, 0x74, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x06, 0x70, 0x72, 0x6f, 0x6d,
-	0x70, 0x74, 0x22, 0x34, 0x0a, 0x12, 0x43, 0x72, 0x65, 0x61, 0x74, 0x65, 0x43, 0x61, 0x72, 0x64,
-	0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x1e, 0x0a, 0x04, 0x63, 0x61, 0x72, 0x64,
-	0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x0a, 0x2e, 0x63, 0x61, 0x72, 0x64, 0x2e, 0x43, 0x61,
-	0x72, 0x64, 0x52, 0x04, 0x63, 0x61, 0x72, 0x64, 0x22, 0xad, 0x01, 0x0a, 0x04, 0x43, 0x61, 0x72,
-	0x64, 0x12, 0x0e, 0x0a, 0x02, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x05, 0x52, 0x02, 0x69,
-	0x64, 0x12, 0x12, 0x0a, 0x04, 0x6e, 0x61, 0x6d, 0x65, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52,
-	0x04, 0x6e, 0x61, 0x6d, 0x65, 0x12, 0x14, 0x0a, 0x05, 0x62, 0x69, 0x6f, 0x6d, 0x65, 0x18, 0x03,
-	0x20, 0x01, 0x28, 0x09, 0x52, 0x05, 0x62, 0x69, 0x6f, 0x6d, 0x65, 0x12, 0x18, 0x0a, 0x07, 0x65,
-	0x6c, 0x65, 0x6d, 0x65, 0x6e, 0x74, 0x18, 0x04, 0x20, 0x01, 0x28, 0x09, 0x52, 0x07, 0x65, 0x6c,
-	0x65, 0x6d, 0x65, 0x6e, 0x74, 0x12, 0x16, 0x0a, 0x06, 0x61, 0x6e, 0x69, 0x6d, 0x61, 0x6c, 0x18,
-	0x05, 0x20, 0x01, 0x28, 0x09, 0x52, 0x06, 0x61, 0x6e, 0x69, 0x6d, 0x61, 0x6c, 0x12, 0x20, 0x0a,
-	0x0b, 0x64, 0x65, 0x73, 0x63, 0x72, 0x69, 0x70, 0x74, 0x69, 0x6f, 0x6e, 0x18, 0x06, 0x20, 0x01,
-	0x28, 0x09, 0x52, 0x0b, 0x64, 0x65, 0x73, 0x63, 0x72, 0x69, 0x70, 0x74, 0x69, 0x6f, 0x6e, 0x12,
-	0x17, 0x0a, 0x07, 0x69, 0x6d, 0x67, 0x5f, 0x75, 0x72, 0x6c, 0x18, 0x07, 0x20, 0x01, 0x28, 0x09,
-	0x52, 0x06, 0x69, 0x6d, 0x67, 0x55, 0x72, 0x6c, 0x22, 0x84, 0x01, 0x0a, 0x0c, 0x43, 0x61, 0x72,
-	0x64, 0x54, 0x65, 0x6d, 0x70, 0x6c, 0x61, 0x74, 0x65, 0x12, 0x1a, 0x0a, 0x08, 0x74, 0x65, 0x6d,
-	0x70, 0x6c, 0x61, 0x74, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x08, 0x74, 0x65, 0x6d,
-	0x70, 0x6c, 0x61, 0x74, 0x65, 0x12, 0x18, 0x0a, 0x07, 0x61, 0x6e, 0x69, 0x6d, 0x61, 0x6c, 0x73,
-	0x18, 0x02, 0x20, 0x03, 0x28, 0x09, 0x52, 0x07, 0x61, 0x6e, 0x69, 0x6d, 0x61, 0x6c, 0x73, 0x12,
-	0x1a, 0x0a, 0x08, 0x65, 0x6c, 0x65, 0x6d, 0x65, 0x6e, 0x74, 0x73, 0x18, 0x03, 0x20, 0x03, 0x28,
-	0x09, 0x52, 0x08, 0x65, 0x6c, 0x65, 0x6d, 0x65, 0x6e, 0x74, 0x73, 0x12, 0x22, 0x0a, 0x0c, 0x64,
-	0x65, 0x73, 0x63, 0x72, 0x69, 0x70, 0x74, 0x69, 0x6f, 0x6e, 0x73, 0x18, 0x04, 0x20, 0x03, 0x28,
-	0x09, 0x52, 0x0c, 0x64, 0x65, 0x73, 0x63, 0x72, 0x69, 0x70, 0x74, 0x69, 0x6f, 0x6e, 0x73, 0x22,
-	0x6a, 0x0a, 0x19, 0x43, 0x72, 0x65, 0x61, 0x74, 0x65, 0x43, 0x61, 0x72, 0x64, 0x54, 0x65, 0x6d,
-	0x70, 0x6c, 0x61, 0x74, 0x65, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x37, 0x0a, 0x0d,
-	0x63, 0x61, 0x72, 0x64, 0x5f, 0x74, 0x65, 0x6d, 0x70, 0x6c, 0x61, 0x74, 0x65, 0x18, 0x01, 0x20,
-	0x01, 0x28, 0x0b, 0x32, 0x12, 0x2e, 0x63, 0x61, 0x72, 0x64, 0x2e, 0x43, 0x61, 0x72, 0x64, 0x54,
-	0x65, 0x6d, 0x70, 0x6c, 0x61, 0x74, 0x65, 0x52, 0x0c, 0x63, 0x61, 0x72, 0x64, 0x54, 0x65, 0x6d,
-	0x70, 0x6c, 0x61, 0x74, 0x65, 0x12, 0x14, 0x0a, 0x05, 0x62, 0x69, 0x6f, 0x6d, 0x65, 0x18, 0x02,
-	0x20, 0x01, 0x28, 0x09, 0x52, 0x05, 0x62, 0x69, 0x6f, 0x6d, 0x65, 0x22, 0x55, 0x0a, 0x1a, 0x43,
-	0x72, 0x65, 0x61, 0x74, 0x65, 0x43, 0x61, 0x72, 0x64, 0x54, 0x65, 0x6d, 0x70, 0x6c, 0x61, 0x74,
-	0x65, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x37, 0x0a, 0x0d, 0x63, 0x61, 0x72,
-	0x64, 0x5f, 0x74, 0x65, 0x6d, 0x70, 0x6c, 0x61, 0x74, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b,
-	0x32, 0x12, 0x2e, 0x63, 0x61, 0x72, 0x64, 0x2e, 0x43, 0x61, 0x72, 0x64, 0x54, 0x65, 0x6d, 0x70,
-	0x6c, 0x61, 0x74, 0x65, 0x52, 0x0c, 0x63, 0x61, 0x72, 0x64, 0x54, 0x65, 0x6d, 0x70, 0x6c, 0x61,
-	0x74, 0x65, 0x32, 0xa5, 0x03, 0x0a, 0x0b, 0x43, 0x61, 0x72, 0x64, 0x53, 0x65, 0x72, 0x76, 0x69,
-	0x63, 0x65, 0x12, 0x39, 0x0a, 0x08, 0x47, 0x65, 0x74, 0x43, 0x61, 0x72, 0x64, 0x73, 0x12, 0x15,
-	0x2e, 0x63, 0x61, 0x72, 0x64, 0x2e, 0x47, 0x65, 0x74, 0x43, 0x61, 0x72, 0x64, 0x73, 0x52, 0x65,
-	0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x16, 0x2e, 0x63, 0x61, 0x72, 0x64, 0x2e, 0x47, 0x65, 0x74,
-	0x43, 0x61, 0x72, 0x64, 0x73, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x36, 0x0a,
-	0x07, 0x4e, 0x65, 0x77, 0x43, 0x61, 0x72, 0x64, 0x12, 0x14, 0x2e, 0x63, 0x61, 0x72, 0x64, 0x2e,
-	0x4e, 0x65, 0x77, 0x43, 0x61, 0x72, 0x64, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x15,
-	0x2e, 0x63, 0x61, 0x72, 0x64, 0x2e, 0x4e, 0x65, 0x77, 0x43, 0x61, 0x72, 0x64, 0x52, 0x65, 0x73,
-	0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x3f, 0x0a, 0x0a, 0x44, 0x65, 0x6c, 0x65, 0x74, 0x65, 0x43,
-	0x61, 0x72, 0x64, 0x12, 0x17, 0x2e, 0x63, 0x61, 0x72, 0x64, 0x2e, 0x44, 0x65, 0x6c, 0x65, 0x74,
+	0x04, 0x63, 0x61, 0x72, 0x64, 0x22, 0x6a, 0x0a, 0x19, 0x43, 0x72, 0x65, 0x61, 0x74, 0x65, 0x43,
+	0x61, 0x72, 0x64, 0x54, 0x65, 0x6d, 0x70, 0x6c, 0x61, 0x74, 0x65, 0x52, 0x65, 0x71, 0x75, 0x65,
+	0x73, 0x74, 0x12, 0x37, 0x0a, 0x0d, 0x63, 0x61, 0x72, 0x64, 0x5f, 0x74, 0x65, 0x6d, 0x70, 0x6c,
+	0x61, 0x74, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x12, 0x2e, 0x63, 0x61, 0x72, 0x64,
+	0x2e, 0x43, 0x61, 0x72, 0x64, 0x54, 0x65, 0x6d, 0x70, 0x6c, 0x61, 0x74, 0x65, 0x52, 0x0c, 0x63,
+	0x61, 0x72, 0x64, 0x54, 0x65, 0x6d, 0x70, 0x6c, 0x61, 0x74, 0x65, 0x12, 0x14, 0x0a, 0x05, 0x62,
+	0x69, 0x6f, 0x6d, 0x65, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x05, 0x62, 0x69, 0x6f, 0x6d,
+	0x65, 0x22, 0x55, 0x0a, 0x1a, 0x43, 0x72, 0x65, 0x61, 0x74, 0x65, 0x43, 0x61, 0x72, 0x64, 0x54,
+	0x65, 0x6d, 0x70, 0x6c, 0x61, 0x74, 0x65, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12,
+	0x37, 0x0a, 0x0d, 0x63, 0x61, 0x72, 0x64, 0x5f, 0x74, 0x65, 0x6d, 0x70, 0x6c, 0x61, 0x74, 0x65,
+	0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x12, 0x2e, 0x63, 0x61, 0x72, 0x64, 0x2e, 0x43, 0x61,
+	0x72, 0x64, 0x54, 0x65, 0x6d, 0x70, 0x6c, 0x61, 0x74, 0x65, 0x52, 0x0c, 0x63, 0x61, 0x72, 0x64,
+	0x54, 0x65, 0x6d, 0x70, 0x6c, 0x61, 0x74, 0x65, 0x22, 0x41, 0x0a, 0x04, 0x44, 0x65, 0x63, 0x6b,
+	0x12, 0x20, 0x0a, 0x05, 0x63, 0x61, 0x72, 0x64, 0x73, 0x18, 0x01, 0x20, 0x03, 0x28, 0x0b, 0x32,
+	0x0a, 0x2e, 0x63, 0x61, 0x72, 0x64, 0x2e, 0x43, 0x61, 0x72, 0x64, 0x52, 0x05, 0x63, 0x61, 0x72,
+	0x64, 0x73, 0x12, 0x17, 0x0a, 0x07, 0x75, 0x73, 0x65, 0x72, 0x5f, 0x69, 0x64, 0x18, 0x02, 0x20,
+	0x01, 0x28, 0x09, 0x52, 0x06, 0x75, 0x73, 0x65, 0x72, 0x49, 0x64, 0x22, 0x61, 0x0a, 0x13, 0x47,
+	0x65, 0x6e, 0x65, 0x72, 0x61, 0x74, 0x65, 0x44, 0x65, 0x63, 0x6b, 0x52, 0x65, 0x71, 0x75, 0x65,
+	0x73, 0x74, 0x12, 0x1b, 0x0a, 0x09, 0x6e, 0x75, 0x6d, 0x5f, 0x63, 0x61, 0x72, 0x64, 0x73, 0x18,
+	0x01, 0x20, 0x01, 0x28, 0x05, 0x52, 0x08, 0x6e, 0x75, 0x6d, 0x43, 0x61, 0x72, 0x64, 0x73, 0x12,
+	0x14, 0x0a, 0x05, 0x62, 0x69, 0x6f, 0x6d, 0x65, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x05,
+	0x62, 0x69, 0x6f, 0x6d, 0x65, 0x12, 0x17, 0x0a, 0x07, 0x75, 0x73, 0x65, 0x72, 0x5f, 0x69, 0x64,
+	0x18, 0x03, 0x20, 0x01, 0x28, 0x09, 0x52, 0x06, 0x75, 0x73, 0x65, 0x72, 0x49, 0x64, 0x22, 0x36,
+	0x0a, 0x14, 0x47, 0x65, 0x6e, 0x65, 0x72, 0x61, 0x74, 0x65, 0x44, 0x65, 0x63, 0x6b, 0x52, 0x65,
+	0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x1e, 0x0a, 0x04, 0x64, 0x65, 0x63, 0x6b, 0x18, 0x01,
+	0x20, 0x01, 0x28, 0x0b, 0x32, 0x0a, 0x2e, 0x63, 0x61, 0x72, 0x64, 0x2e, 0x44, 0x65, 0x63, 0x6b,
+	0x52, 0x04, 0x64, 0x65, 0x63, 0x6b, 0x22, 0x33, 0x0a, 0x11, 0x43, 0x72, 0x65, 0x61, 0x74, 0x65,
+	0x44, 0x65, 0x63, 0x6b, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x1e, 0x0a, 0x04, 0x64,
+	0x65, 0x63, 0x6b, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x0a, 0x2e, 0x63, 0x61, 0x72, 0x64,
+	0x2e, 0x44, 0x65, 0x63, 0x6b, 0x52, 0x04, 0x64, 0x65, 0x63, 0x6b, 0x22, 0x34, 0x0a, 0x12, 0x43,
+	0x72, 0x65, 0x61, 0x74, 0x65, 0x44, 0x65, 0x63, 0x6b, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73,
+	0x65, 0x12, 0x1e, 0x0a, 0x04, 0x64, 0x65, 0x63, 0x6b, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32,
+	0x0a, 0x2e, 0x63, 0x61, 0x72, 0x64, 0x2e, 0x44, 0x65, 0x63, 0x6b, 0x52, 0x04, 0x64, 0x65, 0x63,
+	0x6b, 0x22, 0x30, 0x0a, 0x0e, 0x47, 0x65, 0x74, 0x44, 0x65, 0x63, 0x6b, 0x52, 0x65, 0x71, 0x75,
+	0x65, 0x73, 0x74, 0x12, 0x1e, 0x0a, 0x04, 0x64, 0x65, 0x63, 0x6b, 0x18, 0x01, 0x20, 0x01, 0x28,
+	0x0b, 0x32, 0x0a, 0x2e, 0x63, 0x61, 0x72, 0x64, 0x2e, 0x44, 0x65, 0x63, 0x6b, 0x52, 0x04, 0x64,
+	0x65, 0x63, 0x6b, 0x22, 0x31, 0x0a, 0x0f, 0x47, 0x65, 0x74, 0x44, 0x65, 0x63, 0x6b, 0x52, 0x65,
+	0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x1e, 0x0a, 0x04, 0x64, 0x65, 0x63, 0x6b, 0x18, 0x01,
+	0x20, 0x01, 0x28, 0x0b, 0x32, 0x0a, 0x2e, 0x63, 0x61, 0x72, 0x64, 0x2e, 0x44, 0x65, 0x63, 0x6b,
+	0x52, 0x04, 0x64, 0x65, 0x63, 0x6b, 0x22, 0x2a, 0x0a, 0x0f, 0x47, 0x65, 0x74, 0x44, 0x65, 0x63,
+	0x6b, 0x73, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x17, 0x0a, 0x07, 0x75, 0x73, 0x65,
+	0x72, 0x5f, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x06, 0x75, 0x73, 0x65, 0x72,
+	0x49, 0x64, 0x22, 0x34, 0x0a, 0x10, 0x47, 0x65, 0x74, 0x44, 0x65, 0x63, 0x6b, 0x73, 0x52, 0x65,
+	0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x20, 0x0a, 0x05, 0x64, 0x65, 0x63, 0x6b, 0x73, 0x18,
+	0x01, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x0a, 0x2e, 0x63, 0x61, 0x72, 0x64, 0x2e, 0x44, 0x65, 0x63,
+	0x6b, 0x52, 0x05, 0x64, 0x65, 0x63, 0x6b, 0x73, 0x22, 0x33, 0x0a, 0x11, 0x55, 0x70, 0x64, 0x61,
+	0x74, 0x65, 0x44, 0x65, 0x63, 0x6b, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x1e, 0x0a,
+	0x04, 0x64, 0x65, 0x63, 0x6b, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x0a, 0x2e, 0x63, 0x61,
+	0x72, 0x64, 0x2e, 0x44, 0x65, 0x63, 0x6b, 0x52, 0x04, 0x64, 0x65, 0x63, 0x6b, 0x22, 0x34, 0x0a,
+	0x12, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x44, 0x65, 0x63, 0x6b, 0x52, 0x65, 0x73, 0x70, 0x6f,
+	0x6e, 0x73, 0x65, 0x12, 0x1e, 0x0a, 0x04, 0x64, 0x65, 0x63, 0x6b, 0x18, 0x01, 0x20, 0x01, 0x28,
+	0x0b, 0x32, 0x0a, 0x2e, 0x63, 0x61, 0x72, 0x64, 0x2e, 0x44, 0x65, 0x63, 0x6b, 0x52, 0x04, 0x64,
+	0x65, 0x63, 0x6b, 0x22, 0x33, 0x0a, 0x11, 0x44, 0x65, 0x6c, 0x65, 0x74, 0x65, 0x44, 0x65, 0x63,
+	0x6b, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x1e, 0x0a, 0x04, 0x64, 0x65, 0x63, 0x6b,
+	0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x0a, 0x2e, 0x63, 0x61, 0x72, 0x64, 0x2e, 0x44, 0x65,
+	0x63, 0x6b, 0x52, 0x04, 0x64, 0x65, 0x63, 0x6b, 0x22, 0x34, 0x0a, 0x12, 0x44, 0x65, 0x6c, 0x65,
+	0x74, 0x65, 0x44, 0x65, 0x63, 0x6b, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x1e,
+	0x0a, 0x04, 0x64, 0x65, 0x63, 0x6b, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x0a, 0x2e, 0x63,
+	0x61, 0x72, 0x64, 0x2e, 0x44, 0x65, 0x63, 0x6b, 0x52, 0x04, 0x64, 0x65, 0x63, 0x6b, 0x32, 0xa7,
+	0x04, 0x0a, 0x0b, 0x43, 0x61, 0x72, 0x64, 0x53, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x12, 0x39,
+	0x0a, 0x08, 0x47, 0x65, 0x74, 0x43, 0x61, 0x72, 0x64, 0x73, 0x12, 0x15, 0x2e, 0x63, 0x61, 0x72,
+	0x64, 0x2e, 0x47, 0x65, 0x74, 0x43, 0x61, 0x72, 0x64, 0x73, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73,
+	0x74, 0x1a, 0x16, 0x2e, 0x63, 0x61, 0x72, 0x64, 0x2e, 0x47, 0x65, 0x74, 0x43, 0x61, 0x72, 0x64,
+	0x73, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x36, 0x0a, 0x07, 0x4e, 0x65, 0x77,
+	0x43, 0x61, 0x72, 0x64, 0x12, 0x14, 0x2e, 0x63, 0x61, 0x72, 0x64, 0x2e, 0x4e, 0x65, 0x77, 0x43,
+	0x61, 0x72, 0x64, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x15, 0x2e, 0x63, 0x61, 0x72,
+	0x64, 0x2e, 0x4e, 0x65, 0x77, 0x43, 0x61, 0x72, 0x64, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73,
+	0x65, 0x12, 0x3f, 0x0a, 0x0a, 0x44, 0x65, 0x6c, 0x65, 0x74, 0x65, 0x43, 0x61, 0x72, 0x64, 0x12,
+	0x17, 0x2e, 0x63, 0x61, 0x72, 0x64, 0x2e, 0x44, 0x65, 0x6c, 0x65, 0x74, 0x65, 0x43, 0x61, 0x72,
+	0x64, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x18, 0x2e, 0x63, 0x61, 0x72, 0x64, 0x2e,
+	0x44, 0x65, 0x6c, 0x65, 0x74, 0x65, 0x43, 0x61, 0x72, 0x64, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e,
+	0x73, 0x65, 0x12, 0x48, 0x0a, 0x0d, 0x47, 0x65, 0x6e, 0x65, 0x72, 0x61, 0x74, 0x65, 0x43, 0x61,
+	0x72, 0x64, 0x73, 0x12, 0x1a, 0x2e, 0x63, 0x61, 0x72, 0x64, 0x2e, 0x47, 0x65, 0x6e, 0x65, 0x72,
+	0x61, 0x74, 0x65, 0x43, 0x61, 0x72, 0x64, 0x73, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a,
+	0x1b, 0x2e, 0x63, 0x61, 0x72, 0x64, 0x2e, 0x47, 0x65, 0x6e, 0x65, 0x72, 0x61, 0x74, 0x65, 0x43,
+	0x61, 0x72, 0x64, 0x73, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x57, 0x0a, 0x12,
+	0x43, 0x72, 0x65, 0x61, 0x74, 0x65, 0x43, 0x61, 0x72, 0x64, 0x54, 0x65, 0x6d, 0x70, 0x6c, 0x61,
+	0x74, 0x65, 0x12, 0x1f, 0x2e, 0x63, 0x61, 0x72, 0x64, 0x2e, 0x43, 0x72, 0x65, 0x61, 0x74, 0x65,
+	0x43, 0x61, 0x72, 0x64, 0x54, 0x65, 0x6d, 0x70, 0x6c, 0x61, 0x74, 0x65, 0x52, 0x65, 0x71, 0x75,
+	0x65, 0x73, 0x74, 0x1a, 0x20, 0x2e, 0x63, 0x61, 0x72, 0x64, 0x2e, 0x43, 0x72, 0x65, 0x61, 0x74,
+	0x65, 0x43, 0x61, 0x72, 0x64, 0x54, 0x65, 0x6d, 0x70, 0x6c, 0x61, 0x74, 0x65, 0x52, 0x65, 0x73,
+	0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x3f, 0x0a, 0x0a, 0x43, 0x72, 0x65, 0x61, 0x74, 0x65, 0x43,
+	0x61, 0x72, 0x64, 0x12, 0x17, 0x2e, 0x63, 0x61, 0x72, 0x64, 0x2e, 0x43, 0x72, 0x65, 0x61, 0x74,
 	0x65, 0x43, 0x61, 0x72, 0x64, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x18, 0x2e, 0x63,
-	0x61, 0x72, 0x64, 0x2e, 0x44, 0x65, 0x6c, 0x65, 0x74, 0x65, 0x43, 0x61, 0x72, 0x64, 0x52, 0x65,
-	0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x48, 0x0a, 0x0d, 0x47, 0x65, 0x6e, 0x65, 0x72, 0x61,
-	0x74, 0x65, 0x43, 0x61, 0x72, 0x64, 0x73, 0x12, 0x1a, 0x2e, 0x63, 0x61, 0x72, 0x64, 0x2e, 0x47,
-	0x65, 0x6e, 0x65, 0x72, 0x61, 0x74, 0x65, 0x43, 0x61, 0x72, 0x64, 0x73, 0x52, 0x65, 0x71, 0x75,
-	0x65, 0x73, 0x74, 0x1a, 0x1b, 0x2e, 0x63, 0x61, 0x72, 0x64, 0x2e, 0x47, 0x65, 0x6e, 0x65, 0x72,
-	0x61, 0x74, 0x65, 0x43, 0x61, 0x72, 0x64, 0x73, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65,
-	0x12, 0x57, 0x0a, 0x12, 0x43, 0x72, 0x65, 0x61, 0x74, 0x65, 0x43, 0x61, 0x72, 0x64, 0x54, 0x65,
-	0x6d, 0x70, 0x6c, 0x61, 0x74, 0x65, 0x12, 0x1f, 0x2e, 0x63, 0x61, 0x72, 0x64, 0x2e, 0x43, 0x72,
-	0x65, 0x61, 0x74, 0x65, 0x43, 0x61, 0x72, 0x64, 0x54, 0x65, 0x6d, 0x70, 0x6c, 0x61, 0x74, 0x65,
-	0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x20, 0x2e, 0x63, 0x61, 0x72, 0x64, 0x2e, 0x43,
-	0x72, 0x65, 0x61, 0x74, 0x65, 0x43, 0x61, 0x72, 0x64, 0x54, 0x65, 0x6d, 0x70, 0x6c, 0x61, 0x74,
-	0x65, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x3f, 0x0a, 0x0a, 0x43, 0x72, 0x65,
-	0x61, 0x74, 0x65, 0x43, 0x61, 0x72, 0x64, 0x12, 0x17, 0x2e, 0x63, 0x61, 0x72, 0x64, 0x2e, 0x43,
-	0x72, 0x65, 0x61, 0x74, 0x65, 0x43, 0x61, 0x72, 0x64, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74,
-	0x1a, 0x18, 0x2e, 0x63, 0x61, 0x72, 0x64, 0x2e, 0x43, 0x72, 0x65, 0x61, 0x74, 0x65, 0x43, 0x61,
-	0x72, 0x64, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x42, 0x5b, 0x0a, 0x08, 0x63, 0x6f,
-	0x6d, 0x2e, 0x63, 0x61, 0x72, 0x64, 0x42, 0x09, 0x43, 0x61, 0x72, 0x64, 0x50, 0x72, 0x6f, 0x74,
-	0x6f, 0x50, 0x01, 0x5a, 0x14, 0x63, 0x61, 0x72, 0x64, 0x73, 0x2f, 0x67, 0x65, 0x6e, 0x2f, 0x70,
-	0x72, 0x6f, 0x74, 0x6f, 0x2f, 0x63, 0x61, 0x72, 0x64, 0xa2, 0x02, 0x03, 0x43, 0x58, 0x58, 0xaa,
-	0x02, 0x04, 0x43, 0x61, 0x72, 0x64, 0xca, 0x02, 0x04, 0x43, 0x61, 0x72, 0x64, 0xe2, 0x02, 0x10,
-	0x43, 0x61, 0x72, 0x64, 0x5c, 0x47, 0x50, 0x42, 0x4d, 0x65, 0x74, 0x61, 0x64, 0x61, 0x74, 0x61,
-	0xea, 0x02, 0x04, 0x43, 0x61, 0x72, 0x64, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x61, 0x72, 0x64, 0x2e, 0x43, 0x72, 0x65, 0x61, 0x74, 0x65, 0x43, 0x61, 0x72, 0x64, 0x52, 0x65,
+	0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x45, 0x0a, 0x0c, 0x47, 0x65, 0x6e, 0x65, 0x72, 0x61,
+	0x74, 0x65, 0x44, 0x65, 0x63, 0x6b, 0x12, 0x19, 0x2e, 0x63, 0x61, 0x72, 0x64, 0x2e, 0x47, 0x65,
+	0x6e, 0x65, 0x72, 0x61, 0x74, 0x65, 0x44, 0x65, 0x63, 0x6b, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73,
+	0x74, 0x1a, 0x1a, 0x2e, 0x63, 0x61, 0x72, 0x64, 0x2e, 0x47, 0x65, 0x6e, 0x65, 0x72, 0x61, 0x74,
+	0x65, 0x44, 0x65, 0x63, 0x6b, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x39, 0x0a,
+	0x08, 0x47, 0x65, 0x74, 0x44, 0x65, 0x63, 0x6b, 0x73, 0x12, 0x15, 0x2e, 0x63, 0x61, 0x72, 0x64,
+	0x2e, 0x47, 0x65, 0x74, 0x44, 0x65, 0x63, 0x6b, 0x73, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74,
+	0x1a, 0x16, 0x2e, 0x63, 0x61, 0x72, 0x64, 0x2e, 0x47, 0x65, 0x74, 0x44, 0x65, 0x63, 0x6b, 0x73,
+	0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x42, 0x5b, 0x0a, 0x08, 0x63, 0x6f, 0x6d, 0x2e,
+	0x63, 0x61, 0x72, 0x64, 0x42, 0x09, 0x43, 0x61, 0x72, 0x64, 0x50, 0x72, 0x6f, 0x74, 0x6f, 0x50,
+	0x01, 0x5a, 0x14, 0x63, 0x61, 0x72, 0x64, 0x73, 0x2f, 0x67, 0x65, 0x6e, 0x2f, 0x70, 0x72, 0x6f,
+	0x74, 0x6f, 0x2f, 0x63, 0x61, 0x72, 0x64, 0xa2, 0x02, 0x03, 0x43, 0x58, 0x58, 0xaa, 0x02, 0x04,
+	0x43, 0x61, 0x72, 0x64, 0xca, 0x02, 0x04, 0x43, 0x61, 0x72, 0x64, 0xe2, 0x02, 0x10, 0x43, 0x61,
+	0x72, 0x64, 0x5c, 0x47, 0x50, 0x42, 0x4d, 0x65, 0x74, 0x61, 0x64, 0x61, 0x74, 0x61, 0xea, 0x02,
+	0x04, 0x43, 0x61, 0x72, 0x64, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (
@@ -911,49 +1630,77 @@ func file_proto_card_card_proto_rawDescGZIP() []byte {
 	return file_proto_card_card_proto_rawDescData
 }
 
-var file_proto_card_card_proto_msgTypes = make([]protoimpl.MessageInfo, 14)
+var file_proto_card_card_proto_msgTypes = make([]protoimpl.MessageInfo, 27)
 var file_proto_card_card_proto_goTypes = []interface{}{
-	(*GenerateCardsRequest)(nil),       // 0: card.GenerateCardsRequest
-	(*GenerateCardsResponse)(nil),      // 1: card.GenerateCardsResponse
-	(*DeleteCardRequest)(nil),          // 2: card.DeleteCardRequest
-	(*DeleteCardResponse)(nil),         // 3: card.DeleteCardResponse
-	(*GetCardsRequest)(nil),            // 4: card.GetCardsRequest
-	(*GetCardsResponse)(nil),           // 5: card.GetCardsResponse
-	(*NewCardRequest)(nil),             // 6: card.NewCardRequest
-	(*NewCardResponse)(nil),            // 7: card.NewCardResponse
-	(*CreateCardRequest)(nil),          // 8: card.CreateCardRequest
-	(*CreateCardResponse)(nil),         // 9: card.CreateCardResponse
-	(*Card)(nil),                       // 10: card.Card
-	(*CardTemplate)(nil),               // 11: card.CardTemplate
+	(*Card)(nil),                       // 0: card.Card
+	(*CardTemplate)(nil),               // 1: card.CardTemplate
+	(*GenerateCardsRequest)(nil),       // 2: card.GenerateCardsRequest
+	(*GenerateCardsResponse)(nil),      // 3: card.GenerateCardsResponse
+	(*DeleteCardRequest)(nil),          // 4: card.DeleteCardRequest
+	(*DeleteCardResponse)(nil),         // 5: card.DeleteCardResponse
+	(*GetCardsRequest)(nil),            // 6: card.GetCardsRequest
+	(*GetCardsResponse)(nil),           // 7: card.GetCardsResponse
+	(*NewCardRequest)(nil),             // 8: card.NewCardRequest
+	(*NewCardResponse)(nil),            // 9: card.NewCardResponse
+	(*CreateCardRequest)(nil),          // 10: card.CreateCardRequest
+	(*CreateCardResponse)(nil),         // 11: card.CreateCardResponse
 	(*CreateCardTemplateRequest)(nil),  // 12: card.CreateCardTemplateRequest
 	(*CreateCardTemplateResponse)(nil), // 13: card.CreateCardTemplateResponse
+	(*Deck)(nil),                       // 14: card.Deck
+	(*GenerateDeckRequest)(nil),        // 15: card.GenerateDeckRequest
+	(*GenerateDeckResponse)(nil),       // 16: card.GenerateDeckResponse
+	(*CreateDeckRequest)(nil),          // 17: card.CreateDeckRequest
+	(*CreateDeckResponse)(nil),         // 18: card.CreateDeckResponse
+	(*GetDeckRequest)(nil),             // 19: card.GetDeckRequest
+	(*GetDeckResponse)(nil),            // 20: card.GetDeckResponse
+	(*GetDecksRequest)(nil),            // 21: card.GetDecksRequest
+	(*GetDecksResponse)(nil),           // 22: card.GetDecksResponse
+	(*UpdateDeckRequest)(nil),          // 23: card.UpdateDeckRequest
+	(*UpdateDeckResponse)(nil),         // 24: card.UpdateDeckResponse
+	(*DeleteDeckRequest)(nil),          // 25: card.DeleteDeckRequest
+	(*DeleteDeckResponse)(nil),         // 26: card.DeleteDeckResponse
 }
 var file_proto_card_card_proto_depIdxs = []int32{
-	10, // 0: card.GenerateCardsResponse.cards:type_name -> card.Card
-	10, // 1: card.GetCardsResponse.cards:type_name -> card.Card
-	10, // 2: card.NewCardRequest.card:type_name -> card.Card
-	10, // 3: card.NewCardResponse.card:type_name -> card.Card
-	10, // 4: card.CreateCardRequest.card:type_name -> card.Card
-	10, // 5: card.CreateCardResponse.card:type_name -> card.Card
-	11, // 6: card.CreateCardTemplateRequest.card_template:type_name -> card.CardTemplate
-	11, // 7: card.CreateCardTemplateResponse.card_template:type_name -> card.CardTemplate
-	4,  // 8: card.CardService.GetCards:input_type -> card.GetCardsRequest
-	6,  // 9: card.CardService.NewCard:input_type -> card.NewCardRequest
-	2,  // 10: card.CardService.DeleteCard:input_type -> card.DeleteCardRequest
-	0,  // 11: card.CardService.GenerateCards:input_type -> card.GenerateCardsRequest
-	12, // 12: card.CardService.CreateCardTemplate:input_type -> card.CreateCardTemplateRequest
-	8,  // 13: card.CardService.CreateCard:input_type -> card.CreateCardRequest
-	5,  // 14: card.CardService.GetCards:output_type -> card.GetCardsResponse
-	7,  // 15: card.CardService.NewCard:output_type -> card.NewCardResponse
-	3,  // 16: card.CardService.DeleteCard:output_type -> card.DeleteCardResponse
-	1,  // 17: card.CardService.GenerateCards:output_type -> card.GenerateCardsResponse
-	13, // 18: card.CardService.CreateCardTemplate:output_type -> card.CreateCardTemplateResponse
-	9,  // 19: card.CardService.CreateCard:output_type -> card.CreateCardResponse
-	14, // [14:20] is the sub-list for method output_type
-	8,  // [8:14] is the sub-list for method input_type
-	8,  // [8:8] is the sub-list for extension type_name
-	8,  // [8:8] is the sub-list for extension extendee
-	0,  // [0:8] is the sub-list for field type_name
+	0,  // 0: card.GenerateCardsResponse.cards:type_name -> card.Card
+	0,  // 1: card.GetCardsResponse.cards:type_name -> card.Card
+	0,  // 2: card.NewCardRequest.card:type_name -> card.Card
+	0,  // 3: card.NewCardResponse.card:type_name -> card.Card
+	0,  // 4: card.CreateCardRequest.card:type_name -> card.Card
+	0,  // 5: card.CreateCardResponse.card:type_name -> card.Card
+	1,  // 6: card.CreateCardTemplateRequest.card_template:type_name -> card.CardTemplate
+	1,  // 7: card.CreateCardTemplateResponse.card_template:type_name -> card.CardTemplate
+	0,  // 8: card.Deck.cards:type_name -> card.Card
+	14, // 9: card.GenerateDeckResponse.deck:type_name -> card.Deck
+	14, // 10: card.CreateDeckRequest.deck:type_name -> card.Deck
+	14, // 11: card.CreateDeckResponse.deck:type_name -> card.Deck
+	14, // 12: card.GetDeckRequest.deck:type_name -> card.Deck
+	14, // 13: card.GetDeckResponse.deck:type_name -> card.Deck
+	14, // 14: card.GetDecksResponse.decks:type_name -> card.Deck
+	14, // 15: card.UpdateDeckRequest.deck:type_name -> card.Deck
+	14, // 16: card.UpdateDeckResponse.deck:type_name -> card.Deck
+	14, // 17: card.DeleteDeckRequest.deck:type_name -> card.Deck
+	14, // 18: card.DeleteDeckResponse.deck:type_name -> card.Deck
+	6,  // 19: card.CardService.GetCards:input_type -> card.GetCardsRequest
+	8,  // 20: card.CardService.NewCard:input_type -> card.NewCardRequest
+	4,  // 21: card.CardService.DeleteCard:input_type -> card.DeleteCardRequest
+	2,  // 22: card.CardService.GenerateCards:input_type -> card.GenerateCardsRequest
+	12, // 23: card.CardService.CreateCardTemplate:input_type -> card.CreateCardTemplateRequest
+	10, // 24: card.CardService.CreateCard:input_type -> card.CreateCardRequest
+	15, // 25: card.CardService.GenerateDeck:input_type -> card.GenerateDeckRequest
+	21, // 26: card.CardService.GetDecks:input_type -> card.GetDecksRequest
+	7,  // 27: card.CardService.GetCards:output_type -> card.GetCardsResponse
+	9,  // 28: card.CardService.NewCard:output_type -> card.NewCardResponse
+	5,  // 29: card.CardService.DeleteCard:output_type -> card.DeleteCardResponse
+	3,  // 30: card.CardService.GenerateCards:output_type -> card.GenerateCardsResponse
+	13, // 31: card.CardService.CreateCardTemplate:output_type -> card.CreateCardTemplateResponse
+	11, // 32: card.CardService.CreateCard:output_type -> card.CreateCardResponse
+	16, // 33: card.CardService.GenerateDeck:output_type -> card.GenerateDeckResponse
+	22, // 34: card.CardService.GetDecks:output_type -> card.GetDecksResponse
+	27, // [27:35] is the sub-list for method output_type
+	19, // [19:27] is the sub-list for method input_type
+	19, // [19:19] is the sub-list for extension type_name
+	19, // [19:19] is the sub-list for extension extendee
+	0,  // [0:19] is the sub-list for field type_name
 }
 
 func init() { file_proto_card_card_proto_init() }
@@ -963,126 +1710,6 @@ func file_proto_card_card_proto_init() {
 	}
 	if !protoimpl.UnsafeEnabled {
 		file_proto_card_card_proto_msgTypes[0].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*GenerateCardsRequest); i {
-			case 0:
-				return &v.state
-			case 1:
-				return &v.sizeCache
-			case 2:
-				return &v.unknownFields
-			default:
-				return nil
-			}
-		}
-		file_proto_card_card_proto_msgTypes[1].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*GenerateCardsResponse); i {
-			case 0:
-				return &v.state
-			case 1:
-				return &v.sizeCache
-			case 2:
-				return &v.unknownFields
-			default:
-				return nil
-			}
-		}
-		file_proto_card_card_proto_msgTypes[2].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*DeleteCardRequest); i {
-			case 0:
-				return &v.state
-			case 1:
-				return &v.sizeCache
-			case 2:
-				return &v.unknownFields
-			default:
-				return nil
-			}
-		}
-		file_proto_card_card_proto_msgTypes[3].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*DeleteCardResponse); i {
-			case 0:
-				return &v.state
-			case 1:
-				return &v.sizeCache
-			case 2:
-				return &v.unknownFields
-			default:
-				return nil
-			}
-		}
-		file_proto_card_card_proto_msgTypes[4].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*GetCardsRequest); i {
-			case 0:
-				return &v.state
-			case 1:
-				return &v.sizeCache
-			case 2:
-				return &v.unknownFields
-			default:
-				return nil
-			}
-		}
-		file_proto_card_card_proto_msgTypes[5].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*GetCardsResponse); i {
-			case 0:
-				return &v.state
-			case 1:
-				return &v.sizeCache
-			case 2:
-				return &v.unknownFields
-			default:
-				return nil
-			}
-		}
-		file_proto_card_card_proto_msgTypes[6].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*NewCardRequest); i {
-			case 0:
-				return &v.state
-			case 1:
-				return &v.sizeCache
-			case 2:
-				return &v.unknownFields
-			default:
-				return nil
-			}
-		}
-		file_proto_card_card_proto_msgTypes[7].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*NewCardResponse); i {
-			case 0:
-				return &v.state
-			case 1:
-				return &v.sizeCache
-			case 2:
-				return &v.unknownFields
-			default:
-				return nil
-			}
-		}
-		file_proto_card_card_proto_msgTypes[8].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*CreateCardRequest); i {
-			case 0:
-				return &v.state
-			case 1:
-				return &v.sizeCache
-			case 2:
-				return &v.unknownFields
-			default:
-				return nil
-			}
-		}
-		file_proto_card_card_proto_msgTypes[9].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*CreateCardResponse); i {
-			case 0:
-				return &v.state
-			case 1:
-				return &v.sizeCache
-			case 2:
-				return &v.unknownFields
-			default:
-				return nil
-			}
-		}
-		file_proto_card_card_proto_msgTypes[10].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*Card); i {
 			case 0:
 				return &v.state
@@ -1094,8 +1721,128 @@ func file_proto_card_card_proto_init() {
 				return nil
 			}
 		}
-		file_proto_card_card_proto_msgTypes[11].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_card_card_proto_msgTypes[1].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*CardTemplate); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_proto_card_card_proto_msgTypes[2].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*GenerateCardsRequest); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_proto_card_card_proto_msgTypes[3].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*GenerateCardsResponse); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_proto_card_card_proto_msgTypes[4].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*DeleteCardRequest); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_proto_card_card_proto_msgTypes[5].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*DeleteCardResponse); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_proto_card_card_proto_msgTypes[6].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*GetCardsRequest); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_proto_card_card_proto_msgTypes[7].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*GetCardsResponse); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_proto_card_card_proto_msgTypes[8].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*NewCardRequest); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_proto_card_card_proto_msgTypes[9].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*NewCardResponse); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_proto_card_card_proto_msgTypes[10].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*CreateCardRequest); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_proto_card_card_proto_msgTypes[11].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*CreateCardResponse); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -1130,6 +1877,162 @@ func file_proto_card_card_proto_init() {
 				return nil
 			}
 		}
+		file_proto_card_card_proto_msgTypes[14].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*Deck); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_proto_card_card_proto_msgTypes[15].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*GenerateDeckRequest); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_proto_card_card_proto_msgTypes[16].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*GenerateDeckResponse); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_proto_card_card_proto_msgTypes[17].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*CreateDeckRequest); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_proto_card_card_proto_msgTypes[18].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*CreateDeckResponse); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_proto_card_card_proto_msgTypes[19].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*GetDeckRequest); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_proto_card_card_proto_msgTypes[20].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*GetDeckResponse); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_proto_card_card_proto_msgTypes[21].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*GetDecksRequest); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_proto_card_card_proto_msgTypes[22].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*GetDecksResponse); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_proto_card_card_proto_msgTypes[23].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*UpdateDeckRequest); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_proto_card_card_proto_msgTypes[24].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*UpdateDeckResponse); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_proto_card_card_proto_msgTypes[25].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*DeleteDeckRequest); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_proto_card_card_proto_msgTypes[26].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*DeleteDeckResponse); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
@@ -1137,7 +2040,7 @@ func file_proto_card_card_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_proto_card_card_proto_rawDesc,
 			NumEnums:      0,
-			NumMessages:   14,
+			NumMessages:   27,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

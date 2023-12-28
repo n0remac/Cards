@@ -18,4 +18,3 @@ import {
   export const cardService = createPromiseClient(CardService, transport);
   export const biomeService = createPromiseClient(BiomeService, transport);
   export const userService = createPromiseClient(UserService, transport);
-  
