@@ -4,12 +4,23 @@ import (
 	"cards/gen/proto/card"
 	"cards/pkg/ai"
 	"cards/pkg/biome"
+	"encoding/json"
 	"fmt"
+	"log"
 	"math/rand"
 	"os"
 	"path/filepath"
 	"strings"
 )
+
+type CardAttributes struct {
+	Name    string
+	Type    string
+	Element string
+	Attack  string
+	Defense string
+	Action  string
+}
 
 func CardTemplateFromBiome(b string) (*card.CreateCardTemplateResponse, error) {
 	cardTemplateResponse := &card.CreateCardTemplateResponse{}
@@ -63,6 +74,8 @@ func CreateRandomCharacter(isAnimal bool) (*card.Card, error) {
 }
 
 func generateCard(newCard *card.Card) (*card.Card, error) {
+	fmt.Println("DESCRIPTION", newCard.Description)
+
 	url, description, err := ai.GenerateImage(newCard.Description)
 	if err != nil {
 		return newCard, err
@@ -75,7 +88,72 @@ func generateCard(newCard *card.Card) (*card.Card, error) {
 		fmt.Println("error downloading image:", err)
 		return newCard, err
 	}
+	cardQuery, err := ai.CardQuery(*newCard)
+	if err != nil {
+		fmt.Println("error with card query:", err)
+		return newCard, err
+	}
+
+	cardAtributeString, err := ai.QueryToJSON(cardQuery)
+	if err != nil {
+		fmt.Println("error calling chatgpt api:", err)
+		return newCard, err
+	}
+	var cardAtributes CardAttributes
+
+	er := json.Unmarshal([]byte(cardAtributeString), &cardAtributes)
+	if er != nil {
+		log.Fatal(err)
+	}
+	fmt.Println("ACTION:", cardAtributes.Action)
+	newCard.Attack = cardAtributes.Attack
+	newCard.Defense = cardAtributes.Defense
+	newCard.Action = cardAtributes.Action
+
 	return newCard, nil
+}
+
+func ResourceFromBiome(biomeName string, isAnimal bool) (*card.Card, error) {
+	newCard := &card.Card{}
+
+	filenames, err := getFileNames("pkg/biome/biomes")
+	if err != nil {
+		fmt.Println("error getting filenames:", err)
+		return newCard, err
+	}
+	var biomeFilename string
+	for _, filename := range filenames {
+		if strings.Contains(filename, biomeName) {
+			biomeFilename = filename
+			break
+		}
+	}
+	if biomeFilename == "" {
+		return newCard, fmt.Errorf("biome %s not found", biomeName)
+	}
+
+	selectedBiome, err := biome.ParseBiome(biomeFilename)
+	if err != nil {
+		return newCard, err
+	}
+	fmt.Print("selectedBiome:", selectedBiome)
+
+	element := selectedBiome.Characteristics.Elements[rand.Intn(len(selectedBiome.Characteristics.Elements))]
+	elementName := strings.Split(element, " ")[0]
+
+	if isAnimal {
+		animal := selectedBiome.Characteristics.Wildlife[rand.Intn(len(selectedBiome.Characteristics.Wildlife))]
+		newCard, err = constructAnimalCard(animal, elementName, selectedBiome.Name, element)
+	} else {
+		plant := selectedBiome.Characteristics.Plants[rand.Intn(len(selectedBiome.Characteristics.Plants))]
+		newCard, err = constructPlantCard(plant, elementName, selectedBiome.Name, element)
+	}
+
+	if err != nil {
+		return newCard, err
+	}
+
+	return generateCard(newCard)
 }
 
 func OrganismFromBiome(biomeName string, isAnimal bool) (*card.Card, error) {
@@ -101,6 +179,7 @@ func OrganismFromBiome(biomeName string, isAnimal bool) (*card.Card, error) {
 	if err != nil {
 		return newCard, err
 	}
+	fmt.Print("selectedBiome:", selectedBiome)
 
 	element := selectedBiome.Characteristics.Elements[rand.Intn(len(selectedBiome.Characteristics.Elements))]
 	elementName := strings.Split(element, " ")[0]
@@ -158,18 +237,32 @@ func getRandomCharacter(isAnimal bool) (*card.Card, error) {
 	}
 	randomAnimalIndex := rand.Intn(len(randomBiome.Characteristics.Wildlife))
 	randomAnimal := randomBiome.Characteristics.Wildlife[randomAnimalIndex]
+
 	randomElement := randomBiome.Characteristics.Elements[rand.Intn(len(randomBiome.Characteristics.Elements))]
 	elementName := strings.Split(randomElement, " ")[0]
+
 	randomPlant := randomBiome.Characteristics.Plants[rand.Intn(len(randomBiome.Characteristics.Plants))]
 	if isAnimal {
-		newCard, err = constructAnimalCard(randomAnimal, elementName, randomBiome.Name, randomElement)
+		newCard = constructAnimalCard(randomAnimal, elementName, randomBiome.Name, randomElement)
 	} else {
-		newCard, err = constructPlantCard(randomPlant, elementName, randomBiome.Name, randomElement)
+		newCard = constructPlantCard(randomPlant, elementName, randomBiome.Name, randomElement)
 	}
 	return newCard, nil
 }
 
-func constructAnimalCard(animal string, element string, biome string, description string) (*card.Card, error) {
+func constructResourceCard(resource string, element string, biome string, description string) (*card.Card) {
+	newCard := &card.Card{}
+
+	newCard.Animal = resource
+	newCard.Element = element
+	newCard.Biome = biome
+	newCard.Description = fmt.Sprintf("A %s-%s in the %s. The background depicts %s", element, resource, biome, description)
+	newCard.Name = fmt.Sprintf("%s-%s", element, resource)
+
+	return newCard
+}
+
+func constructAnimalCard(animal string, element string, biome string, description string) (*card.Card) {
 	newCard := &card.Card{}
 
 	newCard.Animal = animal
@@ -178,9 +271,10 @@ func constructAnimalCard(animal string, element string, biome string, descriptio
 	newCard.Description = fmt.Sprintf("A %s-%s from %s. The background depicts %s", element, animal, biome, description)
 	newCard.Name = fmt.Sprintf("%s-%s", element, animal)
 
-	return newCard, nil
+	return newCard
 }
-func constructPlantCard(plant string, element string, biome string, description string) (*card.Card, error) {
+
+func constructPlantCard(plant string, element string, biome string, description string) (*card.Card) {
 	newCard := &card.Card{}
 
 	newCard.Plant = plant
@@ -189,7 +283,7 @@ func constructPlantCard(plant string, element string, biome string, description 
 	newCard.Description = fmt.Sprintf("A %s-%s from %s. The background depicts %s", element, plant, biome, description)
 	newCard.Name = fmt.Sprintf("%s-%s", element, plant)
 
-	return newCard, nil
+	return newCard
 }
 
 func getFileNames(directory string) ([]string, error) {

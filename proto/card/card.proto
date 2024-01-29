@@ -13,6 +13,10 @@ message Card {
   string description = 7;
   string img_url = 8;
   string player = 9;
+  string type = 10;
+  string attack = 11;
+  string defense = 12;
+  string action = 13;
 }
 
 message CardTemplate {

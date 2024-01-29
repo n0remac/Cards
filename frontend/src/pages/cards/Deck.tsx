@@ -34,6 +34,7 @@ const CreateDeck: React.FC = () => {
     e.preventDefault();
     const newDeckRequest = new GenerateDeckRequest();
     newDeckRequest.numCards = Number(count);
+    newDeckRequest.biome = selectedBiome;
 
     try {
       const response = await cardService.generateDeck(newDeckRequest);

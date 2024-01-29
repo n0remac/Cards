@@ -4,7 +4,6 @@ import (
 	"cards/gen/proto/card"
 	"context"
 	"fmt"
-	"math/rand"
 
 	"github.com/bufbuild/connect-go"
 )
@@ -50,11 +49,12 @@ func (s *CardService) GenerateCards(ctx context.Context, req *connect.Request[ca
 	count := int(req.Msg.Count)
 	cards := []*card.Card{}
 	fmt.Println("Generating Cards, Count: ", count)
+	isAnimal := 1
 	for i := 0; i < count; i++ {
 		fmt.Println("Generating Card: ", i)
-		r := rand.Intn(10)
 
-		c, err := CreateRandomCharacter(r > 7)
+		isAnimal *= -1
+		c, err := CreateRandomCharacter(isAnimal > 0)
 		if err != nil {
 			return nil, err
 		}
@@ -82,6 +82,7 @@ func (s *CardService) CreateCardTemplate(ctx context.Context, req *connect.Reque
 func (s *CardService) CreateCard(ctx context.Context, req *connect.Request[card.CreateCardRequest]) (*connect.Response[card.CreateCardResponse], error) {
 	fmt.Println("CreateCard")
 	newCard, err := CreateCardFromPrompt(req.Msg.Card, req.Msg.Prompt)
+
 	if err != nil {
 		fmt.Println("error creating card from prompt: ", err)
 		return nil, err
@@ -107,9 +108,11 @@ func (s *CardService) GenerateDeck(ctx context.Context, req *connect.Request[car
 
 	deck := card.Deck{}
 
+	isAnimal := 1
 	for i := 0; i < numCards; i++ {
 		fmt.Println("Generating Card: ", i)
-		c, err := OrganismFromBiome(biomeName, rand.Intn(10) > 5)
+		isAnimal *= -1
+		c, err := OrganismFromBiome(biomeName, isAnimal > 0)
 		newCard, err := createCard(c)
 		if err != nil {
 			fmt.Println("There was an error creating the card", err)
