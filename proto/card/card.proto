@@ -25,6 +25,7 @@ message CardTemplate {
   repeated string plants = 3;
   repeated string elements = 4;
   repeated string descriptions = 5;
+  repeated string resources = 6;
 }
 
 message GenerateCardsRequest {

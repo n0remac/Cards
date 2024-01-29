@@ -15,20 +15,20 @@ func ParseBiomes(filename string) (Biomes, error) {
 
 	file, err := os.Open(filename)
 	if err != nil {
-		fmt.Println("error opening file:", err)
+		fmt.Println("Error opening file:", err)
 		return nil, err
 	}
 	defer file.Close()
 
 	byteValue, err := io.ReadAll(file)
 	if err != nil {
-		fmt.Println("error reading file:", err)
+		fmt.Println("Error reading file:", err)
 		return nil, err
 	}
-	
+
 	err = json.Unmarshal(byteValue, &biomes)
 	if err != nil {
-		fmt.Println("error unmarshalling json:", err)
+		fmt.Println("Error unmarshalling json:", err)
 		return nil, err
 	}
 
@@ -50,7 +50,7 @@ func ParseBiome(filename string) (Biome, error) {
 		fmt.Println("error reading file:", err)
 		return biome, err
 	}
-	
+
 	err = json.Unmarshal(byteValue, &biome)
 	if err != nil {
 		fmt.Println("error unmarshalling json:", err)

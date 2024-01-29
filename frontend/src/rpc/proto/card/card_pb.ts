@@ -146,6 +146,11 @@ export class CardTemplate extends Message<CardTemplate> {
    */
   descriptions: string[] = [];
 
+  /**
+   * @generated from field: repeated string resources = 6;
+   */
+  resources: string[] = [];
+
   constructor(data?: PartialMessage<CardTemplate>) {
     super();
     proto3.util.initPartial(data, this);
@@ -159,6 +164,7 @@ export class CardTemplate extends Message<CardTemplate> {
     { no: 3, name: "plants", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
     { no: 4, name: "elements", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
     { no: 5, name: "descriptions", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
+    { no: 6, name: "resources", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): CardTemplate {

@@ -35,7 +35,6 @@ func ExtendBiomes() error {
 			return err
 		}
 		saveJSON(fmt.Sprintf("pkg/biome/biomes/%s.json", query["name"]), []byte(aiResponse))
-		fmt.Println(aiResponse)
 	}
 
 	return nil
@@ -95,7 +94,6 @@ func GenerateImage(query string) (string, string, error) {
 	}
 
 	stringResp := string(bodyText)
-	fmt.Println(stringResp)
 	description, url, err := extractInfo(stringResp)
 	if err != nil {
 		fmt.Println(err)

@@ -1,8 +1,9 @@
 package biome
 
 import (
-	"cards/pkg/database"
 	"cards/gen/proto/biome"
+	"cards/pkg/database"
+	"fmt"
 
 	"encoding/json"
 	"io"
@@ -16,23 +17,30 @@ type Biome struct {
 }
 
 type Characteristics struct {
-	Climate       string   `json:"climate"`
-	Vegetation    string   `json:"vegetation"`
-	Plants        []string `json:"plants"`
-	Wildlife      []string `json:"wildlife"`
-	Precipitation string   `json:"precipitation"`
-	Elements      []string `json:"elements"`
+	Climate               string   `json:"climate"`
+	Vegetation            string   `json:"vegetation"`
+	Plants                []string `json:"plants"`
+	Wildlife              []string `json:"wildlife"`
+	Precipitation         string   `json:"precipitation"`
+	Elements              []string `json:"elements"`
+	Elementdescriptions   []string `json:"elementdescriptions"`
+	Resources             []string `json:"resources"`
+	Resourcesdescriptions []string `json:"resourcedescriptions"`
 }
 
 func createBiomeInDB(biome *biome.Biome) (*biome.Biome, error) {
 	sess := database.GetSession()
 
 	newCharacteristics := Characteristics{
-		Climate:       biome.Characteristics.Climate,
-		Vegetation:    biome.Characteristics.Vegetation,
-		Plants:        biome.Characteristics.Plants,
-		Wildlife:      biome.Characteristics.Wildlife,
-		Precipitation: biome.Characteristics.Precipitation,
+		Climate:               biome.Characteristics.Climate,
+		Vegetation:            biome.Characteristics.Vegetation,
+		Plants:                biome.Characteristics.Plants,
+		Wildlife:              biome.Characteristics.Wildlife,
+		Precipitation:         biome.Characteristics.Precipitation,
+		Elements:              biome.Characteristics.Elements,
+		Elementdescriptions:   biome.Characteristics.Elementdescriptions,
+		Resources:             biome.Characteristics.Resources,
+		Resourcesdescriptions: biome.Characteristics.Resourcesdescriptions,
 	}
 
 	// Create a new biome record
@@ -66,11 +74,15 @@ func getBiomesFromDB() ([]*biome.Biome, error) {
 		b.Name = dbBiome.Name
 		b.Type = dbBiome.Type
 		b.Characteristics = &biome.Characteristics{
-			Climate:       dbBiome.Characteristics.Climate,
-			Vegetation:    dbBiome.Characteristics.Vegetation,
-			Plants:        dbBiome.Characteristics.Plants,
-			Wildlife:      dbBiome.Characteristics.Wildlife,
-			Precipitation: dbBiome.Characteristics.Precipitation,
+			Climate:               dbBiome.Characteristics.Climate,
+			Vegetation:            dbBiome.Characteristics.Vegetation,
+			Plants:                dbBiome.Characteristics.Plants,
+			Wildlife:              dbBiome.Characteristics.Wildlife,
+			Precipitation:         dbBiome.Characteristics.Precipitation,
+			Elements:              dbBiome.Characteristics.Elements,
+			Elementdescriptions:   dbBiome.Characteristics.Elementdescriptions,
+			Resources:             dbBiome.Characteristics.Resources,
+			Resourcesdescriptions: dbBiome.Characteristics.Resourcesdescriptions,
 		}
 		biomes = append(biomes, &b)
 	}
@@ -91,9 +103,9 @@ func LoadBiomesFromJSON(filePath string) ([]*biome.Biome, error) {
 	if err != nil {
 		return nil, err
 	}
-
 	err = json.Unmarshal(bytes, &biomes)
 	if err != nil {
+		fmt.Println("Unmarshal error:", err)
 		return nil, err
 	}
 

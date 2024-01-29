@@ -38,7 +38,7 @@ export const CreateCard: React.FC<{}> = () => {
   
         if (response.cardTemplate) {
           const newCardTemplate = response.cardTemplate as CardTemplate;
-  
+          console.log("Card template generated successfully:", response);
           // Initialize selectedOptions with the first option from each category
           const initialSelectedOptions = {
             "Element": newCardTemplate.elements[0],
