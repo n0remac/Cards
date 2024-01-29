@@ -47,6 +47,11 @@ const (
 	CardServiceCreateCardTemplateProcedure = "/card.CardService/CreateCardTemplate"
 	// CardServiceCreateCardProcedure is the fully-qualified name of the CardService's CreateCard RPC.
 	CardServiceCreateCardProcedure = "/card.CardService/CreateCard"
+	// CardServiceGenerateDeckProcedure is the fully-qualified name of the CardService's GenerateDeck
+	// RPC.
+	CardServiceGenerateDeckProcedure = "/card.CardService/GenerateDeck"
+	// CardServiceGetDecksProcedure is the fully-qualified name of the CardService's GetDecks RPC.
+	CardServiceGetDecksProcedure = "/card.CardService/GetDecks"
 )
 
 // CardServiceClient is a client for the card.CardService service.
@@ -57,6 +62,12 @@ type CardServiceClient interface {
 	GenerateCards(context.Context, *connect_go.Request[card.GenerateCardsRequest]) (*connect_go.Response[card.GenerateCardsResponse], error)
 	CreateCardTemplate(context.Context, *connect_go.Request[card.CreateCardTemplateRequest]) (*connect_go.Response[card.CreateCardTemplateResponse], error)
 	CreateCard(context.Context, *connect_go.Request[card.CreateCardRequest]) (*connect_go.Response[card.CreateCardResponse], error)
+	// rpc CreateDeck(CreateDeckRequest) returns (CreateDeckResponse);
+	// rpc GetDeck(GetDeckRequest) returns (GetDeckResponse);
+	// rpc UpdateDeck(UpdateDeckRequest) returns (UpdateDeckResponse);
+	// rpc DeleteDeck(DeleteDeckRequest) returns (DeleteDeckResponse);
+	GenerateDeck(context.Context, *connect_go.Request[card.GenerateDeckRequest]) (*connect_go.Response[card.GenerateDeckResponse], error)
+	GetDecks(context.Context, *connect_go.Request[card.GetDecksRequest]) (*connect_go.Response[card.GetDecksResponse], error)
 }
 
 // NewCardServiceClient constructs a client for the card.CardService service. By default, it uses
@@ -99,6 +110,16 @@ func NewCardServiceClient(httpClient connect_go.HTTPClient, baseURL string, opts
 			baseURL+CardServiceCreateCardProcedure,
 			opts...,
 		),
+		generateDeck: connect_go.NewClient[card.GenerateDeckRequest, card.GenerateDeckResponse](
+			httpClient,
+			baseURL+CardServiceGenerateDeckProcedure,
+			opts...,
+		),
+		getDecks: connect_go.NewClient[card.GetDecksRequest, card.GetDecksResponse](
+			httpClient,
+			baseURL+CardServiceGetDecksProcedure,
+			opts...,
+		),
 	}
 }
 
@@ -110,6 +131,8 @@ type cardServiceClient struct {
 	generateCards      *connect_go.Client[card.GenerateCardsRequest, card.GenerateCardsResponse]
 	createCardTemplate *connect_go.Client[card.CreateCardTemplateRequest, card.CreateCardTemplateResponse]
 	createCard         *connect_go.Client[card.CreateCardRequest, card.CreateCardResponse]
+	generateDeck       *connect_go.Client[card.GenerateDeckRequest, card.GenerateDeckResponse]
+	getDecks           *connect_go.Client[card.GetDecksRequest, card.GetDecksResponse]
 }
 
 // GetCards calls card.CardService.GetCards.
@@ -142,6 +165,16 @@ func (c *cardServiceClient) CreateCard(ctx context.Context, req *connect_go.Requ
 	return c.createCard.CallUnary(ctx, req)
 }
 
+// GenerateDeck calls card.CardService.GenerateDeck.
+func (c *cardServiceClient) GenerateDeck(ctx context.Context, req *connect_go.Request[card.GenerateDeckRequest]) (*connect_go.Response[card.GenerateDeckResponse], error) {
+	return c.generateDeck.CallUnary(ctx, req)
+}
+
+// GetDecks calls card.CardService.GetDecks.
+func (c *cardServiceClient) GetDecks(ctx context.Context, req *connect_go.Request[card.GetDecksRequest]) (*connect_go.Response[card.GetDecksResponse], error) {
+	return c.getDecks.CallUnary(ctx, req)
+}
+
 // CardServiceHandler is an implementation of the card.CardService service.
 type CardServiceHandler interface {
 	GetCards(context.Context, *connect_go.Request[card.GetCardsRequest]) (*connect_go.Response[card.GetCardsResponse], error)
@@ -150,6 +183,12 @@ type CardServiceHandler interface {
 	GenerateCards(context.Context, *connect_go.Request[card.GenerateCardsRequest]) (*connect_go.Response[card.GenerateCardsResponse], error)
 	CreateCardTemplate(context.Context, *connect_go.Request[card.CreateCardTemplateRequest]) (*connect_go.Response[card.CreateCardTemplateResponse], error)
 	CreateCard(context.Context, *connect_go.Request[card.CreateCardRequest]) (*connect_go.Response[card.CreateCardResponse], error)
+	// rpc CreateDeck(CreateDeckRequest) returns (CreateDeckResponse);
+	// rpc GetDeck(GetDeckRequest) returns (GetDeckResponse);
+	// rpc UpdateDeck(UpdateDeckRequest) returns (UpdateDeckResponse);
+	// rpc DeleteDeck(DeleteDeckRequest) returns (DeleteDeckResponse);
+	GenerateDeck(context.Context, *connect_go.Request[card.GenerateDeckRequest]) (*connect_go.Response[card.GenerateDeckResponse], error)
+	GetDecks(context.Context, *connect_go.Request[card.GetDecksRequest]) (*connect_go.Response[card.GetDecksResponse], error)
 }
 
 // NewCardServiceHandler builds an HTTP handler from the service implementation. It returns the path
@@ -188,6 +227,16 @@ func NewCardServiceHandler(svc CardServiceHandler, opts ...connect_go.HandlerOpt
 		svc.CreateCard,
 		opts...,
 	)
+	cardServiceGenerateDeckHandler := connect_go.NewUnaryHandler(
+		CardServiceGenerateDeckProcedure,
+		svc.GenerateDeck,
+		opts...,
+	)
+	cardServiceGetDecksHandler := connect_go.NewUnaryHandler(
+		CardServiceGetDecksProcedure,
+		svc.GetDecks,
+		opts...,
+	)
 	return "/card.CardService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
 		case CardServiceGetCardsProcedure:
@@ -202,6 +251,10 @@ func NewCardServiceHandler(svc CardServiceHandler, opts ...connect_go.HandlerOpt
 			cardServiceCreateCardTemplateHandler.ServeHTTP(w, r)
 		case CardServiceCreateCardProcedure:
 			cardServiceCreateCardHandler.ServeHTTP(w, r)
+		case CardServiceGenerateDeckProcedure:
+			cardServiceGenerateDeckHandler.ServeHTTP(w, r)
+		case CardServiceGetDecksProcedure:
+			cardServiceGetDecksHandler.ServeHTTP(w, r)
 		default:
 			http.NotFound(w, r)
 		}
@@ -233,4 +286,12 @@ func (UnimplementedCardServiceHandler) CreateCardTemplate(context.Context, *conn
 
 func (UnimplementedCardServiceHandler) CreateCard(context.Context, *connect_go.Request[card.CreateCardRequest]) (*connect_go.Response[card.CreateCardResponse], error) {
 	return nil, connect_go.NewError(connect_go.CodeUnimplemented, errors.New("card.CardService.CreateCard is not implemented"))
+}
+
+func (UnimplementedCardServiceHandler) GenerateDeck(context.Context, *connect_go.Request[card.GenerateDeckRequest]) (*connect_go.Response[card.GenerateDeckResponse], error) {
+	return nil, connect_go.NewError(connect_go.CodeUnimplemented, errors.New("card.CardService.GenerateDeck is not implemented"))
+}
+
+func (UnimplementedCardServiceHandler) GetDecks(context.Context, *connect_go.Request[card.GetDecksRequest]) (*connect_go.Response[card.GetDecksResponse], error) {
+	return nil, connect_go.NewError(connect_go.CodeUnimplemented, errors.New("card.CardService.GetDecks is not implemented"))
 }

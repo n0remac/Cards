@@ -11,6 +11,8 @@ import { CreateCard } from './pages/cards/CreateCard';
 import { CombineCards } from './pages/cards/CombineCards';
 import Login from './pages/user/Login';
 import Register from './pages/user/Register';
+import GameLobby from './pages/game/Lobby';
+import Deck from './pages/cards/Deck';
 
 
 export default function App() {
@@ -32,6 +34,12 @@ export default function App() {
                             <Link to="/cards" style={{ display: 'block', color: 'white', textAlign: 'center', padding: '14px 16px', textDecoration: 'none' }}>All Cards</Link>
                         </li>
                         <li style={{ float: 'left' }}>
+                            <Link to="/lobby" style={{ display: 'block', color: 'white', textAlign: 'center', padding: '14px 16px', textDecoration: 'none' }}>Lobby</Link>
+                        </li>
+                        <li style={{ float: 'left' }}>
+                            <Link to="/deck" style={{ display: 'block', color: 'white', textAlign: 'center', padding: '14px 16px', textDecoration: 'none' }}>Deck</Link>
+                        </li>
+                        {/* <li style={{ float: 'left' }}>
                             <Link to="/template" style={{ display: 'block', color: 'white', textAlign: 'center', padding: '14px 16px', textDecoration: 'none' }}>Template Form</Link>
                         </li>
                         <li style={{ float: 'left' }}>
@@ -42,7 +50,7 @@ export default function App() {
                         </li>
                         <li style={{ float: 'left' }}>
                             <Link to="/biomes" style={{ display: 'block', color: 'white', textAlign: 'center', padding: '14px 16px', textDecoration: 'none' }}>Biome Selector</Link>
-                        </li>
+                        </li> */}
                         <li style={{ float: 'right' }}>
                             <Link to="/login" style={{ display: 'block', color: 'white', textAlign: 'center', padding: '14px 16px', textDecoration: 'none' }}>Login</Link>
                         </li>
@@ -65,6 +73,8 @@ export default function App() {
                     <Route path="/cards/combine" element={<CombineCards />} />
                     <Route path="/login" element={<Login />} />
                     <Route path="/register" element={<Register />} />
+                    <Route path="/lobby" element={<GameLobby />} />
+                    <Route path="/deck" element={<Deck />} />
                 </Routes>
             </div>
         </Router>

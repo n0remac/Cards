@@ -2,6 +2,7 @@ package ai
 
 import (
 	"cards/gen/proto/biome"
+	"cards/gen/proto/card"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -144,6 +145,44 @@ func StoryQuery(b biome.Biome) (string, error) {
 
 	fmt.Println("generating prompt")
 	fmt.Println(prompt)
+
+	return prompt, nil
+}
+
+func CardQuery(c card.Card) (string, error) {
+	// Convert the scene and biome to JSON
+	prompt := fmt.Sprintf(`
+Fill out this template with the type, action and attack and defense values. The chosen values should match the animal and element:
+
+{
+	"name": "%s",
+	"type": "",  // "Plant" or "Animal"
+	"element": "%s",
+	"attack": "0",  // Appropriate alue between 1 and 5 based on name, type, and element.
+	"defense": "0", // Appropriate alue between 1 and 5 based on name, type, and element.
+	"mod": "0" // Ability modifyer
+	"action": ""  // A unique action that fits the card
+}
+
+Choose only action from this list:
+"Actions": [
+	"Add one resource to the resource pool",
+	"Raise attack",
+	"Raise defense",
+	"Discard x plants",
+	"Discard x animals",
+	"Deny a win condition of a creature with lower defense",
+	"Heal an Animal or Plant",
+	"Swap Resources",
+	"Double an Attribute",
+	"Protect a Card",
+	"Set a Trap",
+	"Revive",
+	"Sacrifice"
+]	
+
+Only return JSON data.
+    `, c.Name, c.Element)
 
 	return prompt, nil
 }

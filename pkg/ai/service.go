@@ -73,7 +73,9 @@ func GenerateImage(query string) (string, string, error) {
 		"model": "dall-e-3",
 		"prompt": "%s",
 		"n": 1,
-		"size": "1024x1024"
+		"size": "1024x1024",
+		"style": "vivid",
+		"quality": "hd"
 	}`, query))
 	req, err := http.NewRequest("POST", "https://api.openai.com/v1/images/generations", data)
 	if err != nil {

@@ -1,0 +1,10 @@
+syntax = "proto3";
+
+package card;
+
+import "proto/card/card.proto";
+
+// Deck related messages and services
+
+service DeckService {
+}

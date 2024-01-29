@@ -49,10 +49,12 @@ func (s *CardService) GenerateCards(ctx context.Context, req *connect.Request[ca
 	count := int(req.Msg.Count)
 	cards := []*card.Card{}
 	fmt.Println("Generating Cards, Count: ", count)
+	isAnimal := 1
 	for i := 0; i < count; i++ {
 		fmt.Println("Generating Card: ", i)
 
-		c, err := CreateRandomCharacter()
+		isAnimal *= -1
+		c, err := CreateRandomCharacter(isAnimal > 0)
 		if err != nil {
 			return nil, err
 		}
@@ -80,6 +82,7 @@ func (s *CardService) CreateCardTemplate(ctx context.Context, req *connect.Reque
 func (s *CardService) CreateCard(ctx context.Context, req *connect.Request[card.CreateCardRequest]) (*connect.Response[card.CreateCardResponse], error) {
 	fmt.Println("CreateCard")
 	newCard, err := CreateCardFromPrompt(req.Msg.Card, req.Msg.Prompt)
+
 	if err != nil {
 		fmt.Println("error creating card from prompt: ", err)
 		return nil, err
@@ -96,4 +99,38 @@ func (s *CardService) CreateCard(ctx context.Context, req *connect.Request[card.
 	return connect.NewResponse(&card.CreateCardResponse{
 		Card: newCard,
 	}), nil
+}
+
+func (s *CardService) GenerateDeck(ctx context.Context, req *connect.Request[card.GenerateDeckRequest]) (*connect.Response[card.GenerateDeckResponse], error) {
+	fmt.Println("Generating Deck")
+	numCards := int(req.Msg.NumCards)
+	biomeName := req.Msg.Biome
+
+	deck := card.Deck{}
+
+	isAnimal := 1
+	for i := 0; i < numCards; i++ {
+		fmt.Println("Generating Card: ", i)
+		isAnimal *= -1
+		c, err := OrganismFromBiome(biomeName, isAnimal > 0)
+		newCard, err := createCard(c)
+		if err != nil {
+			fmt.Println("There was an error creating the card", err)
+			return nil, err
+		}
+		deck.Cards = append(deck.Cards, newCard)
+	}
+	createDeckInDB(&deck)
+	return connect.NewResponse(&card.GenerateDeckResponse{Deck: &deck}), nil
+}
+
+func (s *CardService) GetDecks(ctx context.Context, req *connect.Request[card.GetDecksRequest]) (*connect.Response[card.GetDecksResponse], error) {
+	fmt.Println("Getting Decks")
+	userId := req.Msg.UserId
+
+	decks, err := getDecksFromDB(userId)
+	if err != nil {
+		return nil, err
+	}
+	return connect.NewResponse(&card.GetDecksResponse{Decks: decks}), nil
 }
