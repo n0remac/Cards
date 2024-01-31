@@ -162,24 +162,40 @@ Fill out this template with the type, action and attack and defense values. The 
 	"defense": "0", // Appropriate alue between 1 and 5 based on name, type, and element.
 	"mod": "0" // Ability modifyer
 	"action": ""  // A unique action that fits the card
+	"flavor_text": ""  // A short sentance that gives the card flavor, drawing inspiration from the name, type, or element.
 }
 
 Choose only action from this list:
 "Actions": [
-	"Add one resource to the resource pool",
-	"Raise attack",
-	"Raise defense",
-	"Discard x plants",
-	"Discard x animals",
-	"Deny a win condition of a creature with lower defense",
-	"Heal an Animal or Plant",
-	"Swap Resources",
-	"Double an Attribute",
-	"Protect a Card",
-	"Set a Trap",
-	"Revive",
-	"Sacrifice"
+	"Add one resource to the resource pool.",
+	"Raise the attack value of another card by MOD.",
+	"Raise the defense value of another card by MOD.",
+	"Lower the attack value of another card by MOD.",
+	"Lower the defense value of another card by MOD.",
+	"Opponent discards a card from their hand.",
+	"Opponent discards a card from their field.",
+	"Return a card to the hand from the field".,
+	"Return a card to the hand from the discard pile.",
 ]	
+
+Only return JSON data.
+    `, c.Name, c.Element)
+
+	return prompt, nil
+}
+
+func ResourceCardQuery(c card.Card) (string, error) {
+	// Convert the scene and biome to JSON
+	prompt := fmt.Sprintf(`
+Fill out this template with the type, action and attack and defense values. The chosen values should match the animal and element:
+
+{
+	"name": "%s",
+	"type": "Resource",
+	"element": "%s",
+	"mod": "0" // Appropriate value between 1 and 3 based on name, type, and element. Lean to the lower end of the scale.
+	"flavor": ""  // A short sentance that gives the card flavor, drawing inspiration from the name, type, or element.
+}
 
 Only return JSON data.
     `, c.Name, c.Element)

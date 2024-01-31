@@ -26,18 +26,27 @@ export const CardComponent: React.FC<CardComponentProps> = ({ card, handleDelete
           <div className='m-1 mb-0'>
             <img className="w-full h-auto relative border-2 border-black rounded-lg mb-0" src={`http://localhost:8080/card_images/${card.name}.png`} alt="Card Image" />
           </div>
-          <div className="flex item-stretch text-center pt-1.5 h-svh mt-0 text-blue-100">
-            <p className="flex item-center justify-center py-14 bg-neutral-300 center-item text-black h-36 w-full text-base shadow-lg relative border-2 border-black rounded-lg min-h-48  m-0.5 mt-0">
-              Action: {card.action} <br></br>
-            </p>
-            <div className="absolute z-0 bottom-0 right-0">
-              <div className="flex items-center justify-center shadow-lg bg-neutral-300 relative rounded border-2 border-black m-0.5 p-0.5 pt-0 pb-0 pl-1 pr-1">
-                <p className="text-black text-bold text-base">
-                {card.attack}/{card.defense}
+            { card.type !== "Resource" &&
+              <div className="flex item-stretch text-center pt-1.5 h-svh mt-0 text-blue-100">
+                <p className="flex item-center justify-center py-14 bg-neutral-300 center-item text-black h-36 w-full text-base shadow-lg relative border-2 border-black rounded-lg min-h-48  m-0.5 mt-0">
+                  Action: {card.action} <br></br>
                 </p>
+                <div className="absolute z-0 bottom-0 right-0">
+                  <div className="flex items-center justify-center shadow-lg bg-neutral-300 relative rounded border-2 border-black m-0.5 p-0.5 pt-0 pb-0 pl-1 pr-1">
+                    <p className="text-black text-bold text-base">
+                    {card.attack}/{card.defense}
+                    </p>
+                  </div>
               </div>
-          </div>
-          </div>
+            </div>
+            }
+            { card.type === "Resource" &&
+              <div className="flex item-stretch text-center pt-1.5 h-svh mt-0 text-blue-100">
+                <p className="flex item-center justify-center p-14 bg-neutral-300 center-item text-black h-36 w-full text-base shadow-lg relative border-2 border-black rounded-lg min-h-48  m-0.5 mt-0">
+                  Add {card.mod} resources to your resource pool this turn. <br></br>
+                </p>
+            </div>
+            }
       </div>
     );
   };

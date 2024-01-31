@@ -17,6 +17,8 @@ message Card {
   string attack = 11;
   string defense = 12;
   string action = 13;
+  string flavor = 14;
+  string mod = 15;
 }
 
 message CardTemplate {

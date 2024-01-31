@@ -77,6 +77,16 @@ export class Card extends Message<Card> {
    */
   action = "";
 
+  /**
+   * @generated from field: string flavor = 14;
+   */
+  flavor = "";
+
+  /**
+   * @generated from field: string mod = 15;
+   */
+  mod = "";
+
   constructor(data?: PartialMessage<Card>) {
     super();
     proto3.util.initPartial(data, this);
@@ -98,6 +108,8 @@ export class Card extends Message<Card> {
     { no: 11, name: "attack", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 12, name: "defense", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 13, name: "action", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 14, name: "flavor", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 15, name: "mod", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): Card {

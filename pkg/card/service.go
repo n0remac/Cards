@@ -4,6 +4,7 @@ import (
 	"cards/gen/proto/card"
 	"context"
 	"fmt"
+	"math/rand"
 
 	"github.com/bufbuild/connect-go"
 )
@@ -49,12 +50,19 @@ func (s *CardService) GenerateCards(ctx context.Context, req *connect.Request[ca
 	count := int(req.Msg.Count)
 	cards := []*card.Card{}
 	fmt.Println("Generating Cards, Count: ", count)
-	isAnimal := 1
 	for i := 0; i < count; i++ {
 		fmt.Println("Generating Card: ", i)
 
-		isAnimal *= -1
-		c, err := CreateRandomCharacter(isAnimal > 0)
+		randInt := rand.Intn(3)
+		var cardType string
+		if randInt == 0 {
+			cardType = "Animal"
+		} else if randInt == 1 {
+			cardType = "Plant"
+		} else {
+			cardType = "Resource"
+		}
+		c, err := CreateCard(cardType, "")
 		if err != nil {
 			return nil, err
 		}

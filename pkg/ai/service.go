@@ -155,7 +155,6 @@ func DownloadImage(url, filePath string) error {
 
 func extractInfo(jsonStr string) (string, string, error) {
 	var resp Response
-
 	err := json.Unmarshal([]byte(jsonStr), &resp)
 	if err != nil {
 		return "", "", err
