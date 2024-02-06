@@ -20,8 +20,8 @@ const GameLobby = () => {
   }, [navigate]);
 
   const joinGame = () => {
-    // Implement logic to join game
-    // Update game state and check if the game is full
+    // redirect to the game page
+    navigate('/game');
   };
 
   if (isGameFull) {

@@ -15,12 +15,6 @@ type Card struct {
 	Data   string `db:"data"`
 }
 
-type Deck struct {
-	ID     int    `db:"id,omitempty"`
-	Player string `json:"player"`
-	Data   string `db:"data"`
-}
-
 func createCard(c *card.Card) (*card.Card, error) {
 	sess := database.GetSession()
 
@@ -58,7 +52,26 @@ func createCardInDB(card *card.Card) (*card.Card, error) {
 	return card, err
 }
 
-func getCardsFromDB() ([]*card.Card, error) {
+func getCardFromDB(id int32) (*card.Card, error) {
+	sess := database.GetSession()
+	var c Card
+	var card *card.Card
+
+	// Query the database for the card with the given ID
+	res := sess.Collection("cards").Find(db.Cond{"id": id})
+	err1 := res.One(&c)
+	if err1 != nil {
+		return nil, err1
+	}
+
+	er := json.Unmarshal([]byte(c.Data), &card)
+	if er != nil {
+		return nil, er
+	}
+	return card, nil
+}
+
+func getCardsFromDB(user string) ([]*card.Card, error) {
 	sess := database.GetSession()
 	var cards []*card.Card
 
@@ -70,7 +83,6 @@ func getCardsFromDB() ([]*card.Card, error) {
 	if err != nil {
 		return nil, err
 	}
-
 	// Convert the JSON data back into card structs
 	for _, dbCard := range dbCards {
 		var c card.Card
@@ -80,9 +92,12 @@ func getCardsFromDB() ([]*card.Card, error) {
 			return nil, err
 		}
 		c.Id = int32(id)
-		cards = append(cards, &c)
+		if user == "" {
+			cards = append(cards, &c)
+		} else if c.Player == user {
+			cards = append(cards, &c)
+		}
 	}
-
 	return cards, nil
 }
 
@@ -92,48 +107,4 @@ func deleteCardFromDB(id int32) error {
 	res := sess.Collection("cards").Find(db.Cond{"id": id})
 	err := res.Delete()
 	return err
-}
-
-func createDeckInDB(deck *card.Deck) error {
-	sess := database.GetSession()
-
-	// Create a new card record
-	deckJSON, _ := json.Marshal(deck)
-
-	newDeck := Deck{
-		Player: deck.UserId,
-		Data:   string(deckJSON),
-	}
-
-	// Insert the new card into the database
-	_, err := sess.Collection("decks").Insert(newDeck)
-	return err
-}
-
-func getDecksFromDB(userId string) ([]*card.Deck, error) {
-	sess := database.GetSession()
-	var decks []*card.Deck
-
-	// Query the database for all card records
-	res := sess.Collection("decks").Find(db.Cond{"player": userId})
-
-	var dbDecks []Deck
-	err := res.All(&dbDecks)
-	if err != nil {
-		return nil, err
-	}
-
-	// Convert the JSON data back into card structs
-	for _, dbDeck := range dbDecks {
-		var d card.Deck
-		id := dbDeck.ID
-		err := json.Unmarshal([]byte(dbDeck.Data), &d)
-		if err != nil {
-			return nil, err
-		}
-		d.UserId = string(id)
-		decks = append(decks, &d)
-	}
-
-	return decks, nil
 }

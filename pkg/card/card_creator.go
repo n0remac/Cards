@@ -83,10 +83,8 @@ func CreateCard(cardType string, selectedBiome string) (*card.Card, error) {
 		return newCard, err
 	}
 	if cardType == "Resource" {
-		fmt.Println("generating resource card")
 		return generateResourceCard(newCard)
 	}
-	fmt.Println("generating card")
 	return generateCard(newCard)
 }
 
@@ -95,7 +93,7 @@ func CreateCardFromBiome(selectedBiome *biome.Biome, cardType string) (*card.Car
 
 	element := selectedBiome.Characteristics.Elements[rand.Intn(len(selectedBiome.Characteristics.Elements))]
 	description := selectedBiome.Characteristics.Elementdescriptions[rand.Intn(len(selectedBiome.Characteristics.Elementdescriptions))]
-	fmt.Println("cardType:", cardType)
+
 	if cardType == "Animal" {
 		animal := selectedBiome.Characteristics.Wildlife[rand.Intn(len(selectedBiome.Characteristics.Wildlife))]
 		newCard = constructAnimalCard(animal, element, selectedBiome.Name, description)
@@ -146,7 +144,6 @@ func generateCard(newCard *card.Card) (*card.Card, error) {
 	newCard.Type = cardAtributes.Type
 	newCard.Flavor = cardAtributes.Flavor
 
-	fmt.Println("newCard:", newCard)
 	return newCard, nil
 }
 
@@ -185,7 +182,6 @@ func generateResourceCard(newCard *card.Card) (*card.Card, error) {
 	newCard.Type = resourceCardAtributes.Type
 	newCard.Flavor = resourceCardAtributes.Flavor
 
-	fmt.Println("newCard:", newCard)
 	return newCard, nil
 }
 

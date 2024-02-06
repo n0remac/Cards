@@ -13,14 +13,26 @@ type CardService struct {
 	// Add any fields if needed
 }
 
+func (s *CardService) GetCard(ctx context.Context, req *connect.Request[card.GetCardRequest]) (*connect.Response[card.GetCardResponse], error) {
+	c, err := getCardFromDB(req.Msg.Id)
+	if err != nil {
+		return nil, err
+	}
+	return connect.NewResponse(&card.GetCardResponse{
+		Card: c,
+	}), nil
+}
+
 func (s *CardService) GetCards(ctx context.Context, req *connect.Request[card.GetCardsRequest]) (*connect.Response[card.GetCardsResponse], error) {
-	cards, err := getCardsFromDB()
+	user := req.Msg.UserId
+	cards, err := getCardsFromDB(user)
 	if err != nil {
 		return nil, err
 	}
 	return connect.NewResponse(&card.GetCardsResponse{
 		Cards: cards,
 	}), nil
+
 }
 
 func (s *CardService) NewCard(ctx context.Context, req *connect.Request[card.NewCardRequest]) (*connect.Response[card.NewCardResponse], error) {
@@ -47,6 +59,8 @@ func (s *CardService) DeleteCard(ctx context.Context, req *connect.Request[card.
 
 func (s *CardService) GenerateCards(ctx context.Context, req *connect.Request[card.GenerateCardsRequest]) (*connect.Response[card.GenerateCardsResponse], error) {
 	fmt.Println("Generating Cards")
+	user := req.Msg.UserId
+	deck := req.Msg.Deck
 	count := int(req.Msg.Count)
 	cards := []*card.Card{}
 	fmt.Println("Generating Cards, Count: ", count)
@@ -62,17 +76,19 @@ func (s *CardService) GenerateCards(ctx context.Context, req *connect.Request[ca
 		} else {
 			cardType = "Resource"
 		}
+
 		c, err := CreateCard(cardType, "")
 		if err != nil {
 			return nil, err
 		}
+		c.Player = user
+		c.Deck = deck
 
 		newCard, err := createCard(c)
 		if err != nil {
 			return nil, err
 		}
 		cards = append(cards, newCard)
-
 	}
 
 	return connect.NewResponse(&card.GenerateCardsResponse{Cards: cards}), nil
@@ -102,43 +118,68 @@ func (s *CardService) CreateCard(ctx context.Context, req *connect.Request[card.
 		return nil, err
 	}
 
-	fmt.Println("newCard: ", newCard)
-
 	return connect.NewResponse(&card.CreateCardResponse{
 		Card: newCard,
 	}), nil
 }
 
-func (s *CardService) GenerateDeck(ctx context.Context, req *connect.Request[card.GenerateDeckRequest]) (*connect.Response[card.GenerateDeckResponse], error) {
-	fmt.Println("Generating Deck")
-	numCards := int(req.Msg.NumCards)
-	biomeName := req.Msg.Biome
+func (s *CardService) GetDeck(ctx context.Context, req *connect.Request[card.GetDeckRequest]) (*connect.Response[card.Deck], error) {
+	deckName := req.Msg.Name
 
-	deck := card.Deck{}
-
-	isAnimal := 1
-	for i := 0; i < numCards; i++ {
-		fmt.Println("Generating Card: ", i)
-		isAnimal *= -1
-		c, err := OrganismFromBiome(biomeName, isAnimal > 0)
-		newCard, err := createCard(c)
-		if err != nil {
-			fmt.Println("There was an error creating the card", err)
-			return nil, err
-		}
-		deck.Cards = append(deck.Cards, newCard)
-	}
-	createDeckInDB(&deck)
-	return connect.NewResponse(&card.GenerateDeckResponse{Deck: &deck}), nil
-}
-
-func (s *CardService) GetDecks(ctx context.Context, req *connect.Request[card.GetDecksRequest]) (*connect.Response[card.GetDecksResponse], error) {
-	fmt.Println("Getting Decks")
-	userId := req.Msg.UserId
-
-	decks, err := getDecksFromDB(userId)
+	cards, err := getCardsFromDB("")
 	if err != nil {
 		return nil, err
 	}
-	return connect.NewResponse(&card.GetDecksResponse{Decks: decks}), nil
+
+	decks, err := getDecks(cards)
+	if err != nil {
+		return nil, err
+	}
+	for _, d := range decks {
+		if d.Name == deckName {
+			return connect.NewResponse(d), nil
+		}
+	}
+	return nil, fmt.Errorf("deck not found")
+}
+
+func (s *CardService) GetDecks(ctx context.Context, req *connect.Request[card.GetCardsRequest]) (*connect.Response[card.GetDecksResponse], error) {
+	cards, err := getCardsFromDB(req.Msg.UserId)
+	if err != nil {
+		return nil, err
+	}
+
+	decks, err := getDecks(cards)
+	if err != nil {
+		return nil, err
+	}
+
+	return connect.NewResponse(&card.GetDecksResponse{
+		Decks: decks,
+	}), nil
+}
+
+func getDecks(cards []*card.Card) ([]*card.Deck, error) {
+	var decks []*card.Deck
+
+	for _, c := range cards {
+		fmt.Println("Card: ", c.Deck)
+		if c.Deck != "" {
+			found := false
+			for _, d := range decks {
+				if d.Name == c.Deck {
+					found = true
+					d.Cards = append(d.Cards, c)
+				}
+			}
+			if !found {
+				newDeck := &card.Deck{Name: c.Deck}
+				newDeck.Cards = append(newDeck.Cards, c)
+				decks = append(decks, newDeck)
+			}
+
+		}
+	}
+
+	return decks, nil
 }

@@ -82,7 +82,7 @@ export const CreateCard: React.FC<{}> = () => {
     newCard.biome = selectedOptions["Biome"];
     newCard.element = selectedOptions["Element"];
     newCard.description = selectedOptions["Description"];
-
+    newCard.player = (localStorage.getItem('username') || '');
     return newCard;
   };
   
