@@ -3,6 +3,8 @@ package biome
 import (
 	"cards/gen/proto/biome"
 	"context"
+	"os"
+	"path/filepath"
 
 	"github.com/bufbuild/connect-go"
 )
@@ -51,4 +53,24 @@ func (s *BiomeService) GenerateBiomeCard(ctx context.Context, req *connect.Reque
 	return connect.NewResponse(&biome.CardResponse{
 		Data: story,
 	}), nil
+}
+
+func getFileNames(directory string) ([]string, error) {
+	var filenames []string
+
+	err := filepath.Walk(directory, func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
+		if !info.IsDir() {
+			filenames = append(filenames, path)
+		}
+		return nil
+	})
+
+	if err != nil {
+		return nil, err
+	}
+
+	return filenames, nil
 }

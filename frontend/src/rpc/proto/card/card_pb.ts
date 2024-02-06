@@ -77,6 +77,21 @@ export class Card extends Message<Card> {
    */
   action = "";
 
+  /**
+   * @generated from field: string flavor = 14;
+   */
+  flavor = "";
+
+  /**
+   * @generated from field: string mod = 15;
+   */
+  mod = "";
+
+  /**
+   * @generated from field: string deck = 16;
+   */
+  deck = "";
+
   constructor(data?: PartialMessage<Card>) {
     super();
     proto3.util.initPartial(data, this);
@@ -98,6 +113,9 @@ export class Card extends Message<Card> {
     { no: 11, name: "attack", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 12, name: "defense", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 13, name: "action", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 14, name: "flavor", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 15, name: "mod", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 16, name: "deck", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): Card {
@@ -114,6 +132,80 @@ export class Card extends Message<Card> {
 
   static equals(a: Card | PlainMessage<Card> | undefined, b: Card | PlainMessage<Card> | undefined): boolean {
     return proto3.util.equals(Card, a, b);
+  }
+}
+
+/**
+ * @generated from message card.GetCardRequest
+ */
+export class GetCardRequest extends Message<GetCardRequest> {
+  /**
+   * @generated from field: int32 id = 1;
+   */
+  id = 0;
+
+  constructor(data?: PartialMessage<GetCardRequest>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "card.GetCardRequest";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "id", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): GetCardRequest {
+    return new GetCardRequest().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): GetCardRequest {
+    return new GetCardRequest().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): GetCardRequest {
+    return new GetCardRequest().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: GetCardRequest | PlainMessage<GetCardRequest> | undefined, b: GetCardRequest | PlainMessage<GetCardRequest> | undefined): boolean {
+    return proto3.util.equals(GetCardRequest, a, b);
+  }
+}
+
+/**
+ * @generated from message card.GetCardResponse
+ */
+export class GetCardResponse extends Message<GetCardResponse> {
+  /**
+   * @generated from field: card.Card card = 1;
+   */
+  card?: Card;
+
+  constructor(data?: PartialMessage<GetCardResponse>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "card.GetCardResponse";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "card", kind: "message", T: Card },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): GetCardResponse {
+    return new GetCardResponse().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): GetCardResponse {
+    return new GetCardResponse().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): GetCardResponse {
+    return new GetCardResponse().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: GetCardResponse | PlainMessage<GetCardResponse> | undefined, b: GetCardResponse | PlainMessage<GetCardResponse> | undefined): boolean {
+    return proto3.util.equals(GetCardResponse, a, b);
   }
 }
 
@@ -146,6 +238,11 @@ export class CardTemplate extends Message<CardTemplate> {
    */
   descriptions: string[] = [];
 
+  /**
+   * @generated from field: repeated string resources = 6;
+   */
+  resources: string[] = [];
+
   constructor(data?: PartialMessage<CardTemplate>) {
     super();
     proto3.util.initPartial(data, this);
@@ -159,6 +256,7 @@ export class CardTemplate extends Message<CardTemplate> {
     { no: 3, name: "plants", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
     { no: 4, name: "elements", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
     { no: 5, name: "descriptions", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
+    { no: 6, name: "resources", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): CardTemplate {
@@ -188,9 +286,19 @@ export class GenerateCardsRequest extends Message<GenerateCardsRequest> {
   userId = "";
 
   /**
-   * @generated from field: int32 count = 2;
+   * @generated from field: string biome = 2;
+   */
+  biome = "";
+
+  /**
+   * @generated from field: int32 count = 3;
    */
   count = 0;
+
+  /**
+   * @generated from field: string deck = 4;
+   */
+  deck = "";
 
   constructor(data?: PartialMessage<GenerateCardsRequest>) {
     super();
@@ -201,7 +309,9 @@ export class GenerateCardsRequest extends Message<GenerateCardsRequest> {
   static readonly typeName = "card.GenerateCardsRequest";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
     { no: 1, name: "user_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 2, name: "count", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
+    { no: 2, name: "biome", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 3, name: "count", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
+    { no: 4, name: "deck", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): GenerateCardsRequest {
@@ -657,14 +767,14 @@ export class CreateCardTemplateResponse extends Message<CreateCardTemplateRespon
  */
 export class Deck extends Message<Deck> {
   /**
-   * @generated from field: repeated card.Card cards = 1;
+   * @generated from field: string name = 1;
    */
-  cards: Card[] = [];
+  name = "";
 
   /**
-   * @generated from field: string user_id = 2;
+   * @generated from field: repeated card.Card cards = 2;
    */
-  userId = "";
+  cards: Card[] = [];
 
   constructor(data?: PartialMessage<Deck>) {
     super();
@@ -674,8 +784,8 @@ export class Deck extends Message<Deck> {
   static readonly runtime: typeof proto3 = proto3;
   static readonly typeName = "card.Deck";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 1, name: "cards", kind: "message", T: Card, repeated: true },
-    { no: 2, name: "user_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 1, name: "name", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "cards", kind: "message", T: Card, repeated: true },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): Deck {
@@ -692,277 +802,6 @@ export class Deck extends Message<Deck> {
 
   static equals(a: Deck | PlainMessage<Deck> | undefined, b: Deck | PlainMessage<Deck> | undefined): boolean {
     return proto3.util.equals(Deck, a, b);
-  }
-}
-
-/**
- * @generated from message card.GenerateDeckRequest
- */
-export class GenerateDeckRequest extends Message<GenerateDeckRequest> {
-  /**
-   * @generated from field: int32 num_cards = 1;
-   */
-  numCards = 0;
-
-  /**
-   * @generated from field: string biome = 2;
-   */
-  biome = "";
-
-  /**
-   * @generated from field: string user_id = 3;
-   */
-  userId = "";
-
-  constructor(data?: PartialMessage<GenerateDeckRequest>) {
-    super();
-    proto3.util.initPartial(data, this);
-  }
-
-  static readonly runtime: typeof proto3 = proto3;
-  static readonly typeName = "card.GenerateDeckRequest";
-  static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 1, name: "num_cards", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
-    { no: 2, name: "biome", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 3, name: "user_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-  ]);
-
-  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): GenerateDeckRequest {
-    return new GenerateDeckRequest().fromBinary(bytes, options);
-  }
-
-  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): GenerateDeckRequest {
-    return new GenerateDeckRequest().fromJson(jsonValue, options);
-  }
-
-  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): GenerateDeckRequest {
-    return new GenerateDeckRequest().fromJsonString(jsonString, options);
-  }
-
-  static equals(a: GenerateDeckRequest | PlainMessage<GenerateDeckRequest> | undefined, b: GenerateDeckRequest | PlainMessage<GenerateDeckRequest> | undefined): boolean {
-    return proto3.util.equals(GenerateDeckRequest, a, b);
-  }
-}
-
-/**
- * @generated from message card.GenerateDeckResponse
- */
-export class GenerateDeckResponse extends Message<GenerateDeckResponse> {
-  /**
-   * @generated from field: card.Deck deck = 1;
-   */
-  deck?: Deck;
-
-  constructor(data?: PartialMessage<GenerateDeckResponse>) {
-    super();
-    proto3.util.initPartial(data, this);
-  }
-
-  static readonly runtime: typeof proto3 = proto3;
-  static readonly typeName = "card.GenerateDeckResponse";
-  static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 1, name: "deck", kind: "message", T: Deck },
-  ]);
-
-  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): GenerateDeckResponse {
-    return new GenerateDeckResponse().fromBinary(bytes, options);
-  }
-
-  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): GenerateDeckResponse {
-    return new GenerateDeckResponse().fromJson(jsonValue, options);
-  }
-
-  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): GenerateDeckResponse {
-    return new GenerateDeckResponse().fromJsonString(jsonString, options);
-  }
-
-  static equals(a: GenerateDeckResponse | PlainMessage<GenerateDeckResponse> | undefined, b: GenerateDeckResponse | PlainMessage<GenerateDeckResponse> | undefined): boolean {
-    return proto3.util.equals(GenerateDeckResponse, a, b);
-  }
-}
-
-/**
- * @generated from message card.CreateDeckRequest
- */
-export class CreateDeckRequest extends Message<CreateDeckRequest> {
-  /**
-   * @generated from field: card.Deck deck = 1;
-   */
-  deck?: Deck;
-
-  constructor(data?: PartialMessage<CreateDeckRequest>) {
-    super();
-    proto3.util.initPartial(data, this);
-  }
-
-  static readonly runtime: typeof proto3 = proto3;
-  static readonly typeName = "card.CreateDeckRequest";
-  static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 1, name: "deck", kind: "message", T: Deck },
-  ]);
-
-  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): CreateDeckRequest {
-    return new CreateDeckRequest().fromBinary(bytes, options);
-  }
-
-  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): CreateDeckRequest {
-    return new CreateDeckRequest().fromJson(jsonValue, options);
-  }
-
-  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): CreateDeckRequest {
-    return new CreateDeckRequest().fromJsonString(jsonString, options);
-  }
-
-  static equals(a: CreateDeckRequest | PlainMessage<CreateDeckRequest> | undefined, b: CreateDeckRequest | PlainMessage<CreateDeckRequest> | undefined): boolean {
-    return proto3.util.equals(CreateDeckRequest, a, b);
-  }
-}
-
-/**
- * @generated from message card.CreateDeckResponse
- */
-export class CreateDeckResponse extends Message<CreateDeckResponse> {
-  /**
-   * @generated from field: card.Deck deck = 1;
-   */
-  deck?: Deck;
-
-  constructor(data?: PartialMessage<CreateDeckResponse>) {
-    super();
-    proto3.util.initPartial(data, this);
-  }
-
-  static readonly runtime: typeof proto3 = proto3;
-  static readonly typeName = "card.CreateDeckResponse";
-  static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 1, name: "deck", kind: "message", T: Deck },
-  ]);
-
-  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): CreateDeckResponse {
-    return new CreateDeckResponse().fromBinary(bytes, options);
-  }
-
-  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): CreateDeckResponse {
-    return new CreateDeckResponse().fromJson(jsonValue, options);
-  }
-
-  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): CreateDeckResponse {
-    return new CreateDeckResponse().fromJsonString(jsonString, options);
-  }
-
-  static equals(a: CreateDeckResponse | PlainMessage<CreateDeckResponse> | undefined, b: CreateDeckResponse | PlainMessage<CreateDeckResponse> | undefined): boolean {
-    return proto3.util.equals(CreateDeckResponse, a, b);
-  }
-}
-
-/**
- * @generated from message card.GetDeckRequest
- */
-export class GetDeckRequest extends Message<GetDeckRequest> {
-  /**
-   * @generated from field: card.Deck deck = 1;
-   */
-  deck?: Deck;
-
-  constructor(data?: PartialMessage<GetDeckRequest>) {
-    super();
-    proto3.util.initPartial(data, this);
-  }
-
-  static readonly runtime: typeof proto3 = proto3;
-  static readonly typeName = "card.GetDeckRequest";
-  static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 1, name: "deck", kind: "message", T: Deck },
-  ]);
-
-  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): GetDeckRequest {
-    return new GetDeckRequest().fromBinary(bytes, options);
-  }
-
-  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): GetDeckRequest {
-    return new GetDeckRequest().fromJson(jsonValue, options);
-  }
-
-  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): GetDeckRequest {
-    return new GetDeckRequest().fromJsonString(jsonString, options);
-  }
-
-  static equals(a: GetDeckRequest | PlainMessage<GetDeckRequest> | undefined, b: GetDeckRequest | PlainMessage<GetDeckRequest> | undefined): boolean {
-    return proto3.util.equals(GetDeckRequest, a, b);
-  }
-}
-
-/**
- * @generated from message card.GetDeckResponse
- */
-export class GetDeckResponse extends Message<GetDeckResponse> {
-  /**
-   * @generated from field: card.Deck deck = 1;
-   */
-  deck?: Deck;
-
-  constructor(data?: PartialMessage<GetDeckResponse>) {
-    super();
-    proto3.util.initPartial(data, this);
-  }
-
-  static readonly runtime: typeof proto3 = proto3;
-  static readonly typeName = "card.GetDeckResponse";
-  static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 1, name: "deck", kind: "message", T: Deck },
-  ]);
-
-  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): GetDeckResponse {
-    return new GetDeckResponse().fromBinary(bytes, options);
-  }
-
-  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): GetDeckResponse {
-    return new GetDeckResponse().fromJson(jsonValue, options);
-  }
-
-  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): GetDeckResponse {
-    return new GetDeckResponse().fromJsonString(jsonString, options);
-  }
-
-  static equals(a: GetDeckResponse | PlainMessage<GetDeckResponse> | undefined, b: GetDeckResponse | PlainMessage<GetDeckResponse> | undefined): boolean {
-    return proto3.util.equals(GetDeckResponse, a, b);
-  }
-}
-
-/**
- * @generated from message card.GetDecksRequest
- */
-export class GetDecksRequest extends Message<GetDecksRequest> {
-  /**
-   * @generated from field: string user_id = 1;
-   */
-  userId = "";
-
-  constructor(data?: PartialMessage<GetDecksRequest>) {
-    super();
-    proto3.util.initPartial(data, this);
-  }
-
-  static readonly runtime: typeof proto3 = proto3;
-  static readonly typeName = "card.GetDecksRequest";
-  static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 1, name: "user_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-  ]);
-
-  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): GetDecksRequest {
-    return new GetDecksRequest().fromBinary(bytes, options);
-  }
-
-  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): GetDecksRequest {
-    return new GetDecksRequest().fromJson(jsonValue, options);
-  }
-
-  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): GetDecksRequest {
-    return new GetDecksRequest().fromJsonString(jsonString, options);
-  }
-
-  static equals(a: GetDecksRequest | PlainMessage<GetDecksRequest> | undefined, b: GetDecksRequest | PlainMessage<GetDecksRequest> | undefined): boolean {
-    return proto3.util.equals(GetDecksRequest, a, b);
   }
 }
 
@@ -1004,150 +843,39 @@ export class GetDecksResponse extends Message<GetDecksResponse> {
 }
 
 /**
- * @generated from message card.UpdateDeckRequest
+ * @generated from message card.GetDeckRequest
  */
-export class UpdateDeckRequest extends Message<UpdateDeckRequest> {
+export class GetDeckRequest extends Message<GetDeckRequest> {
   /**
-   * @generated from field: card.Deck deck = 1;
+   * @generated from field: string name = 1;
    */
-  deck?: Deck;
+  name = "";
 
-  constructor(data?: PartialMessage<UpdateDeckRequest>) {
+  constructor(data?: PartialMessage<GetDeckRequest>) {
     super();
     proto3.util.initPartial(data, this);
   }
 
   static readonly runtime: typeof proto3 = proto3;
-  static readonly typeName = "card.UpdateDeckRequest";
+  static readonly typeName = "card.GetDeckRequest";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 1, name: "deck", kind: "message", T: Deck },
+    { no: 1, name: "name", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ]);
 
-  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): UpdateDeckRequest {
-    return new UpdateDeckRequest().fromBinary(bytes, options);
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): GetDeckRequest {
+    return new GetDeckRequest().fromBinary(bytes, options);
   }
 
-  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): UpdateDeckRequest {
-    return new UpdateDeckRequest().fromJson(jsonValue, options);
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): GetDeckRequest {
+    return new GetDeckRequest().fromJson(jsonValue, options);
   }
 
-  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): UpdateDeckRequest {
-    return new UpdateDeckRequest().fromJsonString(jsonString, options);
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): GetDeckRequest {
+    return new GetDeckRequest().fromJsonString(jsonString, options);
   }
 
-  static equals(a: UpdateDeckRequest | PlainMessage<UpdateDeckRequest> | undefined, b: UpdateDeckRequest | PlainMessage<UpdateDeckRequest> | undefined): boolean {
-    return proto3.util.equals(UpdateDeckRequest, a, b);
-  }
-}
-
-/**
- * @generated from message card.UpdateDeckResponse
- */
-export class UpdateDeckResponse extends Message<UpdateDeckResponse> {
-  /**
-   * @generated from field: card.Deck deck = 1;
-   */
-  deck?: Deck;
-
-  constructor(data?: PartialMessage<UpdateDeckResponse>) {
-    super();
-    proto3.util.initPartial(data, this);
-  }
-
-  static readonly runtime: typeof proto3 = proto3;
-  static readonly typeName = "card.UpdateDeckResponse";
-  static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 1, name: "deck", kind: "message", T: Deck },
-  ]);
-
-  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): UpdateDeckResponse {
-    return new UpdateDeckResponse().fromBinary(bytes, options);
-  }
-
-  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): UpdateDeckResponse {
-    return new UpdateDeckResponse().fromJson(jsonValue, options);
-  }
-
-  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): UpdateDeckResponse {
-    return new UpdateDeckResponse().fromJsonString(jsonString, options);
-  }
-
-  static equals(a: UpdateDeckResponse | PlainMessage<UpdateDeckResponse> | undefined, b: UpdateDeckResponse | PlainMessage<UpdateDeckResponse> | undefined): boolean {
-    return proto3.util.equals(UpdateDeckResponse, a, b);
-  }
-}
-
-/**
- * @generated from message card.DeleteDeckRequest
- */
-export class DeleteDeckRequest extends Message<DeleteDeckRequest> {
-  /**
-   * @generated from field: card.Deck deck = 1;
-   */
-  deck?: Deck;
-
-  constructor(data?: PartialMessage<DeleteDeckRequest>) {
-    super();
-    proto3.util.initPartial(data, this);
-  }
-
-  static readonly runtime: typeof proto3 = proto3;
-  static readonly typeName = "card.DeleteDeckRequest";
-  static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 1, name: "deck", kind: "message", T: Deck },
-  ]);
-
-  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): DeleteDeckRequest {
-    return new DeleteDeckRequest().fromBinary(bytes, options);
-  }
-
-  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): DeleteDeckRequest {
-    return new DeleteDeckRequest().fromJson(jsonValue, options);
-  }
-
-  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): DeleteDeckRequest {
-    return new DeleteDeckRequest().fromJsonString(jsonString, options);
-  }
-
-  static equals(a: DeleteDeckRequest | PlainMessage<DeleteDeckRequest> | undefined, b: DeleteDeckRequest | PlainMessage<DeleteDeckRequest> | undefined): boolean {
-    return proto3.util.equals(DeleteDeckRequest, a, b);
-  }
-}
-
-/**
- * @generated from message card.DeleteDeckResponse
- */
-export class DeleteDeckResponse extends Message<DeleteDeckResponse> {
-  /**
-   * @generated from field: card.Deck deck = 1;
-   */
-  deck?: Deck;
-
-  constructor(data?: PartialMessage<DeleteDeckResponse>) {
-    super();
-    proto3.util.initPartial(data, this);
-  }
-
-  static readonly runtime: typeof proto3 = proto3;
-  static readonly typeName = "card.DeleteDeckResponse";
-  static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 1, name: "deck", kind: "message", T: Deck },
-  ]);
-
-  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): DeleteDeckResponse {
-    return new DeleteDeckResponse().fromBinary(bytes, options);
-  }
-
-  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): DeleteDeckResponse {
-    return new DeleteDeckResponse().fromJson(jsonValue, options);
-  }
-
-  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): DeleteDeckResponse {
-    return new DeleteDeckResponse().fromJsonString(jsonString, options);
-  }
-
-  static equals(a: DeleteDeckResponse | PlainMessage<DeleteDeckResponse> | undefined, b: DeleteDeckResponse | PlainMessage<DeleteDeckResponse> | undefined): boolean {
-    return proto3.util.equals(DeleteDeckResponse, a, b);
+  static equals(a: GetDeckRequest | PlainMessage<GetDeckRequest> | undefined, b: GetDeckRequest | PlainMessage<GetDeckRequest> | undefined): boolean {
+    return proto3.util.equals(GetDeckRequest, a, b);
   }
 }
 

@@ -18,6 +18,7 @@ export const Login = () => {
             const response = await userService.login(request, {});
             const token = response.token;
             localStorage.setItem('userToken', token); // Store the token
+            localStorage.setItem('username', username); // Store the username
             setLoginStatus('Login successful');
             // Redirect or perform additional actions
         } catch (error) {

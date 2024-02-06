@@ -15,6 +15,7 @@ export const GenerateCards = () => {
     e.preventDefault();
     const cardsRequest = new GenerateCardsRequest();
     cardsRequest.count = Number(count);
+    cardsRequest.userId = (localStorage.getItem('username') || '');
 
     try {
       const response = await cardService.generateCards(cardsRequest);

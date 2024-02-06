@@ -3,60 +3,12 @@
 /* eslint-disable */
 // @ts-nocheck
 
-import { CreateDeckRequest, CreateDeckResponse, DeleteDeckRequest, DeleteDeckResponse, GenerateDeckRequest, GenerateDeckResponse, GetDeckRequest, GetDeckResponse, UpdateDeckRequest, UpdateDeckResponse } from "./deck_pb.js";
-import { MethodKind } from "@bufbuild/protobuf";
-
 /**
  * @generated from service card.DeckService
  */
 export const DeckService = {
   typeName: "card.DeckService",
   methods: {
-    /**
-     * @generated from rpc card.DeckService.CreateDeck
-     */
-    createDeck: {
-      name: "CreateDeck",
-      I: CreateDeckRequest,
-      O: CreateDeckResponse,
-      kind: MethodKind.Unary,
-    },
-    /**
-     * @generated from rpc card.DeckService.GetDeck
-     */
-    getDeck: {
-      name: "GetDeck",
-      I: GetDeckRequest,
-      O: GetDeckResponse,
-      kind: MethodKind.Unary,
-    },
-    /**
-     * @generated from rpc card.DeckService.UpdateDeck
-     */
-    updateDeck: {
-      name: "UpdateDeck",
-      I: UpdateDeckRequest,
-      O: UpdateDeckResponse,
-      kind: MethodKind.Unary,
-    },
-    /**
-     * @generated from rpc card.DeckService.DeleteDeck
-     */
-    deleteDeck: {
-      name: "DeleteDeck",
-      I: DeleteDeckRequest,
-      O: DeleteDeckResponse,
-      kind: MethodKind.Unary,
-    },
-    /**
-     * @generated from rpc card.DeckService.GenerateDeck
-     */
-    generateDeck: {
-      name: "GenerateDeck",
-      I: GenerateDeckRequest,
-      O: GenerateDeckResponse,
-      kind: MethodKind.Unary,
-    },
   }
 } as const;
 

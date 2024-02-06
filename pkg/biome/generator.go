@@ -1,9 +1,8 @@
 package biome
 
 import (
-	"cards/pkg/ai"
 	"cards/gen/proto/biome"
-	"fmt"
+	"cards/pkg/ai"
 )
 
 func generateTemplate(b biome.Biome) (string, error) {
@@ -16,9 +15,6 @@ func generateTemplate(b biome.Biome) (string, error) {
 	if err != nil {
 		return err.Error(), err
 	}
-
-	fmt.Println("Generating story:")
-	fmt.Println(story)
 
 	return story, nil
 }

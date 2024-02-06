@@ -17,6 +17,17 @@ message Card {
   string attack = 11;
   string defense = 12;
   string action = 13;
+  string flavor = 14;
+  string mod = 15;
+  string deck = 16;
+}
+
+message GetCardRequest {
+  int32 id = 1;
+}
+
+message GetCardResponse {
+  Card card = 1;
 }
 
 message CardTemplate {
@@ -25,11 +36,14 @@ message CardTemplate {
   repeated string plants = 3;
   repeated string elements = 4;
   repeated string descriptions = 5;
+  repeated string resources = 6;
 }
 
 message GenerateCardsRequest {
   string user_id = 1;
-  int32 count = 2;
+  string biome = 2;
+  int32 count = 3;
+  string deck = 4;
 }
 
 message GenerateCardsResponse {
@@ -81,58 +95,16 @@ message CreateCardTemplateResponse {
 }
 
 message Deck {
-  repeated Card cards = 1;
-  string user_id = 2;
-}
-
-message GenerateDeckRequest {
-  int32 num_cards = 1;
-  string biome = 2;
-  string user_id = 3;
-}
-
-message GenerateDeckResponse {
-  Deck deck = 1;
-}
-
-message CreateDeckRequest {
-  Deck deck = 1;
-}
-
-message CreateDeckResponse {
-  Deck deck = 1;
-}
-
-message GetDeckRequest {
-  Deck deck = 1;
-}
-
-message GetDeckResponse {
-  Deck deck = 1;
-}
-
-message GetDecksRequest {
-  string user_id = 1;
+  string name = 1;
+  repeated Card cards = 2;
 }
 
 message GetDecksResponse {
   repeated Deck decks = 1;
 }
 
-message UpdateDeckRequest {
-  Deck deck = 1;
-}
-
-message UpdateDeckResponse {
-  Deck deck = 1;
-}
-
-message DeleteDeckRequest {
-  Deck deck = 1;
-}
-
-message DeleteDeckResponse {
-  Deck deck = 1;
+message GetDeckRequest {
+  string name = 1;
 }
 
 service CardService {
@@ -142,11 +114,8 @@ service CardService {
   rpc GenerateCards(GenerateCardsRequest) returns (GenerateCardsResponse);
   rpc CreateCardTemplate(CreateCardTemplateRequest) returns (CreateCardTemplateResponse);
   rpc CreateCard(CreateCardRequest) returns (CreateCardResponse);
+  rpc GetCard(GetCardRequest) returns (GetCardResponse);
 
-  // rpc CreateDeck(CreateDeckRequest) returns (CreateDeckResponse);
-  // rpc GetDeck(GetDeckRequest) returns (GetDeckResponse);
-  // rpc UpdateDeck(UpdateDeckRequest) returns (UpdateDeckResponse);
-  // rpc DeleteDeck(DeleteDeckRequest) returns (DeleteDeckResponse);
-  rpc GenerateDeck(GenerateDeckRequest) returns (GenerateDeckResponse);
-  rpc GetDecks(GetDecksRequest) returns (GetDecksResponse);
+  rpc GetDecks(GetCardsRequest) returns (GetDecksResponse);
+  rpc GetDeck(GetDeckRequest) returns (Deck);
 }

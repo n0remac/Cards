@@ -91,14 +91,10 @@ func (s *UserService) DeleteUser(ctx context.Context, req *connect.Request[user.
 
 func hashPassword(password string) (string, error) {
 	bytes, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
-	fmt.Println("password:", password)
-	fmt.Println("hash:", bytes)
 	return string(bytes), err
 }
 
 func checkPasswordHash(password, hash string) (bool, error) {
-	fmt.Println("password:", password)
-	fmt.Println("hash:", hash)
 	err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
 	return err == nil, err
 }

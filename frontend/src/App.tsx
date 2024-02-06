@@ -6,13 +6,14 @@ import TemplateBuilder from '@/pages/TemplateBuilder';
 import BiomeSelector from '@/pages/Biomes';
 import {StoryTemplateForm} from '@/pages/GenerateTemplate';
 import { GenerateCards } from './pages/cards/GenerateCards';
-import { DisplayCards } from './pages/cards/Cards';
+import { AllCards, DisplayCard, UsersCards } from './pages/cards/Cards';
 import { CreateCard } from './pages/cards/CreateCard';
 import { CombineCards } from './pages/cards/CombineCards';
 import Login from './pages/user/Login';
 import Register from './pages/user/Register';
 import GameLobby from './pages/game/Lobby';
-import Deck from './pages/cards/Deck';
+import { Game } from './pages/game/Game';
+import {CreateDeck, UsersDecks, DeckById} from './pages/cards/Deck';
 
 
 export default function App() {
@@ -22,7 +23,7 @@ export default function App() {
                 <nav>
                     <ul style={{ listStyleType: 'none', margin: 0, padding: 0, overflow: 'hidden', backgroundColor: '#333' }}>
                         <li style={{ float: 'left' }}>
-                            <Link to="/cards/combine" style={{ display: 'block', color: 'white', textAlign: 'center', padding: '14px 16px', textDecoration: 'none' }}>Combine Cards</Link>
+                            <Link to="/usercards" style={{ display: 'block', color: 'white', textAlign: 'center', padding: '14px 16px', textDecoration: 'none' }}>My Cards</Link>
                         </li>
                         <li style={{ float: 'left' }}>
                             <Link to="/cards/generate" style={{ display: 'block', color: 'white', textAlign: 'center', padding: '14px 16px', textDecoration: 'none' }}>Generate Cards</Link>
@@ -39,7 +40,14 @@ export default function App() {
                         <li style={{ float: 'left' }}>
                             <Link to="/deck" style={{ display: 'block', color: 'white', textAlign: 'center', padding: '14px 16px', textDecoration: 'none' }}>Deck</Link>
                         </li>
-                        {/* <li style={{ float: 'left' }}>
+                        <li style={{ float: 'left' }}>
+                            <Link to="/userdecks" style={{ display: 'block', color: 'white', textAlign: 'center', padding: '14px 16px', textDecoration: 'none' }}>My Decks</Link>
+                        </li>
+                        {/* 
+                        <li style={{ float: 'left' }}>
+                            <Link to="/cards/combine" style={{ display: 'block', color: 'white', textAlign: 'center', padding: '14px 16px', textDecoration: 'none' }}>Combine Cards</Link>
+                        </li>
+                        <li style={{ float: 'left' }}>
                             <Link to="/template" style={{ display: 'block', color: 'white', textAlign: 'center', padding: '14px 16px', textDecoration: 'none' }}>Template Form</Link>
                         </li>
                         <li style={{ float: 'left' }}>
@@ -64,7 +72,8 @@ export default function App() {
                 <Routes>
                     <Route path="/" element={<Demo />} />
                     <Route path="/cards/generate" element={<GenerateCards />} />
-                    <Route path="/cards/" element={<DisplayCards />} />
+                    <Route path="/cards/" element={<AllCards />} />
+                    <Route path="/usercards" element={<UsersCards />} />
                     <Route path="/cards/create" element={<CreateCard />} />
                     <Route path="/template" element={<TemplateForm />} />
                     <Route path="/template/builder" element={<TemplateBuilder />} />
@@ -74,7 +83,12 @@ export default function App() {
                     <Route path="/login" element={<Login />} />
                     <Route path="/register" element={<Register />} />
                     <Route path="/lobby" element={<GameLobby />} />
-                    <Route path="/deck" element={<Deck />} />
+                    <Route path="/game" element={<Game />} />
+                    <Route path="/deck" element={<CreateDeck />} />
+                    <Route path="/userdecks" element={<UsersDecks />} />
+                    <Route path="/displaydeck" element={<UsersDecks />} />
+                    {/* <Route path="/card/:cardId" element={<DisplayCard />} /> */}
+                    <Route path="/deck/:deckId" element={<DeckById />} />
                 </Routes>
             </div>
         </Router>

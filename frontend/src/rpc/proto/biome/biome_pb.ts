@@ -128,6 +128,21 @@ export class Characteristics extends Message<Characteristics> {
    */
   elements: string[] = [];
 
+  /**
+   * @generated from field: repeated string elementdescriptions = 7;
+   */
+  elementdescriptions: string[] = [];
+
+  /**
+   * @generated from field: repeated string resources = 8;
+   */
+  resources: string[] = [];
+
+  /**
+   * @generated from field: repeated string resourcesdescriptions = 9;
+   */
+  resourcesdescriptions: string[] = [];
+
   constructor(data?: PartialMessage<Characteristics>) {
     super();
     proto3.util.initPartial(data, this);
@@ -142,6 +157,9 @@ export class Characteristics extends Message<Characteristics> {
     { no: 4, name: "wildlife", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
     { no: 5, name: "precipitation", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 6, name: "elements", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
+    { no: 7, name: "elementdescriptions", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
+    { no: 8, name: "resources", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
+    { no: 9, name: "resourcesdescriptions", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): Characteristics {

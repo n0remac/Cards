@@ -28,12 +28,9 @@ type CardServiceClient interface {
 	GenerateCards(ctx context.Context, in *GenerateCardsRequest, opts ...grpc.CallOption) (*GenerateCardsResponse, error)
 	CreateCardTemplate(ctx context.Context, in *CreateCardTemplateRequest, opts ...grpc.CallOption) (*CreateCardTemplateResponse, error)
 	CreateCard(ctx context.Context, in *CreateCardRequest, opts ...grpc.CallOption) (*CreateCardResponse, error)
-	// rpc CreateDeck(CreateDeckRequest) returns (CreateDeckResponse);
-	// rpc GetDeck(GetDeckRequest) returns (GetDeckResponse);
-	// rpc UpdateDeck(UpdateDeckRequest) returns (UpdateDeckResponse);
-	// rpc DeleteDeck(DeleteDeckRequest) returns (DeleteDeckResponse);
-	GenerateDeck(ctx context.Context, in *GenerateDeckRequest, opts ...grpc.CallOption) (*GenerateDeckResponse, error)
-	GetDecks(ctx context.Context, in *GetDecksRequest, opts ...grpc.CallOption) (*GetDecksResponse, error)
+	GetCard(ctx context.Context, in *GetCardRequest, opts ...grpc.CallOption) (*GetCardResponse, error)
+	GetDecks(ctx context.Context, in *GetCardsRequest, opts ...grpc.CallOption) (*GetDecksResponse, error)
+	GetDeck(ctx context.Context, in *GetDeckRequest, opts ...grpc.CallOption) (*Deck, error)
 }
 
 type cardServiceClient struct {
@@ -98,18 +95,27 @@ func (c *cardServiceClient) CreateCard(ctx context.Context, in *CreateCardReques
 	return out, nil
 }
 
-func (c *cardServiceClient) GenerateDeck(ctx context.Context, in *GenerateDeckRequest, opts ...grpc.CallOption) (*GenerateDeckResponse, error) {
-	out := new(GenerateDeckResponse)
-	err := c.cc.Invoke(ctx, "/card.CardService/GenerateDeck", in, out, opts...)
+func (c *cardServiceClient) GetCard(ctx context.Context, in *GetCardRequest, opts ...grpc.CallOption) (*GetCardResponse, error) {
+	out := new(GetCardResponse)
+	err := c.cc.Invoke(ctx, "/card.CardService/GetCard", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *cardServiceClient) GetDecks(ctx context.Context, in *GetDecksRequest, opts ...grpc.CallOption) (*GetDecksResponse, error) {
+func (c *cardServiceClient) GetDecks(ctx context.Context, in *GetCardsRequest, opts ...grpc.CallOption) (*GetDecksResponse, error) {
 	out := new(GetDecksResponse)
 	err := c.cc.Invoke(ctx, "/card.CardService/GetDecks", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *cardServiceClient) GetDeck(ctx context.Context, in *GetDeckRequest, opts ...grpc.CallOption) (*Deck, error) {
+	out := new(Deck)
+	err := c.cc.Invoke(ctx, "/card.CardService/GetDeck", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -126,12 +132,9 @@ type CardServiceServer interface {
 	GenerateCards(context.Context, *GenerateCardsRequest) (*GenerateCardsResponse, error)
 	CreateCardTemplate(context.Context, *CreateCardTemplateRequest) (*CreateCardTemplateResponse, error)
 	CreateCard(context.Context, *CreateCardRequest) (*CreateCardResponse, error)
-	// rpc CreateDeck(CreateDeckRequest) returns (CreateDeckResponse);
-	// rpc GetDeck(GetDeckRequest) returns (GetDeckResponse);
-	// rpc UpdateDeck(UpdateDeckRequest) returns (UpdateDeckResponse);
-	// rpc DeleteDeck(DeleteDeckRequest) returns (DeleteDeckResponse);
-	GenerateDeck(context.Context, *GenerateDeckRequest) (*GenerateDeckResponse, error)
-	GetDecks(context.Context, *GetDecksRequest) (*GetDecksResponse, error)
+	GetCard(context.Context, *GetCardRequest) (*GetCardResponse, error)
+	GetDecks(context.Context, *GetCardsRequest) (*GetDecksResponse, error)
+	GetDeck(context.Context, *GetDeckRequest) (*Deck, error)
 }
 
 // UnimplementedCardServiceServer should be embedded to have forward compatible implementations.
@@ -156,11 +159,14 @@ func (UnimplementedCardServiceServer) CreateCardTemplate(context.Context, *Creat
 func (UnimplementedCardServiceServer) CreateCard(context.Context, *CreateCardRequest) (*CreateCardResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateCard not implemented")
 }
-func (UnimplementedCardServiceServer) GenerateDeck(context.Context, *GenerateDeckRequest) (*GenerateDeckResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GenerateDeck not implemented")
+func (UnimplementedCardServiceServer) GetCard(context.Context, *GetCardRequest) (*GetCardResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetCard not implemented")
 }
-func (UnimplementedCardServiceServer) GetDecks(context.Context, *GetDecksRequest) (*GetDecksResponse, error) {
+func (UnimplementedCardServiceServer) GetDecks(context.Context, *GetCardsRequest) (*GetDecksResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetDecks not implemented")
+}
+func (UnimplementedCardServiceServer) GetDeck(context.Context, *GetDeckRequest) (*Deck, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetDeck not implemented")
 }
 
 // UnsafeCardServiceServer may be embedded to opt out of forward compatibility for this service.
@@ -282,26 +288,26 @@ func _CardService_CreateCard_Handler(srv interface{}, ctx context.Context, dec f
 	return interceptor(ctx, in, info, handler)
 }
 
-func _CardService_GenerateDeck_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GenerateDeckRequest)
+func _CardService_GetCard_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetCardRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(CardServiceServer).GenerateDeck(ctx, in)
+		return srv.(CardServiceServer).GetCard(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/card.CardService/GenerateDeck",
+		FullMethod: "/card.CardService/GetCard",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(CardServiceServer).GenerateDeck(ctx, req.(*GenerateDeckRequest))
+		return srv.(CardServiceServer).GetCard(ctx, req.(*GetCardRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
 func _CardService_GetDecks_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetDecksRequest)
+	in := new(GetCardsRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -313,7 +319,25 @@ func _CardService_GetDecks_Handler(srv interface{}, ctx context.Context, dec fun
 		FullMethod: "/card.CardService/GetDecks",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(CardServiceServer).GetDecks(ctx, req.(*GetDecksRequest))
+		return srv.(CardServiceServer).GetDecks(ctx, req.(*GetCardsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _CardService_GetDeck_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetDeckRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CardServiceServer).GetDeck(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/card.CardService/GetDeck",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CardServiceServer).GetDeck(ctx, req.(*GetDeckRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -350,12 +374,16 @@ var CardService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _CardService_CreateCard_Handler,
 		},
 		{
-			MethodName: "GenerateDeck",
-			Handler:    _CardService_GenerateDeck_Handler,
+			MethodName: "GetCard",
+			Handler:    _CardService_GetCard_Handler,
 		},
 		{
 			MethodName: "GetDecks",
 			Handler:    _CardService_GetDecks_Handler,
+		},
+		{
+			MethodName: "GetDeck",
+			Handler:    _CardService_GetDeck_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

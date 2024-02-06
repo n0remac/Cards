@@ -182,5 +182,3 @@ export const CardCreator: React.FC<{}> = () => {
     
   );
 };
-
-  
