@@ -59,3 +59,17 @@ func ParseBiome(filename string) (Biome, error) {
 
 	return biome, nil
 }
+
+func ParseBiomeJSON(biomeJson string) (Biome, error) {
+	var biome Biome
+
+	byteValue := []byte(biomeJson)
+
+	err := json.Unmarshal(byteValue, &biome)
+	if err != nil {
+		fmt.Println("error unmarshalling json:", err)
+		return biome, err
+	}
+
+	return biome, nil
+}

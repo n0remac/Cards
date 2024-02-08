@@ -5,6 +5,7 @@ import (
 	"cards/pkg/database"
 	"encoding/json"
 	"fmt"
+	"log/slog"
 
 	"github.com/upper/db/v4"
 )
@@ -17,7 +18,7 @@ type Card struct {
 
 func createCard(c *card.Card) (*card.Card, error) {
 	sess := database.GetSession()
-
+	slog.Info("Creating a new card in the database")
 	// Create a new card record
 	cJSON, _ := json.Marshal(c)
 

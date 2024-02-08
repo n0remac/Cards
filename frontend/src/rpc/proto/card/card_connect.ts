@@ -3,7 +3,7 @@
 /* eslint-disable */
 // @ts-nocheck
 
-import { CreateCardRequest, CreateCardResponse, CreateCardTemplateRequest, CreateCardTemplateResponse, Deck, DeleteCardRequest, DeleteCardResponse, GenerateCardsRequest, GenerateCardsResponse, GetCardRequest, GetCardResponse, GetCardsRequest, GetCardsResponse, GetDeckRequest, GetDecksResponse, NewCardRequest, NewCardResponse } from "./card_pb.js";
+import { CreateCardRequest, CreateCardResponse, CreateCardTemplateRequest, CreateCardTemplateResponse, CreateDeckTemplateRequest, CreateDeckTemplateResponse, Deck, DeleteCardRequest, DeleteCardResponse, GenerateCardsRequest, GenerateCardsResponse, GetCardRequest, GetCardResponse, GetCardsRequest, GetCardsResponse, GetDeckRequest, GetDecksResponse, NewCardRequest, NewCardResponse } from "./card_pb.js";
 import { MethodKind } from "@bufbuild/protobuf";
 
 /**
@@ -91,6 +91,15 @@ export const CardService = {
       name: "GetDeck",
       I: GetDeckRequest,
       O: Deck,
+      kind: MethodKind.Unary,
+    },
+    /**
+     * @generated from rpc card.CardService.CreateDeckTemplate
+     */
+    createDeckTemplate: {
+      name: "CreateDeckTemplate",
+      I: CreateDeckTemplateRequest,
+      O: CreateDeckTemplateResponse,
       kind: MethodKind.Unary,
     },
   }

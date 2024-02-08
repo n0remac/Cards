@@ -107,6 +107,18 @@ message GetDeckRequest {
   string name = 1;
 }
 
+message CreateDeckTemplateRequest {
+  string settting = 1;
+  int32 count = 2;
+  string user_id = 3;
+  string deck = 4;
+}
+
+message CreateDeckTemplateResponse {
+  string template = 1;
+  Deck deck = 2;
+}
+
 service CardService {
   rpc GetCards(GetCardsRequest) returns (GetCardsResponse);
   rpc NewCard(NewCardRequest) returns (NewCardResponse);
@@ -118,4 +130,5 @@ service CardService {
 
   rpc GetDecks(GetCardsRequest) returns (GetDecksResponse);
   rpc GetDeck(GetDeckRequest) returns (Deck);
+  rpc CreateDeckTemplate(CreateDeckTemplateRequest) returns (CreateDeckTemplateResponse);
 }

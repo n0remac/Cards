@@ -31,6 +31,7 @@ type CardServiceClient interface {
 	GetCard(ctx context.Context, in *GetCardRequest, opts ...grpc.CallOption) (*GetCardResponse, error)
 	GetDecks(ctx context.Context, in *GetCardsRequest, opts ...grpc.CallOption) (*GetDecksResponse, error)
 	GetDeck(ctx context.Context, in *GetDeckRequest, opts ...grpc.CallOption) (*Deck, error)
+	CreateDeckTemplate(ctx context.Context, in *CreateDeckTemplateRequest, opts ...grpc.CallOption) (*CreateDeckTemplateResponse, error)
 }
 
 type cardServiceClient struct {
@@ -122,6 +123,15 @@ func (c *cardServiceClient) GetDeck(ctx context.Context, in *GetDeckRequest, opt
 	return out, nil
 }
 
+func (c *cardServiceClient) CreateDeckTemplate(ctx context.Context, in *CreateDeckTemplateRequest, opts ...grpc.CallOption) (*CreateDeckTemplateResponse, error) {
+	out := new(CreateDeckTemplateResponse)
+	err := c.cc.Invoke(ctx, "/card.CardService/CreateDeckTemplate", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // CardServiceServer is the server API for CardService service.
 // All implementations should embed UnimplementedCardServiceServer
 // for forward compatibility
@@ -135,6 +145,7 @@ type CardServiceServer interface {
 	GetCard(context.Context, *GetCardRequest) (*GetCardResponse, error)
 	GetDecks(context.Context, *GetCardsRequest) (*GetDecksResponse, error)
 	GetDeck(context.Context, *GetDeckRequest) (*Deck, error)
+	CreateDeckTemplate(context.Context, *CreateDeckTemplateRequest) (*CreateDeckTemplateResponse, error)
 }
 
 // UnimplementedCardServiceServer should be embedded to have forward compatible implementations.
@@ -167,6 +178,9 @@ func (UnimplementedCardServiceServer) GetDecks(context.Context, *GetCardsRequest
 }
 func (UnimplementedCardServiceServer) GetDeck(context.Context, *GetDeckRequest) (*Deck, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetDeck not implemented")
+}
+func (UnimplementedCardServiceServer) CreateDeckTemplate(context.Context, *CreateDeckTemplateRequest) (*CreateDeckTemplateResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreateDeckTemplate not implemented")
 }
 
 // UnsafeCardServiceServer may be embedded to opt out of forward compatibility for this service.
@@ -342,6 +356,24 @@ func _CardService_GetDeck_Handler(srv interface{}, ctx context.Context, dec func
 	return interceptor(ctx, in, info, handler)
 }
 
+func _CardService_CreateDeckTemplate_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateDeckTemplateRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CardServiceServer).CreateDeckTemplate(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/card.CardService/CreateDeckTemplate",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CardServiceServer).CreateDeckTemplate(ctx, req.(*CreateDeckTemplateRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // CardService_ServiceDesc is the grpc.ServiceDesc for CardService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -384,6 +416,10 @@ var CardService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetDeck",
 			Handler:    _CardService_GetDeck_Handler,
+		},
+		{
+			MethodName: "CreateDeckTemplate",
+			Handler:    _CardService_CreateDeckTemplate_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

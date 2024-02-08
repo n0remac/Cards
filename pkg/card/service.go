@@ -2,8 +2,11 @@ package card
 
 import (
 	"cards/gen/proto/card"
+	"cards/pkg/ai"
+	"cards/pkg/biome"
 	"context"
 	"fmt"
+	"log/slog"
 	"math/rand"
 
 	"github.com/bufbuild/connect-go"
@@ -32,7 +35,6 @@ func (s *CardService) GetCards(ctx context.Context, req *connect.Request[card.Ge
 	return connect.NewResponse(&card.GetCardsResponse{
 		Cards: cards,
 	}), nil
-
 }
 
 func (s *CardService) NewCard(ctx context.Context, req *connect.Request[card.NewCardRequest]) (*connect.Response[card.NewCardResponse], error) {
@@ -57,6 +59,19 @@ func (s *CardService) DeleteCard(ctx context.Context, req *connect.Request[card.
 	}), nil
 }
 
+func randomCardType() string {
+	randInt := rand.Intn(3)
+	var cardType string
+	if randInt == 0 {
+		cardType = "Animal"
+	} else if randInt == 1 {
+		cardType = "Plant"
+	} else {
+		cardType = "Resource"
+	}
+	return cardType
+}
+
 func (s *CardService) GenerateCards(ctx context.Context, req *connect.Request[card.GenerateCardsRequest]) (*connect.Response[card.GenerateCardsResponse], error) {
 	fmt.Println("Generating Cards")
 	user := req.Msg.UserId
@@ -67,15 +82,7 @@ func (s *CardService) GenerateCards(ctx context.Context, req *connect.Request[ca
 	for i := 0; i < count; i++ {
 		fmt.Println("Generating Card: ", i)
 
-		randInt := rand.Intn(3)
-		var cardType string
-		if randInt == 0 {
-			cardType = "Animal"
-		} else if randInt == 1 {
-			cardType = "Plant"
-		} else {
-			cardType = "Resource"
-		}
+		cardType := randomCardType()
 
 		c, err := CreateCard(cardType, "")
 		if err != nil {
@@ -159,11 +166,68 @@ func (s *CardService) GetDecks(ctx context.Context, req *connect.Request[card.Ge
 	}), nil
 }
 
+func (s *CardService) CreateDeckTemplate(ctx context.Context, req *connect.Request[card.CreateDeckTemplateRequest]) (*connect.Response[card.CreateDeckTemplateResponse], error) {
+	slog.Info("Creating a new deck template")
+
+	var deck card.Deck
+
+	deck.Name = req.Msg.Deck
+	setting := req.Msg.Settting
+	count := int(req.Msg.Count)
+
+	prompt, err := ai.DeckTemplateQuery(setting)
+	if err != nil {
+		return nil, err
+	}
+
+	response, err := ai.QueryToJSON(prompt)
+	if err != nil {
+		return nil, err
+	}
+	b, err := biome.ParseBiomeJSON(response)
+	if err != nil {
+		return nil, err
+	}
+
+	fmt.Println("Creating deck with biome: ", b)
+
+	for c := 0; c < count; c++ {
+		cardType := randomCardType()
+		curCard, err := CreateCardFromBiome(&b, cardType)
+		if err != nil {
+			return nil, err
+		}
+		curCard.Player = req.Msg.UserId
+		curCard.Deck = req.Msg.Deck
+		var newCard *card.Card
+
+		if cardType == "Resource" {
+			newCard, err = generateResourceCard(curCard)
+		} else {
+			newCard, err = generateCard(curCard)
+		}
+		if err != nil {
+			return nil, err
+		}
+
+		completeCard, err := createCard(newCard)
+		if err != nil {
+			return nil, err
+		}
+
+		deck.Cards = append(deck.Cards, completeCard)
+	}
+
+	return connect.NewResponse(&card.CreateDeckTemplateResponse{
+		Template: response,
+		Deck:     &deck,
+	}), nil
+}
+
 func getDecks(cards []*card.Card) ([]*card.Deck, error) {
 	var decks []*card.Deck
 
 	for _, c := range cards {
-		fmt.Println("Card: ", c.Deck)
 		if c.Deck != "" {
 			found := false
 			for _, d := range decks {

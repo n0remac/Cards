@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"log/slog"
 	"os"
 )
 
@@ -24,7 +25,7 @@ type Biomes []biome.Biome
 func ElementQuery() ([]map[string]string, error) {
 	elements, err := ParseElements("pkg/ai/elements.json")
 	if err != nil {
-		fmt.Println("error parsing elements:", err)
+		slog.Error("error parsing elements:", err)
 		return nil, err
 	}
 
@@ -176,6 +177,7 @@ Choose only action from this list:
 	"Opponent discards a card from their field.",
 	"Return a card to the hand from the field".,
 	"Return a card to the hand from the discard pile.",
+	"Draw a card from the deck."
 ]	
 
 Only return JSON data.
@@ -199,6 +201,34 @@ Fill out this template with the type, action and attack and defense values. The 
 
 Only return JSON data.
     `, c.Name, c.Element)
+
+	return prompt, nil
+}
+
+func DeckTemplateQuery(setting string) (string, error) {
+	// Convert the scene and biome to JSON
+	prompt := fmt.Sprintf(`
+{
+	"name": "",
+	"type": "",
+	"characteristics": {
+		"climate": "",
+		"vegetation": "",
+		"plants": [], // 6 plants that match the prompt
+		"wildlife": [], // 6 animals that match the prompt
+		"precipitation": "",
+		"resources": [], // 6 resources that match the prompt
+		"resourcedescrpitions": [], // 6 descriptions matching each of the resources
+		"elements": [], // 6 elemental aspects that match the prompt
+		"elementdescriptions": [] // 6 descriptions matching each of the elements
+	}
+}
+
+Create a new json template based on the data from the outline above given the following information:
+
+%s
+
+Only return JSON data.`, setting)
 
 	return prompt, nil
 }

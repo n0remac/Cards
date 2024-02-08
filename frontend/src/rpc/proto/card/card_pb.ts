@@ -879,3 +879,101 @@ export class GetDeckRequest extends Message<GetDeckRequest> {
   }
 }
 
+/**
+ * @generated from message card.CreateDeckTemplateRequest
+ */
+export class CreateDeckTemplateRequest extends Message<CreateDeckTemplateRequest> {
+  /**
+   * @generated from field: string settting = 1;
+   */
+  settting = "";
+
+  /**
+   * @generated from field: int32 count = 2;
+   */
+  count = 0;
+
+  /**
+   * @generated from field: string user_id = 3;
+   */
+  userId = "";
+
+  /**
+   * @generated from field: string deck = 4;
+   */
+  deck = "";
+
+  constructor(data?: PartialMessage<CreateDeckTemplateRequest>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "card.CreateDeckTemplateRequest";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "settting", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "count", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
+    { no: 3, name: "user_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 4, name: "deck", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): CreateDeckTemplateRequest {
+    return new CreateDeckTemplateRequest().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): CreateDeckTemplateRequest {
+    return new CreateDeckTemplateRequest().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): CreateDeckTemplateRequest {
+    return new CreateDeckTemplateRequest().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: CreateDeckTemplateRequest | PlainMessage<CreateDeckTemplateRequest> | undefined, b: CreateDeckTemplateRequest | PlainMessage<CreateDeckTemplateRequest> | undefined): boolean {
+    return proto3.util.equals(CreateDeckTemplateRequest, a, b);
+  }
+}
+
+/**
+ * @generated from message card.CreateDeckTemplateResponse
+ */
+export class CreateDeckTemplateResponse extends Message<CreateDeckTemplateResponse> {
+  /**
+   * @generated from field: string template = 1;
+   */
+  template = "";
+
+  /**
+   * @generated from field: card.Deck deck = 2;
+   */
+  deck?: Deck;
+
+  constructor(data?: PartialMessage<CreateDeckTemplateResponse>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "card.CreateDeckTemplateResponse";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "template", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "deck", kind: "message", T: Deck },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): CreateDeckTemplateResponse {
+    return new CreateDeckTemplateResponse().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): CreateDeckTemplateResponse {
+    return new CreateDeckTemplateResponse().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): CreateDeckTemplateResponse {
+    return new CreateDeckTemplateResponse().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: CreateDeckTemplateResponse | PlainMessage<CreateDeckTemplateResponse> | undefined, b: CreateDeckTemplateResponse | PlainMessage<CreateDeckTemplateResponse> | undefined): boolean {
+    return proto3.util.equals(CreateDeckTemplateResponse, a, b);
+  }
+}
+
