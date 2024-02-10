@@ -78,13 +78,14 @@ func (s *CardService) GenerateCards(ctx context.Context, req *connect.Request[ca
 	deck := req.Msg.Deck
 	count := int(req.Msg.Count)
 	cards := []*card.Card{}
+	selectedBiome := req.Msg.Biome
 	fmt.Println("Generating Cards, Count: ", count)
 	for i := 0; i < count; i++ {
 		fmt.Println("Generating Card: ", i)
 
 		cardType := randomCardType()
 
-		c, err := CreateCard(cardType, "")
+		c, err := CreateCard(cardType, selectedBiome)
 		if err != nil {
 			return nil, err
 		}
