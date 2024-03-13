@@ -4,9 +4,11 @@ package main
 
 import (
 	"cards/gen/proto/biome/biomeconnect"
+	"cards/gen/proto/blog/blogconnect"
 	"cards/gen/proto/card/cardconnect"
 	"cards/gen/proto/user/userconnect"
 	"cards/pkg/biome"
+	"cards/pkg/blog"
 	"cards/pkg/card"
 	"cards/pkg/database"
 	"cards/pkg/user"
@@ -56,6 +58,7 @@ func main() {
 	cardService := &card.CardService{}
 	biomeService := &biome.BiomeService{}
 	userService := &user.UserService{}
+	blogService := &blog.BlogService{}
 
 	imageServer := http.FileServer(http.Dir("./pkg/card_images"))
 	apiRoot.Handle("/card_images/", http.StripPrefix("/card_images/", imageServer))
@@ -63,6 +66,7 @@ func main() {
 	apiRoot.Handle(cardconnect.NewCardServiceHandler(cardService, interceptors))
 	apiRoot.Handle(biomeconnect.NewBiomeServiceHandler(biomeService, interceptors))
 	apiRoot.Handle(userconnect.NewUserServiceHandler(userService, interceptors))
+	apiRoot.Handle(blogconnect.NewBlogServiceHandler(blogService, interceptors))
 
 	reflector := grpcreflect.NewStaticReflector(
 		"card.CardService",

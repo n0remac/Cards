@@ -1,0 +1,37 @@
+syntax = "proto3";
+
+package post;
+
+import "google/protobuf/timestamp.proto";
+
+message Post {
+  string id = 1;
+  string title = 2;
+  string content = 3;
+  string author = 4;
+}
+
+service BlogService {
+  rpc CreatePost(CreatePostRequest) returns (CreatePostResponse);
+  rpc GetPosts(GetPostsRequest) returns (GetPostsResponse);
+}
+
+message Posts {
+  repeated Post posts = 1;
+}
+
+message CreatePostRequest {
+  Post post = 1;
+}
+
+message CreatePostResponse {
+  Post post = 1;
+}
+
+message GetPostsResponse {
+  Posts posts = 1;
+}
+
+message GetPostsRequest {
+  Posts posts = 1;
+}
