@@ -1,11 +1,11 @@
 syntax = "proto3";
 
-package post;
+package blog;
 
 import "google/protobuf/timestamp.proto";
 
 message Post {
-  string id = 1;
+  int32 id = 1;
   string title = 2;
   string content = 3;
   string author = 4;

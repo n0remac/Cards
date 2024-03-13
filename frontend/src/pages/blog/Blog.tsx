@@ -1,14 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { blogService } from '../../service'; // Update this path to where your service is defined
-import { Post, GetPostsRequest } from '../../rpc/proto/blog/blog_pb'; // Update these imports based on your actual file structure
+import { Post, Posts, GetPostsRequest } from '../../rpc/proto/blog/blog_pb'; // Update these imports based on your actual file structure
 
 export const AllPosts = () => {
-  const [posts, setPosts] = useState<Post[]>([]);
+  const [posts, setPosts] = useState<Posts>();
 
   useEffect(() => {
     const fetchPosts = async () => {
       const postsRequest = new GetPostsRequest(); // Adjust based on your actual request class, if needed
-
+      
       try {
         const response = await blogService.getPosts(postsRequest);
         if (response.posts) {
@@ -29,7 +29,7 @@ export const AllPosts = () => {
       <h1 className="text-2xl font-bold mb-4">All Blog Posts</h1>
       
       <div className="flex flex-wrap justify-center">
-        {posts.map((post) => (
+        {posts && posts.posts.map((post) => (
           <PostComponent key={post.id} post={post} />
         ))}
       </div>
@@ -38,7 +38,7 @@ export const AllPosts = () => {
 };
 
 interface PostComponentProps {
-  post: Post.AsObject; // Assuming you are using the .asObject method for protobuf objects
+  post: Post
 }
 
 export const PostComponent: React.FC<PostComponentProps> = ({ post }) => {

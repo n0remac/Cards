@@ -22,7 +22,7 @@ const _ = connect_go.IsAtLeastVersion0_1_0
 
 const (
 	// BlogServiceName is the fully-qualified name of the BlogService service.
-	BlogServiceName = "post.BlogService"
+	BlogServiceName = "blog.BlogService"
 )
 
 // These constants are the fully-qualified names of the RPCs defined in this package. They're
@@ -34,18 +34,18 @@ const (
 // period.
 const (
 	// BlogServiceCreatePostProcedure is the fully-qualified name of the BlogService's CreatePost RPC.
-	BlogServiceCreatePostProcedure = "/post.BlogService/CreatePost"
+	BlogServiceCreatePostProcedure = "/blog.BlogService/CreatePost"
 	// BlogServiceGetPostsProcedure is the fully-qualified name of the BlogService's GetPosts RPC.
-	BlogServiceGetPostsProcedure = "/post.BlogService/GetPosts"
+	BlogServiceGetPostsProcedure = "/blog.BlogService/GetPosts"
 )
 
-// BlogServiceClient is a client for the post.BlogService service.
+// BlogServiceClient is a client for the blog.BlogService service.
 type BlogServiceClient interface {
 	CreatePost(context.Context, *connect_go.Request[blog.CreatePostRequest]) (*connect_go.Response[blog.CreatePostResponse], error)
 	GetPosts(context.Context, *connect_go.Request[blog.GetPostsRequest]) (*connect_go.Response[blog.GetPostsResponse], error)
 }
 
-// NewBlogServiceClient constructs a client for the post.BlogService service. By default, it uses
+// NewBlogServiceClient constructs a client for the blog.BlogService service. By default, it uses
 // the Connect protocol with the binary Protobuf Codec, asks for gzipped responses, and sends
 // uncompressed requests. To use the gRPC or gRPC-Web protocols, supply the connect.WithGRPC() or
 // connect.WithGRPCWeb() options.
@@ -74,17 +74,17 @@ type blogServiceClient struct {
 	getPosts   *connect_go.Client[blog.GetPostsRequest, blog.GetPostsResponse]
 }
 
-// CreatePost calls post.BlogService.CreatePost.
+// CreatePost calls blog.BlogService.CreatePost.
 func (c *blogServiceClient) CreatePost(ctx context.Context, req *connect_go.Request[blog.CreatePostRequest]) (*connect_go.Response[blog.CreatePostResponse], error) {
 	return c.createPost.CallUnary(ctx, req)
 }
 
-// GetPosts calls post.BlogService.GetPosts.
+// GetPosts calls blog.BlogService.GetPosts.
 func (c *blogServiceClient) GetPosts(ctx context.Context, req *connect_go.Request[blog.GetPostsRequest]) (*connect_go.Response[blog.GetPostsResponse], error) {
 	return c.getPosts.CallUnary(ctx, req)
 }
 
-// BlogServiceHandler is an implementation of the post.BlogService service.
+// BlogServiceHandler is an implementation of the blog.BlogService service.
 type BlogServiceHandler interface {
 	CreatePost(context.Context, *connect_go.Request[blog.CreatePostRequest]) (*connect_go.Response[blog.CreatePostResponse], error)
 	GetPosts(context.Context, *connect_go.Request[blog.GetPostsRequest]) (*connect_go.Response[blog.GetPostsResponse], error)
@@ -106,7 +106,7 @@ func NewBlogServiceHandler(svc BlogServiceHandler, opts ...connect_go.HandlerOpt
 		svc.GetPosts,
 		opts...,
 	)
-	return "/post.BlogService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	return "/blog.BlogService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
 		case BlogServiceCreatePostProcedure:
 			blogServiceCreatePostHandler.ServeHTTP(w, r)
@@ -122,9 +122,9 @@ func NewBlogServiceHandler(svc BlogServiceHandler, opts ...connect_go.HandlerOpt
 type UnimplementedBlogServiceHandler struct{}
 
 func (UnimplementedBlogServiceHandler) CreatePost(context.Context, *connect_go.Request[blog.CreatePostRequest]) (*connect_go.Response[blog.CreatePostResponse], error) {
-	return nil, connect_go.NewError(connect_go.CodeUnimplemented, errors.New("post.BlogService.CreatePost is not implemented"))
+	return nil, connect_go.NewError(connect_go.CodeUnimplemented, errors.New("blog.BlogService.CreatePost is not implemented"))
 }
 
 func (UnimplementedBlogServiceHandler) GetPosts(context.Context, *connect_go.Request[blog.GetPostsRequest]) (*connect_go.Response[blog.GetPostsResponse], error) {
-	return nil, connect_go.NewError(connect_go.CodeUnimplemented, errors.New("post.BlogService.GetPosts is not implemented"))
+	return nil, connect_go.NewError(connect_go.CodeUnimplemented, errors.New("blog.BlogService.GetPosts is not implemented"))
 }

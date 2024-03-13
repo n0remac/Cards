@@ -36,7 +36,7 @@ func NewBlogServiceClient(cc grpc.ClientConnInterface) BlogServiceClient {
 
 func (c *blogServiceClient) CreatePost(ctx context.Context, in *CreatePostRequest, opts ...grpc.CallOption) (*CreatePostResponse, error) {
 	out := new(CreatePostResponse)
-	err := c.cc.Invoke(ctx, "/post.BlogService/CreatePost", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/blog.BlogService/CreatePost", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -45,7 +45,7 @@ func (c *blogServiceClient) CreatePost(ctx context.Context, in *CreatePostReques
 
 func (c *blogServiceClient) GetPosts(ctx context.Context, in *GetPostsRequest, opts ...grpc.CallOption) (*GetPostsResponse, error) {
 	out := new(GetPostsResponse)
-	err := c.cc.Invoke(ctx, "/post.BlogService/GetPosts", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/blog.BlogService/GetPosts", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -92,7 +92,7 @@ func _BlogService_CreatePost_Handler(srv interface{}, ctx context.Context, dec f
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/post.BlogService/CreatePost",
+		FullMethod: "/blog.BlogService/CreatePost",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(BlogServiceServer).CreatePost(ctx, req.(*CreatePostRequest))
@@ -110,7 +110,7 @@ func _BlogService_GetPosts_Handler(srv interface{}, ctx context.Context, dec fun
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/post.BlogService/GetPosts",
+		FullMethod: "/blog.BlogService/GetPosts",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(BlogServiceServer).GetPosts(ctx, req.(*GetPostsRequest))
@@ -122,7 +122,7 @@ func _BlogService_GetPosts_Handler(srv interface{}, ctx context.Context, dec fun
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
 var BlogService_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "post.BlogService",
+	ServiceName: "blog.BlogService",
 	HandlerType: (*BlogServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
