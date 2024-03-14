@@ -23,13 +23,14 @@ export default function App() {
         <Router>
             <div>
                 <nav>
-                    <ul style={{ listStyleType: 'none', margin: 0, padding: 0, overflow: 'hidden', backgroundColor: '#333' }}>
-                        <li style={{ float: 'left' }}>
-                            <Link to="/" style={{ display: 'block', color: 'white', textAlign: 'center', padding: '14px 16px', textDecoration: 'none' }}>Blog</Link>
+                    <ul className="list-none m-0 p-0 overflow-hidden bg-[#333]">
+                        <li className="float-left">
+                            <Link to="/" className="block text-white text-center py-3 px-4 no-underline">Blog</Link>
                         </li>
-                        <li style={{ float: 'left' }}>
-                            <Link to="/createpost" style={{ display: 'block', color: 'white', textAlign: 'center', padding: '14px 16px', textDecoration: 'none' }}>Create</Link>
+                        <li className="float-left">
+                            <Link to="/createpost" className="block text-white text-center py-3 px-4 no-underline">Create</Link>
                         </li>
+
                         
                         {/* <li style={{ float: 'right' }}>
                             <Link to="/login" style={{ display: 'block', color: 'white', textAlign: 'center', padding: '14px 16px', textDecoration: 'none' }}>Login</Link>
