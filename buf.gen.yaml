@@ -4,7 +4,7 @@ managed:
   go_package_prefix:
     default: cards/gen
 plugins:
-  - plugin: buf.build/protocolbuffers/go
+  - plugin: buf.build/protocolbuffers/go:v1.33.0
     out: ./gen
     opt:
       - paths=source_relative

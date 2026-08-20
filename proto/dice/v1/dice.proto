@@ -1,0 +1,52 @@
+syntax = "proto3";
+
+package dice.v1;
+
+message Vector3 {
+  float x = 1;
+  float y = 2;
+  float z = 3;
+}
+
+message Quaternion {
+  float x = 1;
+  float y = 2;
+  float z = 3;
+  float w = 4;
+}
+
+message DieThrowSpec {
+  uint32 die_index = 1;
+  Vector3 position = 2;
+  Quaternion rotation = 3;
+  Vector3 impulse = 4;
+  Vector3 torque = 5;
+}
+
+message RollSpec {
+  uint32 simulation_version = 1;
+  uint32 roll_id = 2;
+  repeated DieThrowSpec dice = 3;
+}
+
+enum DieValue {
+  DIE_VALUE_UNSPECIFIED = 0;
+  DIE_VALUE_ONE = 1;
+  DIE_VALUE_TWO = 2;
+  DIE_VALUE_THREE = 3;
+  DIE_VALUE_FOUR = 4;
+  DIE_VALUE_FIVE = 5;
+  DIE_VALUE_SIX = 6;
+}
+
+message DieResult {
+  uint32 die_index = 1;
+  DieValue value = 2;
+}
+
+message RollResult {
+  uint32 simulation_version = 1;
+  uint32 roll_id = 2;
+  repeated DieResult dice = 3;
+  uint32 total = 4;
+}

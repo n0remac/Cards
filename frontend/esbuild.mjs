@@ -1,5 +1,6 @@
 import esbuild from "esbuild";
 import { spawn, spawnSync } from "child_process";
+import { rmSync } from "fs";
 
 
 const prodBuild = process.env.BUILD === 'true'
@@ -13,7 +14,7 @@ const runTailwindBuild = (watch) => {
 			'tailwindcss',
 			'build',
 			'-i', 'src/styles/tailwind.css',
-			'-o', 'build/site/tailwind.css'
+			'-o', `${buildDir}/site/tailwind.css`
 		];
 
 		if (watch) {
@@ -34,6 +35,8 @@ const runTailwindBuild = (watch) => {
   
   const baseOptions = {
       bundle: true,
+      splitting: true,
+      format: "esm",
       loader: {
           ".ts": "tsx",
           ".tsx": "tsx",
@@ -56,13 +59,15 @@ const runTailwindBuild = (watch) => {
           "process.env.PRODUCTION": prodBuild ? '"true"' : '"false"'
       },
       entryNames: "[name]",
+      chunkNames: "chunks/[name]-[hash]",
       logLevel: 'info',
   }
-  
+
   async function doBuild(options, serve) {
       if (prodBuild) {
-          runTailwindBuild(false);
+          rmSync(`${buildDir}/site`, { recursive: true, force: true });
           await esbuild.build(options);
+          runTailwindBuild(false);
       } else {
           runTailwindBuild(true);
           try {
@@ -95,4 +100,3 @@ const runTailwindBuild = (watch) => {
       ],
       outdir: `${buildDir}/site/`,
   }, true);
-  

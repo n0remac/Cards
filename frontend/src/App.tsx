@@ -10,6 +10,14 @@ import { CreateTag } from './pages/blog/CreateTag';
 import { FullPostComponent } from './pages/blog/ContentPage';
 import { FilteredPosts } from './pages/blog/FilteredPosts';
 
+const DiceGame = React.lazy(() => import('./pages/dice/DiceGame'));
+
+const DiceRouteFallback = () => (
+    <main className="grid min-h-[calc(100vh-3rem)] place-items-center bg-[#111513] text-stone-300">
+        Loading dice…
+    </main>
+);
+
 export default function App() {
     const [isLoggedIn, setIsLoggedIn] = useState(false);
 
@@ -43,6 +51,9 @@ export default function App() {
                         <li className="float-left">
                             <Link to="/poetry" className="block text-white text-center py-3 px-4 no-underline">Poetry</Link>
                         </li>
+                        <li className="float-left">
+                            <Link to="/dice" className="block text-white text-center py-3 px-4 no-underline">Dice</Link>
+                        </li>
                         {/* Uncomment and adjust the login and register links as necessary */}
                         {/* {!isLoggedIn && (
                             <>
@@ -67,6 +78,14 @@ export default function App() {
                     <Route path='/tags' element={<CreateTag />} />
                     <Route path="/post/:postId" element={<FullPostComponent />} />
                     <Route path="/filtered" element={<FilteredPosts />} />
+                    <Route
+                        path="/dice"
+                        element={(
+                            <React.Suspense fallback={<DiceRouteFallback />}>
+                                <DiceGame />
+                            </React.Suspense>
+                        )}
+                    />
                 </Routes>
             </div>
         </Router>
