@@ -12,13 +12,14 @@ import {
   SPAWN_HEIGHT_MAX,
   SPAWN_HEIGHT_MIN,
   SPAWN_SLOTS,
+  TRAY_HALF_DEPTH,
+  TRAY_HALF_WIDTH,
   VERTICAL_IMPULSE_MAX,
 } from './constants';
-import { PlayableDieValue } from './diceMath';
 import {
   createEscapeRecovery,
   createLocalRollSpec,
-  recordSettledEvent,
+  createRollResultFromSettledEvent,
   validateRollSpec,
 } from './rollModel';
 
@@ -80,6 +81,16 @@ describe('createLocalRollSpec', () => {
     expect(first.toJson()).toEqual(second.toJson());
   });
 
+  it.each([1, 3, 10])('keeps %i dice safely inside the enlarged tray', (count) => {
+    const spec = createLocalRollSpec(count, count, midpointRandom);
+
+    expect(spec.dice).toHaveLength(count);
+    for (const die of spec.dice) {
+      expect(Math.abs(die.position!.x)).toBeLessThan(TRAY_HALF_WIDTH - 1);
+      expect(Math.abs(die.position!.z)).toBeLessThan(TRAY_HALF_DEPTH - 1);
+    }
+  });
+
   it('survives a protobuf binary round trip without changing physics inputs', () => {
     const spec = createLocalRollSpec(3, 9, midpointRandom);
     const replay = RollSpec.fromBinary(spec.toBinary());
@@ -104,7 +115,8 @@ describe('validateRollSpec', () => {
 
   it('reports unsupported versions, duplicate indices, and invalid rotations', () => {
     const spec = createLocalRollSpec(2, 1, midpointRandom);
-    spec.simulationVersion = 99;
+    expect(SIMULATION_VERSION).toBe(2);
+    spec.simulationVersion = 1;
     spec.dice[1].dieIndex = 0;
     spec.dice[0].rotation!.w = 0;
 
@@ -128,61 +140,54 @@ describe('validateRollSpec', () => {
   });
 });
 
-describe('recordSettledEvent', () => {
-  it('ignores stale and duplicate events, then builds an ordered result', () => {
+describe('createRollResultFromSettledEvent', () => {
+  it('rejects stale and duplicate values, then builds an ordered result atomically', () => {
     const spec = createLocalRollSpec(3, 7, midpointRandom);
-    let settled: ReadonlyMap<number, PlayableDieValue> = new Map();
-
-    settled = recordSettledEvent(spec, settled, {
+    expect(createRollResultFromSettledEvent(spec, {
       rollId: 6,
-      dieIndex: 0,
-      value: DieValue.ONE,
-    }).settled;
-    expect(settled.size).toBe(0);
+      dice: [
+        { dieIndex: 0, value: DieValue.ONE },
+        { dieIndex: 1, value: DieValue.TWO },
+        { dieIndex: 2, value: DieValue.THREE },
+      ],
+    })).toBeUndefined();
 
-    settled = recordSettledEvent(spec, settled, {
+    expect(createRollResultFromSettledEvent(spec, {
       rollId: 7,
-      dieIndex: 2,
-      value: DieValue.SIX,
-    }).settled;
-    const duplicate = recordSettledEvent(spec, settled, {
-      rollId: 7,
-      dieIndex: 2,
-      value: DieValue.ONE,
-    });
-    expect(duplicate.settled).toBe(settled);
+      dice: [
+        { dieIndex: 0, value: DieValue.ONE },
+        { dieIndex: 0, value: DieValue.TWO },
+        { dieIndex: 2, value: DieValue.THREE },
+      ],
+    })).toBeUndefined();
 
-    settled = recordSettledEvent(spec, settled, {
+    const completed = createRollResultFromSettledEvent(spec, {
       rollId: 7,
-      dieIndex: 0,
-      value: DieValue.FOUR,
-    }).settled;
-    const completed = recordSettledEvent(spec, settled, {
-      rollId: 7,
-      dieIndex: 1,
-      value: DieValue.TWO,
+      dice: [
+        { dieIndex: 2, value: DieValue.SIX },
+        { dieIndex: 0, value: DieValue.FOUR },
+        { dieIndex: 1, value: DieValue.TWO },
+      ],
     });
 
-    expect(completed.result?.dice.map((die) => die.dieIndex)).toEqual([0, 1, 2]);
-    expect(completed.result?.dice.map((die) => die.value)).toEqual([
+    expect(completed?.dice.map((die) => die.dieIndex)).toEqual([0, 1, 2]);
+    expect(completed?.dice.map((die) => die.value)).toEqual([
       DieValue.FOUR,
       DieValue.TWO,
       DieValue.SIX,
     ]);
-    expect(completed.result?.total).toBe(12);
+    expect(completed?.total).toBe(12);
   });
 
   it('makes callbacks from a replaced roll stale', () => {
     const replaced = createLocalRollSpec(1, 20, midpointRandom);
     const active = createLocalRollSpec(1, 21, midpointRandom);
-    const recorded = recordSettledEvent(active, new Map(), {
+    const completed = createRollResultFromSettledEvent(active, {
       rollId: replaced.rollId,
-      dieIndex: 0,
-      value: DieValue.THREE,
+      dice: [{ dieIndex: 0, value: DieValue.THREE }],
     });
 
-    expect(recorded.settled.size).toBe(0);
-    expect(recorded.result).toBeUndefined();
+    expect(completed).toBeUndefined();
   });
 });
 

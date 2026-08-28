@@ -123,15 +123,21 @@ export type SettlingProgress = {
   settled: boolean;
 };
 
-export function advanceSettling(
+export type BodyMotion = {
+  linearVelocity: VectorLike;
+  angularVelocity: VectorLike;
+};
+
+export function advanceRollSettling(
   stableSteps: number,
-  linearVelocity: VectorLike,
-  angularVelocity: VectorLike,
+  motions: readonly BodyMotion[],
 ): SettlingProgress {
   const thresholdSquared = SETTLE_SPEED_THRESHOLD * SETTLE_SPEED_THRESHOLD;
-  const isStable =
-    speedSquared(linearVelocity) < thresholdSquared &&
-    speedSquared(angularVelocity) < thresholdSquared;
+  const isStable = motions.length > 0 && motions.every(
+    ({ linearVelocity, angularVelocity }) =>
+      speedSquared(linearVelocity) < thresholdSquared &&
+      speedSquared(angularVelocity) < thresholdSquared,
+  );
   const nextStableSteps = isStable
     ? Math.min(stableSteps + 1, SETTLE_STEPS)
     : 0;

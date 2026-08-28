@@ -1,13 +1,17 @@
-import React, { Suspense, useEffect } from 'react';
+import React, { MutableRefObject, Suspense, useCallback, useEffect, useRef } from 'react';
 import { Canvas, useThree } from '@react-three/fiber';
 import {
   CuboidCollider,
   Physics,
+  RapierRigidBody,
   RigidBody,
+  useAfterPhysicsStep,
 } from '@react-three/rapier';
 import { PerspectiveCamera } from 'three';
 import { RollSpec } from '../../rpc/proto/dice/v1/dice_pb';
 import {
+  CAMERA_DESKTOP_FOV,
+  CAMERA_DESKTOP_POSITION,
   FRICTION,
   GRAVITY,
   PHYSICS_TIMESTEP,
@@ -18,12 +22,14 @@ import {
   TRAY_WALL_HEIGHT,
   TRAY_WALL_THICKNESS,
 } from './constants';
-import { Die } from './Die';
-import { DieSettledEvent } from './rollModel';
+import { advanceRollSettling, getUpwardFace, isOutsideTray } from './diceMath';
+import { applyThrowToBody, Die } from './Die';
+import { createEscapeRecovery, RollSettledEvent } from './rollModel';
+import { getDiceCameraLayout } from './sceneLayout';
 
 type DiceSceneProps = {
   activeSpec?: RollSpec;
-  onSettled: (event: DieSettledEvent) => void;
+  onSettled: (event: RollSettledEvent) => void;
   onReady: () => void;
   onWebGLUnavailable: () => void;
 };
@@ -35,12 +41,103 @@ function ResponsiveCamera() {
     if (!(camera instanceof PerspectiveCamera)) {
       return;
     }
-    const narrow = size.width / size.height < 0.9;
-    camera.position.set(0, narrow ? 14 : 10.5, narrow ? 14 : 10);
-    camera.fov = narrow ? 48 : 42;
+    const layout = getDiceCameraLayout(size.width, size.height);
+    camera.position.set(...layout.position);
+    camera.fov = layout.fov;
     camera.lookAt(0, 0, 0);
     camera.updateProjectionMatrix();
   }, [camera, size.height, size.width]);
+
+  return null;
+}
+
+type BodyRegistry = MutableRefObject<Map<string, RapierRigidBody>>;
+
+function bodyKey(rollId: number, dieIndex: number): string {
+  return `${rollId}:${dieIndex}`;
+}
+
+type RollSettlingObserverProps = {
+  activeSpec?: RollSpec;
+  bodies: BodyRegistry;
+  onSettled: (event: RollSettledEvent) => void;
+};
+
+function RollSettlingObserver({
+  activeSpec,
+  bodies,
+  onSettled,
+}: RollSettlingObserverProps) {
+  const observedRollIdRef = useRef<number>();
+  const reportedRollIdRef = useRef<number>();
+  const stableStepsRef = useRef(0);
+
+  useAfterPhysicsStep(() => {
+    if (!activeSpec) {
+      observedRollIdRef.current = undefined;
+      reportedRollIdRef.current = undefined;
+      stableStepsRef.current = 0;
+      return;
+    }
+
+    if (observedRollIdRef.current !== activeSpec.rollId) {
+      observedRollIdRef.current = activeSpec.rollId;
+      reportedRollIdRef.current = undefined;
+      stableStepsRef.current = 0;
+    }
+    if (reportedRollIdRef.current === activeSpec.rollId) {
+      return;
+    }
+
+    const rollBodies: Array<{
+      throwSpec: RollSpec['dice'][number];
+      body: RapierRigidBody;
+    }> = [];
+    for (const throwSpec of activeSpec.dice) {
+      const body = bodies.current.get(
+        bodyKey(activeSpec.rollId, throwSpec.dieIndex),
+      );
+      if (!body) {
+        stableStepsRef.current = 0;
+        return;
+      }
+      rollBodies.push({ throwSpec, body });
+    }
+
+    let recovered = false;
+    for (const { body, throwSpec } of rollBodies) {
+      const position = body.translation();
+      if (isOutsideTray(position)) {
+        applyThrowToBody(body, createEscapeRecovery(throwSpec, position));
+        recovered = true;
+      }
+    }
+    if (recovered) {
+      stableStepsRef.current = 0;
+      return;
+    }
+
+    const progress = advanceRollSettling(
+      stableStepsRef.current,
+      rollBodies.map(({ body }) => ({
+        linearVelocity: body.linvel(),
+        angularVelocity: body.angvel(),
+      })),
+    );
+    stableStepsRef.current = progress.stableSteps;
+    if (!progress.settled) {
+      return;
+    }
+
+    reportedRollIdRef.current = activeSpec.rollId;
+    onSettled({
+      rollId: activeSpec.rollId,
+      dice: rollBodies.map(({ body, throwSpec }) => ({
+        dieIndex: throwSpec.dieIndex,
+        value: getUpwardFace(body.rotation()),
+      })),
+    });
+  });
 
   return null;
 }
@@ -114,7 +211,7 @@ function DiceTray() {
           receiveShadow
         >
           <boxGeometry args={[
-            TRAY_HALF_WIDTH * 2,
+            TRAY_HALF_WIDTH * 2 + TRAY_WALL_THICKNESS * 2,
             TRAY_WALL_HEIGHT,
             TRAY_WALL_THICKNESS,
           ]} />
@@ -142,13 +239,21 @@ function DiceTray() {
           restitution={RESTITUTION}
         />
         <CuboidCollider
-          args={[TRAY_HALF_WIDTH, wallY, wallHalfThickness]}
+          args={[
+            TRAY_HALF_WIDTH + TRAY_WALL_THICKNESS,
+            wallY,
+            wallHalfThickness,
+          ]}
           position={[0, wallY, -TRAY_HALF_DEPTH - wallHalfThickness]}
           friction={FRICTION}
           restitution={RESTITUTION}
         />
         <CuboidCollider
-          args={[TRAY_HALF_WIDTH, wallY, wallHalfThickness]}
+          args={[
+            TRAY_HALF_WIDTH + TRAY_WALL_THICKNESS,
+            wallY,
+            wallHalfThickness,
+          ]}
           position={[0, wallY, TRAY_HALF_DEPTH + wallHalfThickness]}
           friction={FRICTION}
           restitution={RESTITUTION}
@@ -164,29 +269,51 @@ export function DiceScene({
   onReady,
   onWebGLUnavailable,
 }: DiceSceneProps) {
+  const bodies = useRef<Map<string, RapierRigidBody>>(new Map());
+  const registerBody = useCallback(
+    (rollId: number, dieIndex: number, body: RapierRigidBody) => {
+      bodies.current.set(bodyKey(rollId, dieIndex), body);
+    },
+    [],
+  );
+  const unregisterBody = useCallback(
+    (rollId: number, dieIndex: number, body: RapierRigidBody) => {
+      const key = bodyKey(rollId, dieIndex);
+      if (bodies.current.get(key) === body) {
+        bodies.current.delete(key);
+      }
+    },
+    [],
+  );
+
   return (
     <Canvas
       shadows
       dpr={[1, 1.75]}
-      camera={{ position: [0, 10.5, 10], fov: 42, near: 0.1, far: 100 }}
+      camera={{
+        position: [...CAMERA_DESKTOP_POSITION],
+        fov: CAMERA_DESKTOP_FOV,
+        near: 0.1,
+        far: 100,
+      }}
       gl={{ antialias: true }}
       fallback={<WebGLFallback onUnavailable={onWebGLUnavailable} />}
     >
       <color attach="background" args={['#171b1a']} />
-      <fog attach="fog" args={['#171b1a', 16, 30]} />
+      <fog attach="fog" args={['#171b1a', 34, 52]} />
       <ResponsiveCamera />
       <hemisphereLight color="#fff4dc" groundColor="#1b1511" intensity={1.15} />
       <directionalLight
         castShadow
-        position={[-4, 11, 5]}
+        position={[-6, 25, 7]}
         intensity={2.2}
         color="#ffe5bd"
         shadow-mapSize-width={1024}
         shadow-mapSize-height={1024}
-        shadow-camera-left={-8}
-        shadow-camera-right={8}
-        shadow-camera-top={8}
-        shadow-camera-bottom={-8}
+        shadow-camera-left={-11}
+        shadow-camera-right={11}
+        shadow-camera-top={11}
+        shadow-camera-bottom={-11}
       />
       <Suspense fallback={null}>
         <Physics
@@ -196,12 +323,18 @@ export function DiceScene({
         >
           <PhysicsReady onReady={onReady} />
           <DiceTray />
+          <RollSettlingObserver
+            activeSpec={activeSpec}
+            bodies={bodies}
+            onSettled={onSettled}
+          />
           {activeSpec?.dice.map((die) => (
             <Die
-              key={die.dieIndex}
+              key={`${activeSpec.rollId}:${die.dieIndex}`}
               rollId={activeSpec.rollId}
               throwSpec={die}
-              onSettled={onSettled}
+              onBodyReady={registerBody}
+              onBodyRemoved={unregisterBody}
             />
           ))}
         </Physics>

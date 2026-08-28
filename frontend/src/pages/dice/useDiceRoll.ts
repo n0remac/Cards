@@ -9,10 +9,9 @@ import {
 import {
   assertValidRollSpec,
   createLocalRollSpec,
-  DieSettledEvent,
-  recordSettledEvent,
+  createRollResultFromSettledEvent,
+  RollSettledEvent,
 } from './rollModel';
-import { PlayableDieValue } from './diceMath';
 
 export type RollPhase = 'idle' | 'rolling' | 'settled';
 
@@ -24,7 +23,7 @@ export type DiceRollController = {
   changeCount: (delta: number) => void;
   roll: () => void;
   startRoll: (spec: RollSpec) => void;
-  reportSettled: (event: DieSettledEvent) => void;
+  reportSettled: (event: RollSettledEvent) => void;
 };
 
 export function useDiceRoll(): DiceRollController {
@@ -33,7 +32,7 @@ export function useDiceRoll(): DiceRollController {
   const [phase, setPhase] = useState<RollPhase>('idle');
   const [result, setResult] = useState<RollResult>();
   const activeSpecRef = useRef<RollSpec>();
-  const settledRef = useRef<ReadonlyMap<number, PlayableDieValue>>(new Map());
+  const completedRollIdRef = useRef<number>();
   const rollIdRef = useRef(0);
   const phaseRef = useRef<RollPhase>('idle');
 
@@ -47,7 +46,7 @@ export function useDiceRoll(): DiceRollController {
       assertValidRollSpec(spec);
       rollIdRef.current = spec.rollId;
       activeSpecRef.current = spec;
-      settledRef.current = new Map();
+      completedRollIdRef.current = undefined;
       setActiveSpec(spec);
       setResult(undefined);
       setCurrentPhase('rolling');
@@ -69,7 +68,7 @@ export function useDiceRoll(): DiceRollController {
       }
       setCount((current) => Math.min(MAX_DICE, Math.max(MIN_DICE, current + delta)));
       activeSpecRef.current = undefined;
-      settledRef.current = new Map();
+      completedRollIdRef.current = undefined;
       setActiveSpec(undefined);
       setResult(undefined);
       setCurrentPhase('idle');
@@ -78,20 +77,18 @@ export function useDiceRoll(): DiceRollController {
   );
 
   const reportSettled = useCallback(
-    (event: DieSettledEvent) => {
+    (event: RollSettledEvent) => {
       const spec = activeSpecRef.current;
-      if (!spec) {
+      if (!spec || completedRollIdRef.current === event.rollId) {
         return;
       }
-      const recorded = recordSettledEvent(spec, settledRef.current, event);
-      if (recorded.settled === settledRef.current) {
+      const completedResult = createRollResultFromSettledEvent(spec, event);
+      if (!completedResult) {
         return;
       }
-      settledRef.current = recorded.settled;
-      if (recorded.result) {
-        setResult(recorded.result);
-        setCurrentPhase('settled');
-      }
+      completedRollIdRef.current = event.rollId;
+      setResult(completedResult);
+      setCurrentPhase('settled');
     },
     [setCurrentPhase],
   );

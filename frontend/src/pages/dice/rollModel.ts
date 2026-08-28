@@ -30,15 +30,14 @@ import {
 
 export type RandomSource = () => number;
 
-export type DieSettledEvent = {
-  rollId: number;
+export type IndexedDieValue = {
   dieIndex: number;
   value: PlayableDieValue;
 };
 
-export type RecordedSettling = {
-  settled: ReadonlyMap<number, PlayableDieValue>;
-  result?: RollResult;
+export type RollSettledEvent = {
+  rollId: number;
+  dice: readonly IndexedDieValue[];
 };
 
 const float32 = (value: number): number => Math.fround(value);
@@ -239,30 +238,28 @@ export function createRollResult(
   });
 }
 
-export function recordSettledEvent(
+export function createRollResultFromSettledEvent(
   spec: RollSpec,
-  settled: ReadonlyMap<number, PlayableDieValue>,
-  event: DieSettledEvent,
-): RecordedSettling {
-  const dieExists = spec.dice.some((die) => die.dieIndex === event.dieIndex);
-  if (
-    event.rollId !== spec.rollId ||
-    !dieExists ||
-    settled.has(event.dieIndex) ||
-    !isPlayableDieValue(event.value)
-  ) {
-    return { settled };
+  event: RollSettledEvent,
+): RollResult | undefined {
+  if (event.rollId !== spec.rollId || event.dice.length !== spec.dice.length) {
+    return undefined;
   }
 
-  const nextSettled = new Map(settled);
-  nextSettled.set(event.dieIndex, event.value);
-  return {
-    settled: nextSettled,
-    result:
-      nextSettled.size === spec.dice.length
-        ? createRollResult(spec, nextSettled)
-        : undefined,
-  };
+  const expectedIndices = new Set(spec.dice.map((die) => die.dieIndex));
+  const settled = new Map<number, PlayableDieValue>();
+  for (const die of event.dice) {
+    if (
+      !expectedIndices.has(die.dieIndex) ||
+      settled.has(die.dieIndex) ||
+      !isPlayableDieValue(die.value)
+    ) {
+      return undefined;
+    }
+    settled.set(die.dieIndex, die.value);
+  }
+
+  return createRollResult(spec, settled);
 }
 
 export function createEscapeRecovery(

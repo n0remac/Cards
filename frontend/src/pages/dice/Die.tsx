@@ -5,7 +5,6 @@ import {
   CuboidCollider,
   RapierRigidBody,
   RigidBody,
-  useAfterPhysicsStep,
 } from '@react-three/rapier';
 import { DieThrowSpec } from '../../rpc/proto/dice/v1/dice_pb';
 import {
@@ -18,22 +17,24 @@ import {
   RESTITUTION,
 } from './constants';
 import {
-  advanceSettling,
-  getUpwardFace,
-  isOutsideTray,
   quaternionToObject,
   vectorToObject,
   vectorToTuple,
 } from './diceMath';
-import {
-  createEscapeRecovery,
-  DieSettledEvent,
-} from './rollModel';
 
 type DieProps = {
   rollId: number;
   throwSpec: DieThrowSpec;
-  onSettled: (event: DieSettledEvent) => void;
+  onBodyReady: (
+    rollId: number,
+    dieIndex: number,
+    body: RapierRigidBody,
+  ) => void;
+  onBodyRemoved: (
+    rollId: number,
+    dieIndex: number,
+    body: RapierRigidBody,
+  ) => void;
 };
 
 type PipPoint = readonly [number, number];
@@ -100,7 +101,7 @@ function DieVisual() {
   );
 }
 
-function applyThrow(body: RapierRigidBody, spec: DieThrowSpec) {
+export function applyThrowToBody(body: RapierRigidBody, spec: DieThrowSpec) {
   body.setTranslation(vectorToObject(spec.position), true);
   body.setRotation(quaternionToObject(spec.rotation), true);
   body.setLinvel({ x: 0, y: 0, z: 0 }, true);
@@ -112,66 +113,34 @@ function applyThrow(body: RapierRigidBody, spec: DieThrowSpec) {
   body.wakeUp();
 }
 
-export function Die({ rollId, throwSpec, onSettled }: DieProps) {
+export function Die({
+  rollId,
+  throwSpec,
+  onBodyReady,
+  onBodyRemoved,
+}: DieProps) {
   const bodyRef = useRef<RapierRigidBody>(null);
   const appliedRollIdRef = useRef<number>();
-  const reportedRollIdRef = useRef<number>();
-  const stableStepsRef = useRef(0);
 
   useEffect(() => {
     const body = bodyRef.current;
-    if (!body || appliedRollIdRef.current === rollId) {
+    if (!body) {
       return;
     }
-    appliedRollIdRef.current = rollId;
-    reportedRollIdRef.current = undefined;
-    stableStepsRef.current = 0;
-    applyThrow(body, throwSpec);
-  }, [rollId, throwSpec]);
-
-  useAfterPhysicsStep(() => {
-    const body = bodyRef.current;
-    if (!body || appliedRollIdRef.current !== rollId) {
-      return;
+    onBodyReady(rollId, throwSpec.dieIndex, body);
+    if (appliedRollIdRef.current !== rollId) {
+      appliedRollIdRef.current = rollId;
+      applyThrowToBody(body, throwSpec);
     }
 
-    const position = body.translation();
-    if (isOutsideTray(position)) {
-      const recovery = createEscapeRecovery(throwSpec, position);
-      stableStepsRef.current = 0;
-      reportedRollIdRef.current = undefined;
-      applyThrow(body, recovery);
-      return;
-    }
-
-    if (reportedRollIdRef.current === rollId) {
-      return;
-    }
-
-    const progress = advanceSettling(
-      stableStepsRef.current,
-      body.linvel(),
-      body.angvel(),
-    );
-    stableStepsRef.current = progress.stableSteps;
-    if (!progress.settled) {
-      return;
-    }
-
-    reportedRollIdRef.current = rollId;
-    onSettled({
-      rollId,
-      dieIndex: throwSpec.dieIndex,
-      value: getUpwardFace(body.rotation()),
-    });
-  });
+    return () => onBodyRemoved(rollId, throwSpec.dieIndex, body);
+  }, [onBodyReady, onBodyRemoved, rollId, throwSpec]);
 
   return (
     <RigidBody
       ref={bodyRef}
       colliders={false}
       position={vectorToTuple(throwSpec.position)}
-      mass={DIE_MASS}
       linearDamping={LINEAR_DAMPING}
       angularDamping={ANGULAR_DAMPING}
       ccd
@@ -183,6 +152,7 @@ export function Die({ rollId, throwSpec, onSettled }: DieProps) {
           DIE_COLLIDER_HALF_EXTENT,
           DIE_COLLIDER_HALF_EXTENT,
         ]}
+        mass={DIE_MASS}
         friction={FRICTION}
         restitution={RESTITUTION}
       />

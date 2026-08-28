@@ -4,9 +4,9 @@ import {
   Quaternion,
   Vector3,
 } from '../../rpc/proto/dice/v1/dice_pb';
-import { SETTLE_STEPS } from './constants';
+import { ESCAPE_BOUNDS, SETTLE_STEPS } from './constants';
 import {
-  advanceSettling,
+  advanceRollSettling,
   getUpwardFace,
   isOutsideTray,
   quaternionToObject,
@@ -51,32 +51,60 @@ describe('physics adapters', () => {
   });
 });
 
-describe('advanceSettling', () => {
+describe('advanceRollSettling', () => {
   const still = { x: 0, y: 0, z: 0 };
+  const atRest = (count: number) => Array.from({ length: count }, () => ({
+    linearVelocity: still,
+    angularVelocity: still,
+  }));
 
-  it('settles only after the required consecutive physics steps', () => {
+  it('settles the roll only after every die is stable for 20 shared steps', () => {
     let stableSteps = 0;
     for (let step = 1; step <= SETTLE_STEPS; step += 1) {
-      const progress = advanceSettling(stableSteps, still, still);
+      const progress = advanceRollSettling(stableSteps, atRest(10));
       stableSteps = progress.stableSteps;
       expect(progress.settled).toBe(step === SETTLE_STEPS);
     }
   });
 
-  it('resets after either velocity exceeds the threshold', () => {
-    expect(
-      advanceSettling(12, { x: 0.051, y: 0, z: 0 }, still),
-    ).toEqual({ stableSteps: 0, settled: false });
-    expect(
-      advanceSettling(12, still, { x: 0, y: 0.051, z: 0 }),
-    ).toEqual({ stableSteps: 0, settled: false });
+  it('resets the whole roll when any die moves, then requires 20 new steps', () => {
+    const motions = atRest(3);
+    motions[1] = {
+      linearVelocity: { x: 0.051, y: 0, z: 0 },
+      angularVelocity: still,
+    };
+    expect(advanceRollSettling(19, motions)).toEqual({
+      stableSteps: 0,
+      settled: false,
+    });
+
+    let progress = { stableSteps: 0, settled: false };
+    for (let step = 1; step <= SETTLE_STEPS; step += 1) {
+      progress = advanceRollSettling(progress.stableSteps, atRest(3));
+      expect(progress.settled).toBe(step === SETTLE_STEPS);
+    }
+  });
+
+  it('does not settle an empty body collection', () => {
+    expect(advanceRollSettling(19, [])).toEqual({
+      stableSteps: 0,
+      settled: false,
+    });
   });
 });
 
 describe('isOutsideTray', () => {
   it('recognizes safe and escaped positions', () => {
     expect(isOutsideTray({ x: 0, y: 1, z: 0 })).toBe(false);
-    expect(isOutsideTray({ x: 7, y: 1, z: 0 })).toBe(true);
-    expect(isOutsideTray({ x: 0, y: -3, z: 0 })).toBe(true);
+    expect(isOutsideTray({
+      x: ESCAPE_BOUNDS.x + 0.01,
+      y: 1,
+      z: 0,
+    })).toBe(true);
+    expect(isOutsideTray({
+      x: 0,
+      y: ESCAPE_BOUNDS.y - 0.01,
+      z: 0,
+    })).toBe(true);
   });
 });
