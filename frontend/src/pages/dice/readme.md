@@ -1,184 +1,98 @@
-# Dice Roller
+# Dice table
 
-This directory contains the client-only, physics-driven D6 roller served at `/dice`. It supports 1–10 dice, uses Rapier as the authority for live transforms and final orientations, and produces replayable protobuf `RollSpec` and `RollResult` messages.
+This directory contains the persistent, phone-first D6 table at `/dice`. Rapier
+owns local animation. The rolling player owns the canonical values and final
+approximate placements that will eventually be shared over a live transport.
 
-The route is lazy-loaded from `App.tsx`, so Three.js, React Three Fiber, Rapier, and the Rapier WASM loader are not part of the initial bundle for ordinary blog routes.
+Exact physics replay is intentionally not a protocol guarantee. A `RollSpec` is
+shared animation input so phones begin with similar throws. A `RollCompleted`
+event replaces observer-calculated values with the roller-reported values and
+reconciles normalized placements.
 
-## Design boundaries
-
-The feature deliberately separates durable roll data from browser rendering and physics implementation details:
-
-```text
-local random generation
-        ↓
-  protobuf RollSpec
-        ↓
- validated startRoll()
-        ↓
-  Rapier simulation
-        ↓
-roll-wide stable window
-        ↓
- protobuf RollResult
-        ↓
- accessible HTML result
-```
-
-- React owns the selected count, active specification, roll phase, and final result.
-- Rapier owns die positions, rotations, and velocities while a roll is active.
-- `createLocalRollSpec()` is the only source of randomness.
-- `startRoll(spec)` validates and executes supplied data without adding randomness.
-- Faces are read only after the whole roll settles; individual dice never finalize early.
-- Three.js, Rapier, React, and UI concepts do not appear in the protobuf schema.
-
-The protobuf schema is [`proto/dice/v1/dice.proto`](../../../../proto/dice/v1/dice.proto), and the generated browser messages are in [`rpc/proto/dice/v1/dice_pb.ts`](../../rpc/proto/dice/v1/dice_pb.ts). Generated files should not be edited by hand.
-
-## Directory map
+## Responsibilities
 
 | File | Responsibility |
 | --- | --- |
-| `DiceGame.tsx` | Route UI, accessible controls and results, loading/WebGL/error states, and the scene error boundary. |
-| `useDiceRoll.ts` | Browser-side controller for count, active `RollSpec`, roll phase, stale completion rejection, and final `RollResult`. |
-| `DiceScene.tsx` | React Three Fiber canvas, Rapier world, tray, camera, rigid-body registry, escape handling, and roll-wide settling observer. |
-| `Die.tsx` | Shared die geometry/materials, pip layout, explicit cuboid collider, rigid-body registration, and applying a supplied throw. |
-| `rollModel.ts` | Pure roll generation, protobuf validation, result construction, settled-event validation, ordering, and deterministic escape recovery. |
-| `diceMath.ts` | Protobuf-to-physics adapters, quaternion face detection, global settling progression, and escape-bound checks. |
-| `sceneLayout.ts` | Pure desktop/mobile camera selection. |
-| `constants.ts` | Simulation version, physics parameters, tray dimensions, spawn slots, thresholds, bounds, and camera presets. |
-| `*.test.ts` | Vitest coverage for contracts, generation, face math, settling, results, recovery, and responsive framing. |
+| `DiceGame.tsx` | Route presentation, loading/error state, and bottom controls. |
+| `useDiceTable.ts` | UI controller and construction of local domain events. Exposes add-new, reroll, selection, drag, settlement, and remote-event commands. |
+| `tableModel.ts` | Pure reducer for the persistent die map, stable ordering, active roll, snapshots, drag sequences, and reconciliation targets. |
+| `tableEventAdapter.ts` | Synchronous loopback adapter with the same publish/receive boundary expected from a future network adapter. |
+| `arenaLayout.ts` | Pure aspect-derived camera, edge walls, playable quadrilateral, floor/shadow bounds, normalized mapping, and containment correction. |
+| `DiceArena.tsx` | Camera and Rapier floor/wall collider ownership. The floor and responsive wall bodies are separate. |
+| `RollObserver.tsx` | Post-step containment, active-roll settlement, face reading, and displaced-die placement reporting. |
+| `Die.tsx` | Stable Rapier body, visual, body-mode transitions, pointer dragging, and result reconciliation. |
+| `rollModel.ts` | Shared animation input generation and validation plus authoritative result construction. |
+| `diceMath.ts` | Face/quaternion and settlement math with no React or Rapier dependency. |
 
-## Roll lifecycle
+## State and events
 
-1. `DiceGame` calls `controller.roll()`.
-2. `useDiceRoll` increments the `rollId` and calls `createLocalRollSpec(count, rollId)`.
-3. Roll generation selects predefined non-overlapping spawn slots, adds bounded jitter, creates a uniform unit quaternion, and supplies impulse and torque values.
-4. Every physics input is normalized with `Math.fround()` before the protobuf message is constructed. This keeps a fresh roll and a protobuf binary round trip on the same float32 inputs.
-5. `startRoll(spec)` rejects unsupported or malformed specifications, clears the previous result, and changes the phase to `rolling`.
-6. `DiceScene` keys each die by `rollId:dieIndex`, registers its Rapier body, and `Die` applies the supplied translation, rotation, impulse, and torque.
-7. After every fixed physics step, `RollSettlingObserver` checks every registered die. If one body is missing, moving too quickly, or recovered after an escape, the shared stable-step count resets.
-8. After all dice remain below both velocity thresholds for 20 consecutive steps, the observer reads every final quaternion in the same step and emits one `RollSettledEvent`.
-9. The controller rejects stale or repeated completion events, builds an indexed and sorted `RollResult`, calculates its total, and changes the phase to `settled`.
+All table mutations use revisioned protobuf `TableEvent` values. The local
+adapter immediately loops those events back into the reducer; a future
+WebSocket adapter can deliver the same messages without introducing a second
+single-player code path.
 
-Rolling again while dice are moving creates a new roll ID and makes callbacks from the replaced roll stale. Count controls remain disabled until the current roll settles.
+The reducer stores dice by stable `dieId`. `dieOrder` controls rendering order,
+while an active roll only identifies the bodies being watched for settlement.
+Starting an add-new roll appends bodies. Starting a reroll reuses existing IDs.
+Only one roll can be active, but all prior dice remain mounted and collidable.
 
-## Replay contract and simulation versions
+The controller exposes `selectedDieIds`, `setSelectedDieIds()`,
+`reroll(dieIds)`, and `rerollSelected()`. Selection/grouping UI is intentionally
+deferred.
 
-`RollSpec` contains the complete initial conditions needed by this client:
+## Body modes
 
-- `simulation_version`
-- `roll_id`
-- ordered die indices
-- position and rotation
-- impulse and torque
+- `rolling`: dynamic, CCD enabled, all rotations enabled, and supplied throw
+  impulse/torque applied once per global roll ID.
+- `settled`: dynamic translation with all rotations locked. The canonical
+  face-up quaternion survives collisions and dragging.
+- `held`: kinematic-position-based. Pointer rays intersect a horizontal table
+  plane and publish normalized drag events. Release restores a dynamic,
+  rotation-locked body with zero angular velocity.
 
-The current `SIMULATION_VERSION` is `5`. A spec is accepted only when its version matches the client and when it has:
+Settled dice may still slide when struck. At roll settlement, the roller reports
+placements for every rolled die and any existing die displaced far enough by a
+collision.
 
-- 1–10 dice;
-- unique, contiguous indices beginning at zero;
-- present, finite, float32 vectors and quaternions;
-- a normalized quaternion for every die; and
-- a positive uint32 roll ID.
+## Arena and resizing
 
-A `RollSpec` is replayable only with the matching simulation version, viewport dimensions, and pinned client physics implementation. It is not a permanent cross-version lockstep guarantee. Changes to colliders, table geometry, viewport size, physics values, throw application, settling rules, or face evaluation can change outcomes and therefore require a simulation-version review. Future multiplayer should send an authoritative result alongside the spec and use local physics primarily for animation and reconciliation.
+`ArenaLayout` depends only on the viewport aspect ratio. The camera projects the
+four screen corners onto the table plane, and those projections are the wall
+collider centerlines. The CSS wood border is therefore the visible wall at every
+screen size; the Rapier walls do not remain at a fixed center tray.
 
-## Physics and tray
+The playable quadrilateral is inset by the die radius and wall thickness. Table
+positions use normalized `u/v` coordinates over this quadrilateral. On an aspect
+change, settled/held dice remap from their normalized positions while rolling
+dice are contained in the new shape.
 
-The fixed configuration is centralized in `constants.ts`:
+Walls are intentionally short. Fast or airborne dice that cross a collider are
+projected just inside the nearest playable edge and their outward velocity is
+reflected and damped. A fallen die keeps its edge-relative x/z position rather
+than respawning at the center.
 
-- gravity: `[0, -9.81, 0]`;
-- timestep: `1 / 60`;
-- die mass: `1`;
-- friction: `0.7`;
-- restitution: `0.35`;
-- linear damping: `0.1`;
-- angular damping: `0.15`;
-- CCD and sleeping enabled.
+Equivalent pixel-size changes share the same rounded aspect key, so they do not
+remount the responsive wall body.
 
-The visual die is an ivory rounded box with dark pip discs, while collision uses a separate cuboid collider. Decorative geometry therefore cannot change collision behavior.
+## Multiplayer contract
 
-The table uses one 80×80-unit felt surface and matching floor collider. Four invisible wall colliders are calculated from the camera's ground-plane footprint whenever the viewport changes, so their projected positions exactly follow the screen edges at every aspect ratio. Dice can therefore travel across the entire visible viewport and collide with the slim CSS wooden frame instead of the old inset 14×10-unit tray. The wider bottom frame owns the controls.
+The protobuf schema supports:
 
-Ten fixed spawn slots keep dice separated before bounded jitter is applied. Spawn heights remain between 3 and 5 units.
+- stable die IDs alongside roll-order indices;
+- add-new and reroll-existing modes;
+- normalized table positions, placements, die state, and snapshots;
+- roll-start and roll-complete events with roller identity, animation input,
+  authoritative values, and changed placements;
+- sequenced drag start/update/end events with player and interaction identity;
+- a revisioned event envelope suitable for snapshot plus event-stream sync.
 
-## Settling and face mapping
+Simulation version `3` is the first published version of this completed
+foundation. It describes compatible animation input interpretation, not
+lockstep deterministic physics.
 
-Settling is a roll-level rule. On each actual Rapier step:
+## Verification
 
-- every die must have linear speed below `0.05`;
-- every die must have angular speed below `0.05`;
-- the conditions must hold for 20 consecutive steps; and
-- movement by any one die resets the shared counter to zero.
-
-Only after that shared window completes are final faces read. This prevents a die from being reported and then changed by a later collision.
-
-Face values use these local normals:
-
-```text
-+Y = 1    -Y = 6
-+X = 2    -X = 5
-+Z = 3    -Z = 4
-```
-
-`getUpwardFace()` rotates each normal by the final Rapier quaternion and selects the one with the largest dot product against world up `(0, 1, 0)`.
-
-## Escape recovery
-
-The full-size table makes recovery a distant emergency fallback rather than part of ordinary play. It begins only near the outer edge of the 80×80-unit physics floor. If a body crosses those centralized bounds, the roll-wide observer:
-
-1. moves it to its predefined safe slot at height 4;
-2. restores the supplied rotation;
-3. clears linear/angular velocity, forces, and torque;
-4. applies a reduced center-directed impulse and half of the supplied torque; and
-5. resets the shared settling counter.
-
-Recovery contains no randomness, so it remains deterministic for the active specification.
-
-## Accessibility and failure states
-
-The HTML interface remains usable without interpreting the 3D scene:
-
-- count and roll controls are native buttons with visible focus styles;
-- status and results use an `aria-live="polite"` region;
-- results are rendered as ordered text such as `5 + 2 + 6 = 13`;
-- count changes are locked while rolling;
-- loading, unsupported WebGL, initialization error, idle, rolling, and settled states are distinct; and
-- the Canvas is wrapped in a route-local error boundary.
-
-## Testing and development
-
-From the repository root:
-
-```bash
-npm test
-npm run build
-```
-
-To run only this feature's tests:
-
-```bash
-npx vitest run frontend/src/pages/dice
-```
-
-The tests cover:
-
-- all six face orientations and opposite-face conventions;
-- protobuf/physics adapters;
-- float32 roll generation and binary round trips;
-- count, index, spawn, impulse, torque, and version validation;
-- shared 20-step settling and reset behavior;
-- stale/duplicate result data, ordering, and totals;
-- deterministic escape recovery; and
-- desktop/mobile camera framing for the enlarged tray.
-
-When changing the feature, also manually check 1, 3, and 10 dice, rerolls during motion, face/result agreement, collisions, responsive framing, keyboard controls, and WebGL failure behavior.
-
-## Maintenance rules
-
-- Keep new dice-specific code in this directory unless it is a genuinely shared contract or generated artifact.
-- Keep randomness in `createLocalRollSpec()` and allow an injected random source for tests.
-- Never mirror per-frame Rapier transforms into React state.
-- Do not finalize individual dice; preserve the roll-wide stable window.
-- Build `RollResult` through the existing pure helpers so ordering and totals cannot diverge.
-- Validate externally supplied specs before touching physics bodies.
-- Treat `rollId` as the stale-event boundary.
-- Review and usually increment `SIMULATION_VERSION` whenever a change can alter replay behavior.
+`npm test` covers reducer transitions, contract binary round trips, normalized
+mapping properties, representative viewport ratios, all four edge walls,
+containment correction, canonical face quaternions, and direct Rapier CCD/body
+mode behavior. `npm run build` produces the browser bundle.

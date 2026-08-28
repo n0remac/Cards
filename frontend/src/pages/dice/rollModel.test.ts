@@ -1,210 +1,133 @@
 import { describe, expect, it } from 'vitest';
+import { DieValue, RollSpec } from '../../rpc/proto/dice/v1/dice_pb';
+import { DICE_TABLE_CONFIG, MAX_DICE, SIMULATION_VERSION } from './constants';
 import {
-  DieValue,
-  RollSpec,
-} from '../../rpc/proto/dice/v1/dice_pb';
-import {
-  HORIZONTAL_IMPULSE_MAX,
-  MAX_DICE,
-  MAX_ROLL_ID,
-  MIN_TORQUE_MAGNITUDE,
-  SIMULATION_VERSION,
-  SPAWN_HEIGHT_MAX,
-  SPAWN_HEIGHT_MIN,
-  SPAWN_SLOTS,
-  TRAY_HALF_DEPTH,
-  TRAY_HALF_WIDTH,
-  VERTICAL_IMPULSE_MAX,
-} from './constants';
-import {
-  createEscapeRecovery,
   createLocalRollSpec,
   createRollResultFromSettledEvent,
+  RollTarget,
   validateRollSpec,
 } from './rollModel';
 
 const midpointRandom = () => 0.5;
+const targets = (count: number): RollTarget[] =>
+  Array.from({ length: count }, (_, index) => ({ dieId: `die-${index}` }));
 
 describe('createLocalRollSpec', () => {
-  it('creates indexed, bounded, non-overlapping float32 throws', () => {
-    const spec = createLocalRollSpec(MAX_DICE, 42, midpointRandom);
-
+  it('creates stable, indexed, normalized float32 animation inputs', () => {
+    const spec = createLocalRollSpec(targets(MAX_DICE), 'roll-42', midpointRandom);
     expect(spec.simulationVersion).toBe(SIMULATION_VERSION);
-    expect(spec.rollId).toBe(42);
-    expect(spec.dice.map((die) => die.dieIndex)).toEqual(
-      Array.from({ length: MAX_DICE }, (_, index) => index),
+    expect(spec.rollId).toBe('roll-42');
+    expect(spec.dice.map((die) => die.dieId)).toEqual(
+      targets(MAX_DICE).map((die) => die.dieId),
     );
-
-    for (const die of spec.dice) {
-      expect(die.position?.y).toBeGreaterThanOrEqual(SPAWN_HEIGHT_MIN);
-      expect(die.position?.y).toBeLessThanOrEqual(SPAWN_HEIGHT_MAX);
-      const components = [
+    spec.dice.forEach((die, index) => {
+      expect(die.dieIndex).toBe(index);
+      expect(die.tablePosition?.u).toBeGreaterThanOrEqual(0);
+      expect(die.tablePosition?.u).toBeLessThanOrEqual(1);
+      expect(die.tablePosition?.v).toBeGreaterThanOrEqual(0);
+      expect(die.tablePosition?.v).toBeLessThanOrEqual(1);
+      expect(die.position?.y).toBeGreaterThanOrEqual(
+        DICE_TABLE_CONFIG.roll.spawnHeightMinimum,
+      );
+      expect(die.position?.y).toBeLessThanOrEqual(
+        DICE_TABLE_CONFIG.roll.spawnHeightMaximum,
+      );
+      for (const value of [
         die.position?.x,
         die.position?.y,
         die.position?.z,
-        die.rotation?.x,
-        die.rotation?.y,
-        die.rotation?.z,
-        die.rotation?.w,
-        die.impulse?.x,
-        die.impulse?.y,
-        die.impulse?.z,
-        die.torque?.x,
-        die.torque?.y,
-        die.torque?.z,
-      ];
-      expect(components.every((value) => value !== undefined && Math.fround(value) === value)).toBe(true);
-      expect(die.impulse!.x).toBeGreaterThanOrEqual(-HORIZONTAL_IMPULSE_MAX);
-      expect(die.impulse!.x).toBeLessThanOrEqual(HORIZONTAL_IMPULSE_MAX);
-      expect(die.impulse!.y).toBeGreaterThanOrEqual(0);
-      expect(die.impulse!.y).toBeLessThanOrEqual(VERTICAL_IMPULSE_MAX);
-      expect(die.impulse!.z).toBeGreaterThanOrEqual(-HORIZONTAL_IMPULSE_MAX);
-      expect(die.impulse!.z).toBeLessThanOrEqual(HORIZONTAL_IMPULSE_MAX);
-      expect(Math.hypot(die.torque!.x, die.torque!.y, die.torque!.z)).toBeGreaterThanOrEqual(
-        MIN_TORQUE_MAGNITUDE,
-      );
-    }
-
-    for (let first = 0; first < spec.dice.length; first += 1) {
-      for (let second = first + 1; second < spec.dice.length; second += 1) {
-        const a = spec.dice[first].position!;
-        const b = spec.dice[second].position!;
-        expect(Math.hypot(a.x - b.x, a.z - b.z)).toBeGreaterThan(1);
+        die.tablePosition?.u,
+        die.tablePosition?.v,
+      ]) {
+        expect(Math.fround(value ?? Number.NaN)).toBe(value);
       }
-    }
+    });
   });
 
   it('uses only the injected random source', () => {
-    const first = createLocalRollSpec(3, 12, midpointRandom);
-    const second = createLocalRollSpec(3, 12, midpointRandom);
-
-    expect(first.toJson()).toEqual(second.toJson());
+    const first = createLocalRollSpec(targets(3), 'roll-12', midpointRandom);
+    const second = createLocalRollSpec(targets(3), 'roll-12', midpointRandom);
+    expect(RollSpec.equals(first, second)).toBe(true);
   });
 
-  it.each([1, 3, 10])('keeps %i dice safely inside the enlarged tray', (count) => {
-    const spec = createLocalRollSpec(count, count, midpointRandom);
-
-    expect(spec.dice).toHaveLength(count);
-    for (const die of spec.dice) {
-      expect(Math.abs(die.position!.x)).toBeLessThan(TRAY_HALF_WIDTH - 1);
-      expect(Math.abs(die.position!.z)).toBeLessThan(TRAY_HALF_DEPTH - 1);
-    }
+  it('uses supplied normalized positions for reroll animation', () => {
+    const spec = createLocalRollSpec([
+      { dieId: 'stable-die', position: { u: 0.84, v: 0.72 } },
+    ], 'reroll-1', midpointRandom);
+    expect(spec.dice[0].tablePosition?.u).toBeCloseTo(0.84);
+    expect(spec.dice[0].tablePosition?.v).toBeCloseTo(0.72);
   });
 
-  it('survives a protobuf binary round trip without changing physics inputs', () => {
-    const spec = createLocalRollSpec(3, 9, midpointRandom);
+  it('survives a protobuf round trip without changing animation inputs', () => {
+    const spec = createLocalRollSpec(targets(3), 'roll-9', midpointRandom);
     const replay = RollSpec.fromBinary(spec.toBinary());
-
     expect(RollSpec.equals(spec, replay)).toBe(true);
-    expect(replay.dice.map((die) => die.toJson())).toEqual(
-      spec.dice.map((die) => die.toJson()),
-    );
   });
 
-  it('rejects invalid counts and IDs', () => {
-    expect(() => createLocalRollSpec(0, 1, midpointRandom)).toThrow(/count/);
-    expect(() => createLocalRollSpec(1, 0, midpointRandom)).toThrow(/Roll ID/);
-    expect(() => createLocalRollSpec(1, MAX_ROLL_ID + 1, midpointRandom)).toThrow(/Roll ID/);
+  it('rejects invalid target sets and IDs', () => {
+    expect(() => createLocalRollSpec([], 'roll', midpointRandom)).toThrow(/between/);
+    expect(() => createLocalRollSpec(targets(MAX_DICE + 1), 'roll', midpointRandom))
+      .toThrow(/between/);
+    expect(() => createLocalRollSpec(targets(1), '', midpointRandom)).toThrow(/Roll ID/);
+    expect(() => createLocalRollSpec([
+      { dieId: 'same' },
+      { dieId: 'same' },
+    ], 'roll', midpointRandom)).toThrow(/unique stable ID/);
   });
 });
 
 describe('validateRollSpec', () => {
-  it('accepts generated local specs', () => {
-    expect(validateRollSpec(createLocalRollSpec(3, 1, midpointRandom))).toEqual([]);
+  it('accepts generated specs', () => {
+    expect(validateRollSpec(
+      createLocalRollSpec(targets(3), 'roll-1', midpointRandom),
+    )).toEqual([]);
   });
 
-  it('reports unsupported versions, duplicate indices, and invalid rotations', () => {
-    const spec = createLocalRollSpec(2, 1, midpointRandom);
-    expect(SIMULATION_VERSION).toBe(5);
-    spec.simulationVersion = 1;
+  it('reports version, identity, ordering, normalized, and quaternion errors', () => {
+    const spec = createLocalRollSpec(targets(2), 'roll-1', midpointRandom);
+    spec.simulationVersion += 1;
     spec.dice[1].dieIndex = 0;
-    spec.dice[0].rotation!.w = 0;
-
-    expect(validateRollSpec(spec).join(' ')).toMatch(/Unsupported simulation version/);
-    expect(validateRollSpec(spec).join(' ')).toMatch(/unique and contiguous/);
-    expect(validateRollSpec(spec).join(' ')).toMatch(/invalid rotation/);
-  });
-
-  it('requires present, finite float32 vectors and uint32 roll IDs', () => {
-    const spec = createLocalRollSpec(2, 1, midpointRandom);
-    spec.rollId = MAX_ROLL_ID + 1;
-    spec.dice[0].position = undefined;
-    spec.dice[1].impulse!.x = Number.NaN;
-    spec.dice[1].torque!.z = 0.1;
-
+    spec.dice[1].dieId = spec.dice[0].dieId;
+    spec.dice[0].rotation!.w = 8;
+    spec.dice[0].tablePosition!.u = 2;
     const errors = validateRollSpec(spec).join(' ');
-    expect(errors).toMatch(/Roll ID/);
-    expect(errors).toMatch(/invalid position/);
-    expect(errors).toMatch(/invalid impulse/);
-    expect(errors).toMatch(/invalid torque/);
+    expect(errors).toMatch(/Unsupported simulation version/);
+    expect(errors).toMatch(/unique and contiguous/);
+    expect(errors).toMatch(/IDs must be non-empty and unique/);
+    expect(errors).toMatch(/invalid table position/);
+    expect(errors).toMatch(/invalid rotation/);
   });
 });
 
 describe('createRollResultFromSettledEvent', () => {
-  it('rejects stale and duplicate values, then builds an ordered result atomically', () => {
-    const spec = createLocalRollSpec(3, 7, midpointRandom);
+  it('rejects stale and duplicate reports, then returns stable IDs in roll order', () => {
+    const spec = createLocalRollSpec(targets(3), 'roll-7', midpointRandom);
+    const dice = [
+      { dieId: 'die-2', dieIndex: 2, value: DieValue.SIX },
+      { dieId: 'die-0', dieIndex: 0, value: DieValue.FOUR },
+      { dieId: 'die-1', dieIndex: 1, value: DieValue.TWO },
+    ] as const;
     expect(createRollResultFromSettledEvent(spec, {
-      rollId: 6,
-      dice: [
-        { dieIndex: 0, value: DieValue.ONE },
-        { dieIndex: 1, value: DieValue.TWO },
-        { dieIndex: 2, value: DieValue.THREE },
-      ],
+      rollId: 'old-roll',
+      dice,
+      placements: [],
+    })).toBeUndefined();
+    expect(createRollResultFromSettledEvent(spec, {
+      rollId: spec.rollId,
+      dice: [dice[0], dice[0], dice[1]],
+      placements: [],
     })).toBeUndefined();
 
-    expect(createRollResultFromSettledEvent(spec, {
-      rollId: 7,
-      dice: [
-        { dieIndex: 0, value: DieValue.ONE },
-        { dieIndex: 0, value: DieValue.TWO },
-        { dieIndex: 2, value: DieValue.THREE },
-      ],
-    })).toBeUndefined();
-
-    const completed = createRollResultFromSettledEvent(spec, {
-      rollId: 7,
-      dice: [
-        { dieIndex: 2, value: DieValue.SIX },
-        { dieIndex: 0, value: DieValue.FOUR },
-        { dieIndex: 1, value: DieValue.TWO },
-      ],
+    const result = createRollResultFromSettledEvent(spec, {
+      rollId: spec.rollId,
+      dice,
+      placements: [],
     });
-
-    expect(completed?.dice.map((die) => die.dieIndex)).toEqual([0, 1, 2]);
-    expect(completed?.dice.map((die) => die.value)).toEqual([
-      DieValue.FOUR,
-      DieValue.TWO,
-      DieValue.SIX,
+    expect(result?.dice.map((die) => [die.dieId, die.value])).toEqual([
+      ['die-0', DieValue.FOUR],
+      ['die-1', DieValue.TWO],
+      ['die-2', DieValue.SIX],
     ]);
-    expect(completed?.total).toBe(12);
-  });
-
-  it('makes callbacks from a replaced roll stale', () => {
-    const replaced = createLocalRollSpec(1, 20, midpointRandom);
-    const active = createLocalRollSpec(1, 21, midpointRandom);
-    const completed = createRollResultFromSettledEvent(active, {
-      rollId: replaced.rollId,
-      dice: [{ dieIndex: 0, value: DieValue.THREE }],
-    });
-
-    expect(completed).toBeUndefined();
-  });
-});
-
-describe('createEscapeRecovery', () => {
-  it('is deterministic, uses the safe slot, and reduces torque', () => {
-    const die = createLocalRollSpec(1, 1, midpointRandom).dice[0];
-    const escaped = { x: 9, y: -3, z: -8 };
-    const first = createEscapeRecovery(die, escaped);
-    const second = createEscapeRecovery(die, escaped);
-
-    expect(first.toJson()).toEqual(second.toJson());
-    expect(first.position).toMatchObject({
-      x: Math.fround(SPAWN_SLOTS[0][0]),
-      y: 4,
-      z: Math.fround(SPAWN_SLOTS[0][1]),
-    });
-    expect(first.impulse).toMatchObject({ x: -1.5, y: 0.25, z: 1.5 });
-    expect(first.torque?.x).toBe(Math.fround(die.torque!.x * 0.5));
+    expect(result?.total).toBe(12);
   });
 });

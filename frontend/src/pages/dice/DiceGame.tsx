@@ -2,7 +2,7 @@ import React, { Component, ErrorInfo, ReactNode, useCallback, useState } from 'r
 import { MAX_DICE, MIN_DICE } from './constants';
 import { DiceScene } from './DiceScene';
 import { orderedValues } from './rollModel';
-import { useDiceRoll } from './useDiceRoll';
+import { useDiceTable } from './useDiceTable';
 
 type SceneStatus = 'loading' | 'ready' | 'unsupported' | 'error';
 
@@ -52,11 +52,12 @@ const WOOD_GRAIN = {
 };
 
 export default function DiceGame() {
-  const controller = useDiceRoll();
+  const controller = useDiceTable();
   const [sceneStatus, setSceneStatus] = useState<SceneStatus>('loading');
-  const values = orderedValues(controller.result);
+  const values = orderedValues(controller.lastResult);
   const countLocked = controller.phase === 'rolling';
-  const rollDisabled = sceneStatus !== 'ready';
+  const rollDisabled = sceneStatus !== 'ready' || countLocked;
+  const rollingCount = controller.activeRoll?.spec.dice.length ?? controller.count;
 
   const markReady = useCallback(() => setSceneStatus('ready'), []);
   const markUnsupported = useCallback(() => setSceneStatus('unsupported'), []);
@@ -69,16 +70,16 @@ export default function DiceGame() {
       : sceneStatus === 'error'
         ? 'The physics engine could not initialize.'
         : controller.phase === 'rolling'
-          ? `Rolling ${controller.count} ${controller.count === 1 ? 'die' : 'dice'}…`
+          ? `Rolling ${rollingCount} ${rollingCount === 1 ? 'die' : 'dice'}…`
           : controller.phase === 'settled'
             ? `${values.join(' + ')} =`
-            : 'Choose your dice and roll.';
+            : 'Choose how many new dice to add.';
 
-  const rollLabel = controller.phase === 'idle' ? 'Roll dice' : 'Roll again';
+  const rollLabel = controller.phase === 'rolling' ? 'Rolling…' : 'Roll new dice';
 
   return (
     <main
-      className="relative h-screen h-[100dvh] w-full overflow-hidden bg-[#4b2818] p-2 pb-0 text-stone-100 sm:p-3 sm:pb-0 lg:p-4 lg:pb-0"
+      className="relative h-[100dvh] w-full overflow-hidden bg-[#4b2818] p-2 pb-0 text-stone-100 sm:p-3 sm:pb-0 lg:p-4 lg:pb-0"
       style={WOOD_GRAIN}
     >
       <section
@@ -88,8 +89,14 @@ export default function DiceGame() {
         <div className="relative min-h-0 flex-1 overflow-hidden rounded-t-lg bg-[#185438] shadow-[inset_0_0_0_1px_rgba(255,255,255,0.08),inset_0_8px_18px_rgba(0,0,0,0.32)] sm:rounded-t-xl">
           <DiceSceneErrorBoundary onError={markError}>
             <DiceScene
-              activeSpec={controller.activeSpec}
+              dice={controller.dice}
+              dieOrder={controller.dieOrder}
+              activeRoll={controller.activeRoll}
+              localPlayerId={controller.localPlayerId}
               onSettled={controller.reportSettled}
+              onDragStart={controller.startDrag}
+              onDragUpdate={controller.updateDrag}
+              onDragEnd={controller.endDrag}
               onReady={markReady}
               onWebGLUnavailable={markUnsupported}
             />
@@ -120,13 +127,13 @@ export default function DiceGame() {
             <p className="min-w-0 truncate text-xs font-medium tracking-wide text-stone-200/80 sm:text-sm">
               {statusText}
             </p>
-            {controller.result && (
-              <p className="flex shrink-0 items-baseline gap-1.5" aria-label={`Total ${controller.result.total}`}>
+            {controller.lastResult && (
+              <p className="flex shrink-0 items-baseline gap-1.5" aria-label={`Total ${controller.lastResult.total}`}>
                 <span className="text-[0.6rem] font-bold uppercase tracking-[0.18em] text-emerald-200/70">
                   Total
                 </span>
                 <strong className="text-2xl leading-none tabular-nums text-emerald-200">
-                  {controller.result.total}
+                  {controller.lastResult.total}
                 </strong>
               </p>
             )}
@@ -167,7 +174,7 @@ export default function DiceGame() {
             <button
               type="button"
               disabled={rollDisabled}
-              onClick={controller.roll}
+              onClick={() => controller.rollNew()}
               className="h-12 min-w-0 flex-1 rounded-xl border border-[#fff1ca]/60 bg-[#efd8a7] px-3 text-sm font-black uppercase tracking-[0.12em] text-[#173c2a] shadow-lg shadow-black/35 transition hover:bg-[#ffe9bb] focus:outline-none focus:ring-2 focus:ring-emerald-300 focus:ring-offset-2 focus:ring-offset-[#422317] disabled:cursor-not-allowed disabled:border-stone-600 disabled:bg-stone-700 disabled:text-stone-400 sm:h-14 sm:text-base"
             >
               {rollLabel}

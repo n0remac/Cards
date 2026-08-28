@@ -17,16 +17,28 @@ message Quaternion {
 
 message DieThrowSpec {
   uint32 die_index = 1;
+  // Legacy initial-position field retained for compatibility. Version 3 uses
+  // table_position for x/z and position.y for the spawn height.
   Vector3 position = 2;
   Quaternion rotation = 3;
   Vector3 impulse = 4;
   Vector3 torque = 5;
+  string die_id = 6;
+  NormalizedTablePosition table_position = 7;
 }
 
+// RollSpec is shared animation input. Clients intentionally do not promise
+// deterministic replay across devices or simulation implementations.
 message RollSpec {
   uint32 simulation_version = 1;
-  uint32 roll_id = 2;
+  string roll_id = 2;
   repeated DieThrowSpec dice = 3;
+}
+
+enum RollMode {
+  ROLL_MODE_UNSPECIFIED = 0;
+  ROLL_MODE_ADD_NEW = 1;
+  ROLL_MODE_REROLL_EXISTING = 2;
 }
 
 enum DieValue {
@@ -42,11 +54,91 @@ enum DieValue {
 message DieResult {
   uint32 die_index = 1;
   DieValue value = 2;
+  string die_id = 3;
 }
 
 message RollResult {
   uint32 simulation_version = 1;
-  uint32 roll_id = 2;
+  string roll_id = 2;
   repeated DieResult dice = 3;
   uint32 total = 4;
+}
+
+message NormalizedTablePosition {
+  float u = 1;
+  float v = 2;
+}
+
+message TableDieState {
+  string die_id = 1;
+  DieValue value = 2;
+  NormalizedTablePosition position = 3;
+  string owner_player_id = 4;
+  uint64 revision = 5;
+}
+
+message DiePlacement {
+  string die_id = 1;
+  NormalizedTablePosition position = 2;
+}
+
+message TableSnapshot {
+  string table_id = 1;
+  uint64 revision = 2;
+  repeated TableDieState dice = 3;
+}
+
+message RollStarted {
+  string roll_id = 1;
+  string roller_id = 2;
+  RollMode mode = 3;
+  RollSpec animation_spec = 4;
+}
+
+message RollCompleted {
+  string roll_id = 1;
+  string roller_id = 2;
+  RollResult result = 3;
+  repeated DiePlacement changed_placements = 4;
+  RollSpec animation_spec = 5;
+}
+
+message DragStarted {
+  string die_id = 1;
+  string player_id = 2;
+  string interaction_id = 3;
+  uint64 sequence = 4;
+  NormalizedTablePosition position = 5;
+}
+
+message DragUpdated {
+  string die_id = 1;
+  string player_id = 2;
+  string interaction_id = 3;
+  uint64 sequence = 4;
+  NormalizedTablePosition position = 5;
+}
+
+message DragEnded {
+  string die_id = 1;
+  string player_id = 2;
+  string interaction_id = 3;
+  uint64 sequence = 4;
+  NormalizedTablePosition position = 5;
+}
+
+// TableEvent can back a later snapshot-plus-event-stream transport. The
+// frontend already applies local actions through this same event envelope.
+message TableEvent {
+  string table_id = 1;
+  uint64 revision = 2;
+
+  oneof payload {
+    RollStarted roll_started = 3;
+    RollCompleted roll_completed = 4;
+    DragStarted drag_started = 5;
+    DragUpdated drag_updated = 6;
+    DragEnded drag_ended = 7;
+    TableSnapshot snapshot = 8;
+  }
 }

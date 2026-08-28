@@ -4,9 +4,7 @@ import {
   Vector3 as ProtoVector3,
 } from '../../rpc/proto/dice/v1/dice_pb';
 import {
-  ESCAPE_BOUNDS,
-  SETTLE_SPEED_THRESHOLD,
-  SETTLE_STEPS,
+  DICE_TABLE_CONFIG,
 } from './constants';
 
 export type PlayableDieValue =
@@ -114,6 +112,24 @@ export function getUpwardFace(quaternion: QuaternionLike): PlayableDieValue {
   return bestFace.value;
 }
 
+export function faceUpQuaternion(value: PlayableDieValue): QuaternionLike {
+  const halfTurn = Math.SQRT1_2;
+  switch (value) {
+    case DieValue.ONE:
+      return { x: 0, y: 0, z: 0, w: 1 };
+    case DieValue.SIX:
+      return { x: 1, y: 0, z: 0, w: 0 };
+    case DieValue.TWO:
+      return { x: 0, y: 0, z: halfTurn, w: halfTurn };
+    case DieValue.FIVE:
+      return { x: 0, y: 0, z: -halfTurn, w: halfTurn };
+    case DieValue.THREE:
+      return { x: -halfTurn, y: 0, z: 0, w: halfTurn };
+    case DieValue.FOUR:
+      return { x: halfTurn, y: 0, z: 0, w: halfTurn };
+  }
+}
+
 function speedSquared(vector: VectorLike): number {
   return vector.x * vector.x + vector.y * vector.y + vector.z * vector.z;
 }
@@ -132,26 +148,19 @@ export function advanceRollSettling(
   stableSteps: number,
   motions: readonly BodyMotion[],
 ): SettlingProgress {
-  const thresholdSquared = SETTLE_SPEED_THRESHOLD * SETTLE_SPEED_THRESHOLD;
+  const { settleSpeedThreshold, settleSteps } = DICE_TABLE_CONFIG.roll;
+  const thresholdSquared = settleSpeedThreshold * settleSpeedThreshold;
   const isStable = motions.length > 0 && motions.every(
     ({ linearVelocity, angularVelocity }) =>
       speedSquared(linearVelocity) < thresholdSquared &&
       speedSquared(angularVelocity) < thresholdSquared,
   );
   const nextStableSteps = isStable
-    ? Math.min(stableSteps + 1, SETTLE_STEPS)
+    ? Math.min(stableSteps + 1, settleSteps)
     : 0;
 
   return {
     stableSteps: nextStableSteps,
-    settled: nextStableSteps >= SETTLE_STEPS,
+    settled: nextStableSteps >= settleSteps,
   };
-}
-
-export function isOutsideTray(position: VectorLike): boolean {
-  return (
-    Math.abs(position.x) > ESCAPE_BOUNDS.x ||
-    position.y < ESCAPE_BOUNDS.y ||
-    Math.abs(position.z) > ESCAPE_BOUNDS.z
-  );
 }

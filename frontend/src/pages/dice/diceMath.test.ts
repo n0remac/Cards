@@ -4,11 +4,11 @@ import {
   Quaternion,
   Vector3,
 } from '../../rpc/proto/dice/v1/dice_pb';
-import { ESCAPE_BOUNDS, SETTLE_STEPS } from './constants';
+import { DICE_TABLE_CONFIG } from './constants';
 import {
   advanceRollSettling,
+  faceUpQuaternion,
   getUpwardFace,
-  isOutsideTray,
   quaternionToObject,
   vectorToObject,
   vectorToTuple,
@@ -32,6 +32,20 @@ describe('getUpwardFace', () => {
     expect(DieValue.ONE + DieValue.SIX).toBe(7);
     expect(DieValue.TWO + DieValue.FIVE).toBe(7);
     expect(DieValue.THREE + DieValue.FOUR).toBe(7);
+  });
+
+  it('creates a canonical face-up quaternion for every playable value', () => {
+    const values = [
+      DieValue.ONE,
+      DieValue.TWO,
+      DieValue.THREE,
+      DieValue.FOUR,
+      DieValue.FIVE,
+      DieValue.SIX,
+    ] as const;
+    for (const value of values) {
+      expect(getUpwardFace(faceUpQuaternion(value))).toBe(value);
+    }
   });
 });
 
@@ -60,10 +74,10 @@ describe('advanceRollSettling', () => {
 
   it('settles the roll only after every die is stable for 20 shared steps', () => {
     let stableSteps = 0;
-    for (let step = 1; step <= SETTLE_STEPS; step += 1) {
+    for (let step = 1; step <= DICE_TABLE_CONFIG.roll.settleSteps; step += 1) {
       const progress = advanceRollSettling(stableSteps, atRest(10));
       stableSteps = progress.stableSteps;
-      expect(progress.settled).toBe(step === SETTLE_STEPS);
+      expect(progress.settled).toBe(step === DICE_TABLE_CONFIG.roll.settleSteps);
     }
   });
 
@@ -79,9 +93,9 @@ describe('advanceRollSettling', () => {
     });
 
     let progress = { stableSteps: 0, settled: false };
-    for (let step = 1; step <= SETTLE_STEPS; step += 1) {
+    for (let step = 1; step <= DICE_TABLE_CONFIG.roll.settleSteps; step += 1) {
       progress = advanceRollSettling(progress.stableSteps, atRest(3));
-      expect(progress.settled).toBe(step === SETTLE_STEPS);
+      expect(progress.settled).toBe(step === DICE_TABLE_CONFIG.roll.settleSteps);
     }
   });
 
@@ -90,25 +104,5 @@ describe('advanceRollSettling', () => {
       stableSteps: 0,
       settled: false,
     });
-  });
-});
-
-describe('isOutsideTray', () => {
-  it('allows dice past the old inset tray bounds', () => {
-    expect(isOutsideTray({ x: 0, y: 1, z: 0 })).toBe(false);
-    expect(isOutsideTray({ x: 9, y: 1, z: 7 })).toBe(false);
-  });
-
-  it('recognizes positions beyond the full table as escaped', () => {
-    expect(isOutsideTray({
-      x: ESCAPE_BOUNDS.x + 0.01,
-      y: 1,
-      z: 0,
-    })).toBe(true);
-    expect(isOutsideTray({
-      x: 0,
-      y: ESCAPE_BOUNDS.y - 0.01,
-      z: 0,
-    })).toBe(true);
   });
 });

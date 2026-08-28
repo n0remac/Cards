@@ -1,43 +1,38 @@
 import {
   DieResult,
   DieThrowSpec,
-  DieValue,
+  NormalizedTablePosition,
   Quaternion,
   RollResult,
   RollSpec,
   Vector3,
 } from '../../rpc/proto/dice/v1/dice_pb';
 import {
-  HORIZONTAL_IMPULSE_MAX,
+  DICE_TABLE_CONFIG,
   MAX_DICE,
-  MAX_ROLL_ID,
   MIN_DICE,
-  MIN_TORQUE_MAGNITUDE,
-  QUATERNION_TOLERANCE,
   SIMULATION_VERSION,
-  SPAWN_HEIGHT_MAX,
-  SPAWN_HEIGHT_MIN,
-  SPAWN_JITTER,
-  SPAWN_SLOTS,
-  TORQUE_MAX,
-  VERTICAL_IMPULSE_MAX,
 } from './constants';
-import {
-  isPlayableDieValue,
-  PlayableDieValue,
-  VectorLike,
-} from './diceMath';
+import { isPlayableDieValue, PlayableDieValue } from './diceMath';
 
 export type RandomSource = () => number;
-
-export type IndexedDieValue = {
+export type RollTarget = {
+  dieId: string;
+  position?: Pick<NormalizedTablePosition, 'u' | 'v'>;
+};
+export type SettledDie = {
+  dieId: string;
   dieIndex: number;
   value: PlayableDieValue;
 };
-
+export type SettledPlacement = {
+  dieId: string;
+  position: NormalizedTablePosition;
+};
 export type RollSettledEvent = {
-  rollId: number;
-  dice: readonly IndexedDieValue[];
+  rollId: string;
+  dice: readonly SettledDie[];
+  placements: readonly SettledPlacement[];
 };
 
 const float32 = (value: number): number => Math.fround(value);
@@ -59,11 +54,7 @@ function randomBetween(
 }
 
 function createVector(x: number, y: number, z: number): Vector3 {
-  return new Vector3({
-    x: float32(x),
-    y: float32(y),
-    z: float32(z),
-  });
+  return new Vector3({ x: float32(x), y: float32(y), z: float32(z) });
 }
 
 function createUniformQuaternion(random: RandomSource): Quaternion {
@@ -72,7 +63,6 @@ function createUniformQuaternion(random: RandomSource): Quaternion {
   const u3 = sample(random);
   const rootOneMinusU1 = Math.sqrt(1 - u1);
   const rootU1 = Math.sqrt(u1);
-
   return new Quaternion({
     x: float32(rootOneMinusU1 * Math.sin(2 * Math.PI * u2)),
     y: float32(rootOneMinusU1 * Math.cos(2 * Math.PI * u2)),
@@ -82,55 +72,77 @@ function createUniformQuaternion(random: RandomSource): Quaternion {
 }
 
 function createTorque(random: RandomSource, dieIndex: number): Vector3 {
+  const { minimumTorqueMagnitude, torqueMaximum } = DICE_TABLE_CONFIG.roll;
   const components = [
-    randomBetween(random, -TORQUE_MAX, TORQUE_MAX),
-    randomBetween(random, -TORQUE_MAX, TORQUE_MAX),
-    randomBetween(random, -TORQUE_MAX, TORQUE_MAX),
+    randomBetween(random, -torqueMaximum, torqueMaximum),
+    randomBetween(random, -torqueMaximum, torqueMaximum),
+    randomBetween(random, -torqueMaximum, torqueMaximum),
   ];
-  if (Math.hypot(...components) < MIN_TORQUE_MAGNITUDE) {
+  if (Math.hypot(...components) < minimumTorqueMagnitude) {
     const axis = dieIndex % 3;
     components[axis] = components[axis] < 0
-      ? -MIN_TORQUE_MAGNITUDE
-      : MIN_TORQUE_MAGNITUDE;
+      ? -minimumTorqueMagnitude
+      : minimumTorqueMagnitude;
   }
   return createVector(components[0], components[1], components[2]);
 }
 
+function normalizedSpawnPosition(
+  target: RollTarget,
+  dieIndex: number,
+  random: RandomSource,
+): NormalizedTablePosition {
+  const { normalizedSpawnSlots, spawnJitter } = DICE_TABLE_CONFIG.roll;
+  const fallback = normalizedSpawnSlots[dieIndex] ?? normalizedSpawnSlots[0];
+  const source = target.position ?? { u: fallback[0], v: fallback[1] };
+  return new NormalizedTablePosition({
+    u: float32(Math.min(0.96, Math.max(0.04,
+      source.u + randomBetween(random, -spawnJitter, spawnJitter)))),
+    v: float32(Math.min(0.96, Math.max(0.04,
+      source.v + randomBetween(random, -spawnJitter, spawnJitter)))),
+  });
+}
+
 export function createLocalRollSpec(
-  count: number,
-  rollId: number,
+  targets: readonly RollTarget[],
+  rollId: string,
   random: RandomSource = Math.random,
 ): RollSpec {
-  if (!Number.isInteger(count) || count < MIN_DICE || count > MAX_DICE) {
-    throw new Error(`Dice count must be between ${MIN_DICE} and ${MAX_DICE}.`);
+  if (targets.length < MIN_DICE || targets.length > MAX_DICE) {
+    throw new Error(`A roll must contain between ${MIN_DICE} and ${MAX_DICE} dice.`);
   }
-  if (!Number.isInteger(rollId) || rollId <= 0 || rollId > MAX_ROLL_ID) {
-    throw new Error('Roll ID must be a positive uint32 value.');
+  if (!rollId.trim()) {
+    throw new Error('Roll ID must not be empty.');
+  }
+  if (new Set(targets.map(({ dieId }) => dieId)).size !== targets.length ||
+      targets.some(({ dieId }) => !dieId.trim())) {
+    throw new Error('Every rolled die must have a unique stable ID.');
   }
 
-  const dice = SPAWN_SLOTS.slice(0, count).map(([slotX, slotZ], dieIndex) =>
-    new DieThrowSpec({
+  const {
+    horizontalImpulseMaximum,
+    spawnHeightMaximum,
+    spawnHeightMinimum,
+    verticalImpulseMaximum,
+  } = DICE_TABLE_CONFIG.roll;
+  const dice = targets.map((target, dieIndex) => {
+    const tablePosition = normalizedSpawnPosition(target, dieIndex, random);
+    const height = randomBetween(random, spawnHeightMinimum, spawnHeightMaximum);
+    return new DieThrowSpec({
       dieIndex,
-      position: createVector(
-        slotX + randomBetween(random, -SPAWN_JITTER, SPAWN_JITTER),
-        randomBetween(random, SPAWN_HEIGHT_MIN, SPAWN_HEIGHT_MAX),
-        slotZ + randomBetween(random, -SPAWN_JITTER, SPAWN_JITTER),
-      ),
+      dieId: target.dieId,
+      tablePosition,
+      position: createVector(tablePosition.u, height, tablePosition.v),
       rotation: createUniformQuaternion(random),
       impulse: createVector(
-        randomBetween(random, -HORIZONTAL_IMPULSE_MAX, HORIZONTAL_IMPULSE_MAX),
-        randomBetween(random, 0, VERTICAL_IMPULSE_MAX),
-        randomBetween(random, -HORIZONTAL_IMPULSE_MAX, HORIZONTAL_IMPULSE_MAX),
+        randomBetween(random, -horizontalImpulseMaximum, horizontalImpulseMaximum),
+        randomBetween(random, 0, verticalImpulseMaximum),
+        randomBetween(random, -horizontalImpulseMaximum, horizontalImpulseMaximum),
       ),
       torque: createTorque(random, dieIndex),
-    }),
-  );
-
-  return new RollSpec({
-    simulationVersion: SIMULATION_VERSION,
-    rollId,
-    dice,
+    });
   });
+  return new RollSpec({ simulationVersion: SIMULATION_VERSION, rollId, dice });
 }
 
 function isFiniteFloat32(value: number): boolean {
@@ -138,22 +150,14 @@ function isFiniteFloat32(value: number): boolean {
 }
 
 function vectorIsValid(vector: Vector3 | undefined): boolean {
-  return Boolean(
-    vector &&
-      isFiniteFloat32(vector.x) &&
-      isFiniteFloat32(vector.y) &&
-      isFiniteFloat32(vector.z),
-  );
+  return Boolean(vector && isFiniteFloat32(vector.x) &&
+    isFiniteFloat32(vector.y) && isFiniteFloat32(vector.z));
 }
 
 function quaternionIsValid(quaternion: Quaternion | undefined): boolean {
-  if (
-    !quaternion ||
-    !isFiniteFloat32(quaternion.x) ||
-    !isFiniteFloat32(quaternion.y) ||
-    !isFiniteFloat32(quaternion.z) ||
-    !isFiniteFloat32(quaternion.w)
-  ) {
+  if (!quaternion || !isFiniteFloat32(quaternion.x) ||
+      !isFiniteFloat32(quaternion.y) || !isFiniteFloat32(quaternion.z) ||
+      !isFiniteFloat32(quaternion.w)) {
     return false;
   }
   const length = Math.hypot(
@@ -162,7 +166,15 @@ function quaternionIsValid(quaternion: Quaternion | undefined): boolean {
     quaternion.z,
     quaternion.w,
   );
-  return Math.abs(length - 1) <= QUATERNION_TOLERANCE;
+  return Math.abs(length - 1) <= DICE_TABLE_CONFIG.roll.quaternionTolerance;
+}
+
+function normalizedPositionIsValid(
+  position: NormalizedTablePosition | undefined,
+): boolean {
+  return Boolean(position && isFiniteFloat32(position.u) &&
+    isFiniteFloat32(position.v) && position.u >= 0 && position.u <= 1 &&
+    position.v >= 0 && position.v <= 1);
 }
 
 export function validateRollSpec(spec: RollSpec): string[] {
@@ -170,12 +182,8 @@ export function validateRollSpec(spec: RollSpec): string[] {
   if (spec.simulationVersion !== SIMULATION_VERSION) {
     errors.push(`Unsupported simulation version ${spec.simulationVersion}.`);
   }
-  if (
-    !Number.isInteger(spec.rollId) ||
-    spec.rollId <= 0 ||
-    spec.rollId > MAX_ROLL_ID
-  ) {
-    errors.push('Roll ID must be a positive uint32 value.');
+  if (!spec.rollId.trim()) {
+    errors.push('Roll ID must not be empty.');
   }
   if (spec.dice.length < MIN_DICE || spec.dice.length > MAX_DICE) {
     errors.push(`A roll must contain between ${MIN_DICE} and ${MAX_DICE} dice.`);
@@ -185,10 +193,18 @@ export function validateRollSpec(spec: RollSpec): string[] {
   if (sortedIndices.some((index, position) => index !== position)) {
     errors.push('Die indices must be unique and contiguous from zero.');
   }
+  const dieIds = spec.dice.map((die) => die.dieId);
+  if (dieIds.some((dieId) => !dieId.trim()) ||
+      new Set(dieIds).size !== dieIds.length) {
+    errors.push('Die IDs must be non-empty and unique.');
+  }
 
   for (const die of spec.dice) {
     if (!vectorIsValid(die.position)) {
       errors.push(`Die ${die.dieIndex} has an invalid position.`);
+    }
+    if (!normalizedPositionIsValid(die.tablePosition)) {
+      errors.push(`Die ${die.dieIndex} has an invalid table position.`);
     }
     if (!quaternionIsValid(die.rotation)) {
       errors.push(`Die ${die.dieIndex} has an invalid rotation.`);
@@ -200,36 +216,31 @@ export function validateRollSpec(spec: RollSpec): string[] {
       errors.push(`Die ${die.dieIndex} has an invalid torque.`);
     }
   }
-
   return errors;
 }
 
 export function assertValidRollSpec(spec: RollSpec): void {
   const errors = validateRollSpec(spec);
-  if (errors.length > 0) {
+  if (errors.length) {
     throw new Error(errors.join(' '));
   }
 }
 
 export function createRollResult(
   spec: RollSpec,
-  settled: ReadonlyMap<number, PlayableDieValue>,
+  settled: ReadonlyMap<string, PlayableDieValue>,
 ): RollResult {
   assertValidRollSpec(spec);
   if (settled.size !== spec.dice.length) {
     throw new Error('Cannot complete a roll before every die has settled.');
   }
-
-  const dice = spec.dice
-    .map((die) => {
-      const value = settled.get(die.dieIndex);
-      if (value === undefined || !isPlayableDieValue(value)) {
-        throw new Error(`Missing a valid result for die ${die.dieIndex}.`);
-      }
-      return new DieResult({ dieIndex: die.dieIndex, value });
-    })
-    .sort((a, b) => a.dieIndex - b.dieIndex);
-
+  const dice = spec.dice.map((die) => {
+    const value = settled.get(die.dieId);
+    if (value === undefined || !isPlayableDieValue(value)) {
+      throw new Error(`Missing a valid result for die ${die.dieId}.`);
+    }
+    return new DieResult({ dieIndex: die.dieIndex, dieId: die.dieId, value });
+  }).sort((a, b) => a.dieIndex - b.dieIndex);
   return new RollResult({
     simulationVersion: spec.simulationVersion,
     rollId: spec.rollId,
@@ -245,55 +256,22 @@ export function createRollResultFromSettledEvent(
   if (event.rollId !== spec.rollId || event.dice.length !== spec.dice.length) {
     return undefined;
   }
-
-  const expectedIndices = new Set(spec.dice.map((die) => die.dieIndex));
-  const settled = new Map<number, PlayableDieValue>();
+  const expectedIds = new Set(spec.dice.map((die) => die.dieId));
+  const settled = new Map<string, PlayableDieValue>();
   for (const die of event.dice) {
-    if (
-      !expectedIndices.has(die.dieIndex) ||
-      settled.has(die.dieIndex) ||
-      !isPlayableDieValue(die.value)
-    ) {
+    if (!expectedIds.has(die.dieId) || settled.has(die.dieId) ||
+        !isPlayableDieValue(die.value)) {
       return undefined;
     }
-    settled.set(die.dieIndex, die.value);
+    settled.set(die.dieId, die.value);
   }
-
   return createRollResult(spec, settled);
-}
-
-export function createEscapeRecovery(
-  die: DieThrowSpec,
-  escapedPosition: VectorLike,
-): DieThrowSpec {
-  const [slotX, slotZ] = SPAWN_SLOTS[die.dieIndex] ?? SPAWN_SLOTS[0];
-  const centerImpulseX = Math.max(-1.5, Math.min(1.5, -escapedPosition.x * 0.4));
-  const centerImpulseZ = Math.max(-1.5, Math.min(1.5, -escapedPosition.z * 0.4));
-
-  return new DieThrowSpec({
-    dieIndex: die.dieIndex,
-    position: createVector(slotX, 4, slotZ),
-    rotation: die.rotation
-      ? new Quaternion({
-          x: die.rotation.x,
-          y: die.rotation.y,
-          z: die.rotation.z,
-          w: die.rotation.w,
-        })
-      : undefined,
-    impulse: createVector(centerImpulseX, 0.25, centerImpulseZ),
-    torque: die.torque
-      ? createVector(die.torque.x * 0.5, die.torque.y * 0.5, die.torque.z * 0.5)
-      : undefined,
-  });
 }
 
 export function orderedValues(result: RollResult | undefined): PlayableDieValue[] {
   if (!result) {
     return [];
   }
-  return [...result.dice]
-    .sort((a, b) => a.dieIndex - b.dieIndex)
-    .map((die) => die.value)
-    .filter(isPlayableDieValue);
+  return [...result.dice].sort((a, b) => a.dieIndex - b.dieIndex)
+    .map((die) => die.value).filter(isPlayableDieValue);
 }
