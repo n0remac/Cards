@@ -94,8 +94,12 @@ describe('advanceRollSettling', () => {
 });
 
 describe('isOutsideTray', () => {
-  it('recognizes safe and escaped positions', () => {
+  it('allows dice past the old inset tray bounds', () => {
     expect(isOutsideTray({ x: 0, y: 1, z: 0 })).toBe(false);
+    expect(isOutsideTray({ x: 9, y: 1, z: 7 })).toBe(false);
+  });
+
+  it('recognizes positions beyond the full table as escaped', () => {
     expect(isOutsideTray({
       x: ESCAPE_BOUNDS.x + 0.01,
       y: 1,

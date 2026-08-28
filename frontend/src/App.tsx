@@ -1,9 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
+import {
+    BrowserRouter as Router,
+    Link,
+    Route,
+    Routes,
+    useLocation,
+} from 'react-router-dom';
 import { AllPosts } from './pages/blog/Blog';
 import { CreatePost } from './pages/blog/CreatePost';
 import Login from './pages/user/Login';
-import Register from './pages/user/Register';
 import Resume from './pages/blog/Resume';
 import { Poetry } from './pages/blog/Poetry';
 import { CreateTag } from './pages/blog/CreateTag';
@@ -13,13 +18,15 @@ import { FilteredPosts } from './pages/blog/FilteredPosts';
 const DiceGame = React.lazy(() => import('./pages/dice/DiceGame'));
 
 const DiceRouteFallback = () => (
-    <main className="grid min-h-[calc(100vh-3rem)] place-items-center bg-[#111513] text-stone-300">
+    <main className="grid h-screen h-[100dvh] place-items-center bg-[#185438] text-emerald-50">
         Loading dice…
     </main>
 );
 
-export default function App() {
+function AppRoutes() {
     const [isLoggedIn, setIsLoggedIn] = useState(false);
+    const pathname = useLocation().pathname;
+    const isDiceRoute = pathname === '/dice' || pathname.startsWith('/dice/');
 
     useEffect(() => {
         // Check if user is logged in by checking the presence of a token or any identifier in localStorage
@@ -28,8 +35,8 @@ export default function App() {
     }, []);
 
     return (
-        <Router>
-            <div>
+        <div>
+            {!isDiceRoute && (
                 <nav>
                     <ul className="list-none m-0 p-0 overflow-hidden bg-[#333]">
                         <li className="float-left">
@@ -67,27 +74,35 @@ export default function App() {
                         )} */}
                     </ul>
                 </nav>
+            )}
 
-                <Routes>
-                    <Route path="/" element={<AllPosts />} />
-                    <Route path="/createpost" element={<CreatePost />} />
-                    <Route path="/login" element={<Login />} />
-                    {/* <Route path='/register' element={<Register />} /> */}
-                    <Route path='/resume' element={<Resume />} />
-                    <Route path='/poetry' element={<Poetry />} />
-                    <Route path='/tags' element={<CreateTag />} />
-                    <Route path="/post/:postId" element={<FullPostComponent />} />
-                    <Route path="/filtered" element={<FilteredPosts />} />
-                    <Route
-                        path="/dice"
-                        element={(
-                            <React.Suspense fallback={<DiceRouteFallback />}>
-                                <DiceGame />
-                            </React.Suspense>
-                        )}
-                    />
-                </Routes>
-            </div>
+            <Routes>
+                <Route path="/" element={<AllPosts />} />
+                <Route path="/createpost" element={<CreatePost />} />
+                <Route path="/login" element={<Login />} />
+                {/* <Route path='/register' element={<Register />} /> */}
+                <Route path='/resume' element={<Resume />} />
+                <Route path='/poetry' element={<Poetry />} />
+                <Route path='/tags' element={<CreateTag />} />
+                <Route path="/post/:postId" element={<FullPostComponent />} />
+                <Route path="/filtered" element={<FilteredPosts />} />
+                <Route
+                    path="/dice"
+                    element={(
+                        <React.Suspense fallback={<DiceRouteFallback />}>
+                            <DiceGame />
+                        </React.Suspense>
+                    )}
+                />
+            </Routes>
+        </div>
+    );
+}
+
+export default function App() {
+    return (
+        <Router>
+            <AppRoutes />
         </Router>
     );
 }

@@ -71,7 +71,7 @@ Rolling again while dice are moving creates a new roll ID and makes callbacks fr
 - position and rotation
 - impulse and torque
 
-The current `SIMULATION_VERSION` is `2`. A spec is accepted only when its version matches the client and when it has:
+The current `SIMULATION_VERSION` is `5`. A spec is accepted only when its version matches the client and when it has:
 
 - 1–10 dice;
 - unique, contiguous indices beginning at zero;
@@ -79,7 +79,7 @@ The current `SIMULATION_VERSION` is `2`. A spec is accepted only when its versio
 - a normalized quaternion for every die; and
 - a positive uint32 roll ID.
 
-A `RollSpec` is replayable only with the matching simulation version and pinned client physics implementation. It is not a permanent cross-version lockstep guarantee. Changes to colliders, tray geometry, physics values, throw application, settling rules, or face evaluation can change outcomes and therefore require a simulation-version review. Future multiplayer should send an authoritative result alongside the spec and use local physics primarily for animation and reconciliation.
+A `RollSpec` is replayable only with the matching simulation version, viewport dimensions, and pinned client physics implementation. It is not a permanent cross-version lockstep guarantee. Changes to colliders, table geometry, viewport size, physics values, throw application, settling rules, or face evaluation can change outcomes and therefore require a simulation-version review. Future multiplayer should send an authoritative result alongside the spec and use local physics primarily for animation and reconciliation.
 
 ## Physics and tray
 
@@ -96,7 +96,7 @@ The fixed configuration is centralized in `constants.ts`:
 
 The visual die is an ivory rounded box with dark pip discs, while collision uses a separate cuboid collider. Decorative geometry therefore cannot change collision behavior.
 
-The tray has a 14×10-unit felt play surface, an explicit floor collider, and four overlapping walnut wall colliders. The walls are intentionally high because the existing torque envelope can produce energetic throws. Camera presets use a steeper view on both desktop and narrow screens so the enlarged felt remains visible.
+The table uses one 80×80-unit felt surface and matching floor collider. Four invisible wall colliders are calculated from the camera's ground-plane footprint whenever the viewport changes, so their projected positions exactly follow the screen edges at every aspect ratio. Dice can therefore travel across the entire visible viewport and collide with the slim CSS wooden frame instead of the old inset 14×10-unit tray. The wider bottom frame owns the controls.
 
 Ten fixed spawn slots keep dice separated before bounded jitter is applied. Spawn heights remain between 3 and 5 units.
 
@@ -123,7 +123,7 @@ Face values use these local normals:
 
 ## Escape recovery
 
-The enlarged tray makes recovery a fallback rather than the normal path. If a body crosses the centralized escape bounds, the roll-wide observer:
+The full-size table makes recovery a distant emergency fallback rather than part of ordinary play. It begins only near the outer edge of the 80×80-unit physics floor. If a body crosses those centralized bounds, the roll-wide observer:
 
 1. moves it to its predefined safe slot at height 4;
 2. restores the supplied rotation;

@@ -115,7 +115,7 @@ describe('validateRollSpec', () => {
 
   it('reports unsupported versions, duplicate indices, and invalid rotations', () => {
     const spec = createLocalRollSpec(2, 1, midpointRandom);
-    expect(SIMULATION_VERSION).toBe(2);
+    expect(SIMULATION_VERSION).toBe(5);
     spec.simulationVersion = 1;
     spec.dice[1].dieIndex = 0;
     spec.dice[0].rotation!.w = 0;

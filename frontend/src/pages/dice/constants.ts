@@ -1,4 +1,4 @@
-export const SIMULATION_VERSION = 2;
+export const SIMULATION_VERSION = 5;
 export const MIN_DICE = 1;
 export const MAX_DICE = 10;
 export const DEFAULT_DICE = 3;
@@ -20,13 +20,13 @@ export const TRAY_HALF_WIDTH = 7;
 export const TRAY_HALF_DEPTH = 5;
 export const TRAY_FLOOR_THICKNESS = 0.25;
 export const TRAY_WALL_THICKNESS = 0.35;
-export const TRAY_WALL_HEIGHT = 8;
-export const TRAY_ESCAPE_MARGIN = 1;
+export const TRAY_WALL_COLLIDER_HEIGHT = 8;
+export const TABLE_HALF_EXTENT = 40;
 
 export const ESCAPE_BOUNDS = {
-  x: TRAY_HALF_WIDTH + TRAY_WALL_THICKNESS + TRAY_ESCAPE_MARGIN,
+  x: TABLE_HALF_EXTENT - DIE_SIZE,
   y: -3,
-  z: TRAY_HALF_DEPTH + TRAY_WALL_THICKNESS + TRAY_ESCAPE_MARGIN,
+  z: TABLE_HALF_EXTENT - DIE_SIZE,
 } as const;
 
 export const SPAWN_HEIGHT_MIN = 3;

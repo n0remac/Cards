@@ -1,4 +1,11 @@
-import React, { MutableRefObject, Suspense, useCallback, useEffect, useRef } from 'react';
+import React, {
+  MutableRefObject,
+  Suspense,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+} from 'react';
 import { Canvas, useThree } from '@react-three/fiber';
 import {
   CuboidCollider,
@@ -16,16 +23,15 @@ import {
   GRAVITY,
   PHYSICS_TIMESTEP,
   RESTITUTION,
+  TABLE_HALF_EXTENT,
   TRAY_FLOOR_THICKNESS,
-  TRAY_HALF_DEPTH,
-  TRAY_HALF_WIDTH,
-  TRAY_WALL_HEIGHT,
+  TRAY_WALL_COLLIDER_HEIGHT,
   TRAY_WALL_THICKNESS,
 } from './constants';
 import { advanceRollSettling, getUpwardFace, isOutsideTray } from './diceMath';
 import { applyThrowToBody, Die } from './Die';
 import { createEscapeRecovery, RollSettledEvent } from './rollModel';
-import { getDiceCameraLayout } from './sceneLayout';
+import { getDiceCameraLayout, getTableBoundary } from './sceneLayout';
 
 type DiceSceneProps = {
   activeSpec?: RollSpec;
@@ -44,6 +50,7 @@ function ResponsiveCamera() {
     const layout = getDiceCameraLayout(size.width, size.height);
     camera.position.set(...layout.position);
     camera.fov = layout.fov;
+    camera.aspect = size.width / size.height;
     camera.lookAt(0, 0, 0);
     camera.updateProjectionMatrix();
   }, [camera, size.height, size.width]);
@@ -150,114 +157,75 @@ function PhysicsReady({ onReady }: { onReady: () => void }) {
 function WebGLFallback({ onUnavailable }: { onUnavailable: () => void }) {
   useEffect(() => onUnavailable(), [onUnavailable]);
   return (
-    <div className="grid h-full place-items-center bg-[#171b1a] px-6 text-center text-stone-200">
+    <div className="grid h-full place-items-center bg-[#185438] px-6 text-center text-emerald-50">
       This browser could not create the WebGL scene. The dice roller requires WebGL.
     </div>
   );
 }
 
 function DiceTray() {
+  const { size } = useThree();
   const floorY = -TRAY_FLOOR_THICKNESS / 2;
-  const wallY = TRAY_WALL_HEIGHT / 2;
-  const wallHalfThickness = TRAY_WALL_THICKNESS / 2;
+  const wallY = TRAY_WALL_COLLIDER_HEIGHT / 2;
+  const boundary = useMemo(
+    () => getTableBoundary(size.width, size.height),
+    [size.height, size.width],
+  );
+  const walls = useMemo(() => boundary.map((start, index) => {
+    const end = boundary[(index + 1) % boundary.length];
+    const deltaX = end.x - start.x;
+    const deltaZ = end.z - start.z;
+    return {
+      halfLength: Math.hypot(deltaX, deltaZ) / 2,
+      position: [
+        (start.x + end.x) / 2,
+        wallY,
+        (start.z + end.z) / 2,
+      ] as [number, number, number],
+      rotation: [0, -Math.atan2(deltaZ, deltaX), 0] as [number, number, number],
+    };
+  }), [boundary, wallY]);
 
   return (
     <group>
-      <mesh position={[0, floorY - 0.12, 0]} receiveShadow>
-        <boxGeometry args={[
-          TRAY_HALF_WIDTH * 2 + TRAY_WALL_THICKNESS * 2,
-          TRAY_FLOOR_THICKNESS,
-          TRAY_HALF_DEPTH * 2 + TRAY_WALL_THICKNESS * 2,
-        ]} />
-        <meshStandardMaterial color="#3a2014" roughness={0.64} />
-      </mesh>
       <mesh position={[0, floorY + 0.015, 0]} receiveShadow>
         <boxGeometry args={[
-          TRAY_HALF_WIDTH * 2,
+          TABLE_HALF_EXTENT * 2,
           TRAY_FLOOR_THICKNESS,
-          TRAY_HALF_DEPTH * 2,
+          TABLE_HALF_EXTENT * 2,
         ]} />
-        <meshStandardMaterial color="#234f3a" roughness={0.94} />
+        <meshStandardMaterial color="#1d6847" roughness={0.96} />
       </mesh>
 
-      {[-1, 1].map((direction) => (
-        <mesh
-          key={`x-wall-${direction}`}
-          position={[
-            direction * (TRAY_HALF_WIDTH + wallHalfThickness),
-            wallY,
-            0,
-          ]}
-          castShadow
-          receiveShadow
-        >
-          <boxGeometry args={[
-            TRAY_WALL_THICKNESS,
-            TRAY_WALL_HEIGHT,
-            TRAY_HALF_DEPTH * 2 + TRAY_WALL_THICKNESS * 2,
-          ]} />
-          <meshStandardMaterial color="#4b2817" roughness={0.48} />
-        </mesh>
-      ))}
-      {[-1, 1].map((direction) => (
-        <mesh
-          key={`z-wall-${direction}`}
-          position={[
-            0,
-            wallY,
-            direction * (TRAY_HALF_DEPTH + wallHalfThickness),
-          ]}
-          castShadow
-          receiveShadow
-        >
-          <boxGeometry args={[
-            TRAY_HALF_WIDTH * 2 + TRAY_WALL_THICKNESS * 2,
-            TRAY_WALL_HEIGHT,
-            TRAY_WALL_THICKNESS,
-          ]} />
-          <meshStandardMaterial color="#4b2817" roughness={0.48} />
-        </mesh>
-      ))}
-
-      <RigidBody type="fixed" colliders={false}>
+      <RigidBody
+        key={`${size.width}:${size.height}`}
+        type="fixed"
+        colliders={false}
+      >
         <CuboidCollider
-          args={[TRAY_HALF_WIDTH, TRAY_FLOOR_THICKNESS / 2, TRAY_HALF_DEPTH]}
+          args={[
+            TABLE_HALF_EXTENT,
+            TRAY_FLOOR_THICKNESS / 2,
+            TABLE_HALF_EXTENT,
+          ]}
           position={[0, floorY, 0]}
           friction={FRICTION}
           restitution={RESTITUTION}
         />
-        <CuboidCollider
-          args={[wallHalfThickness, wallY, TRAY_HALF_DEPTH + TRAY_WALL_THICKNESS]}
-          position={[-TRAY_HALF_WIDTH - wallHalfThickness, wallY, 0]}
-          friction={FRICTION}
-          restitution={RESTITUTION}
-        />
-        <CuboidCollider
-          args={[wallHalfThickness, wallY, TRAY_HALF_DEPTH + TRAY_WALL_THICKNESS]}
-          position={[TRAY_HALF_WIDTH + wallHalfThickness, wallY, 0]}
-          friction={FRICTION}
-          restitution={RESTITUTION}
-        />
-        <CuboidCollider
-          args={[
-            TRAY_HALF_WIDTH + TRAY_WALL_THICKNESS,
-            wallY,
-            wallHalfThickness,
-          ]}
-          position={[0, wallY, -TRAY_HALF_DEPTH - wallHalfThickness]}
-          friction={FRICTION}
-          restitution={RESTITUTION}
-        />
-        <CuboidCollider
-          args={[
-            TRAY_HALF_WIDTH + TRAY_WALL_THICKNESS,
-            wallY,
-            wallHalfThickness,
-          ]}
-          position={[0, wallY, TRAY_HALF_DEPTH + wallHalfThickness]}
-          friction={FRICTION}
-          restitution={RESTITUTION}
-        />
+        {walls.map((wall, index) => (
+          <CuboidCollider
+            key={index}
+            args={[
+              wall.halfLength + TRAY_WALL_THICKNESS,
+              wallY,
+              TRAY_WALL_THICKNESS / 2,
+            ]}
+            position={wall.position}
+            rotation={wall.rotation}
+            friction={FRICTION}
+            restitution={RESTITUTION}
+          />
+        ))}
       </RigidBody>
     </group>
   );
@@ -299,8 +267,8 @@ export function DiceScene({
       gl={{ antialias: true }}
       fallback={<WebGLFallback onUnavailable={onWebGLUnavailable} />}
     >
-      <color attach="background" args={['#171b1a']} />
-      <fog attach="fog" args={['#171b1a', 34, 52]} />
+      <color attach="background" args={['#1d6847']} />
+      <fog attach="fog" args={['#1d6847', 34, 52]} />
       <ResponsiveCamera />
       <hemisphereLight color="#fff4dc" groundColor="#1b1511" intensity={1.15} />
       <directionalLight
