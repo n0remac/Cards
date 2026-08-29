@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { PerspectiveCamera, Vector3 } from 'three';
+import { DirectionalLight, PerspectiveCamera, Vector3 } from 'three';
 import {
   containArenaMotion,
   createArenaLayout,
@@ -86,6 +86,35 @@ describe('ArenaLayout', () => {
       )).toBe(true);
     }
   });
+
+  it.each(viewports)(
+    'covers the visible $name table and airborne dice with the shadow camera',
+    ({ width, height }) => {
+      const layout = getArenaLayout(width, height);
+      const light = new DirectionalLight();
+      light.position.set(...DICE_TABLE_CONFIG.lighting.directionalPosition);
+      light.target.position.set(0, 0, 0);
+      light.updateMatrixWorld(true);
+      light.target.updateMatrixWorld(true);
+      Object.assign(light.shadow.camera, layout.shadowBounds);
+      light.shadow.camera.updateProjectionMatrix();
+      light.shadow.updateMatrices(light);
+      const maximumCasterHeight = DICE_TABLE_CONFIG.roll.spawnHeightMaximum +
+        DICE_TABLE_CONFIG.die.size / 2;
+
+      for (const { x, z } of layout.screenBoundary) {
+        for (const y of [0, maximumCasterHeight]) {
+          const point = new Vector3(x, y, z).applyMatrix4(
+            light.shadow.camera.matrixWorldInverse,
+          );
+          expect(point.x).toBeGreaterThanOrEqual(layout.shadowBounds.left);
+          expect(point.x).toBeLessThanOrEqual(layout.shadowBounds.right);
+          expect(point.y).toBeGreaterThanOrEqual(layout.shadowBounds.bottom);
+          expect(point.y).toBeLessThanOrEqual(layout.shadowBounds.top);
+        }
+      }
+    },
+  );
 
   it('projects escapes just inside each nearest wall and reflects velocity', () => {
     const layout = createArenaLayout(390 / 844);

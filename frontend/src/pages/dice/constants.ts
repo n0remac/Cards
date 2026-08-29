@@ -34,6 +34,10 @@ export const DICE_TABLE_CONFIG = {
     mobileAspectBreakpoint: 0.9,
     minimumHalfTableWidth: 7.35,
   },
+  lighting: {
+    directionalPosition: [-6, 25, 7] as const,
+    shadowPadding: 2,
+  },
   roll: {
     maximumDefinitionsPerAdd: 12,
     settleSpeedThreshold: 0.05,

@@ -1,8 +1,16 @@
-import React, { Suspense, useCallback, useEffect, useMemo, useRef } from 'react';
+import React, {
+  Suspense,
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+} from 'react';
 import { Canvas, useThree } from '@react-three/fiber';
 import { Physics, RapierRigidBody } from '@react-three/rapier';
+import { DirectionalLight } from 'three';
 import { NormalizedTablePosition } from '../../rpc/proto/dice/v1/dice_pb';
-import { createArenaLayout } from './arenaLayout';
+import { ArenaLayout, createArenaLayout } from './arenaLayout';
 import { DICE_TABLE_CONFIG } from './constants';
 import { Die } from './Die';
 import { DiceArena, ResponsiveArenaCamera } from './DiceArena';
@@ -46,6 +54,37 @@ function WebGLFallback({ onUnavailable }: { onUnavailable: () => void }) {
     <div className="grid h-full place-items-center bg-[#185438] px-6 text-center text-emerald-50">
       This browser could not create the WebGL scene. The dice table requires WebGL.
     </div>
+  );
+}
+
+function ArenaDirectionalLight({ layout }: { layout: ArenaLayout }) {
+  const lightRef = useRef<DirectionalLight>(null);
+  const directionalLight = DICE_TABLE_CONFIG.lighting;
+
+  useLayoutEffect(() => {
+    const shadow = lightRef.current?.shadow;
+    if (!shadow) {
+      return;
+    }
+    Object.assign(shadow.camera, layout.shadowBounds);
+    shadow.camera.updateProjectionMatrix();
+    shadow.needsUpdate = true;
+  }, [layout]);
+
+  return (
+    <directionalLight
+      ref={lightRef}
+      castShadow
+      position={[...directionalLight.directionalPosition]}
+      intensity={2.2}
+      color="#ffe5bd"
+      shadow-mapSize-width={1024}
+      shadow-mapSize-height={1024}
+      shadow-camera-left={layout.shadowBounds.left}
+      shadow-camera-right={layout.shadowBounds.right}
+      shadow-camera-top={layout.shadowBounds.top}
+      shadow-camera-bottom={layout.shadowBounds.bottom}
+    />
   );
 }
 
@@ -98,18 +137,7 @@ function DiceWorld({
     <>
       <ResponsiveArenaCamera layout={layout} />
       <hemisphereLight color="#fff4dc" groundColor="#1b1511" intensity={1.15} />
-      <directionalLight
-        castShadow
-        position={[-6, 25, 7]}
-        intensity={2.2}
-        color="#ffe5bd"
-        shadow-mapSize-width={1024}
-        shadow-mapSize-height={1024}
-        shadow-camera-left={-layout.shadowBounds.halfExtent}
-        shadow-camera-right={layout.shadowBounds.halfExtent}
-        shadow-camera-top={layout.shadowBounds.halfExtent}
-        shadow-camera-bottom={-layout.shadowBounds.halfExtent}
-      />
+      <ArenaDirectionalLight layout={layout} />
       <DiceArena layout={layout} />
       <RollObserver
         activeRoll={activeRoll}
@@ -146,6 +174,7 @@ export function DiceScene(props: DiceSceneProps) {
   return (
     <Canvas
       shadows
+      style={{ touchAction: 'none' }}
       dpr={[1, 1.75]}
       camera={{
         position: [...camera.desktopPosition],

@@ -59,7 +59,9 @@ but selection/grouping and add-new UI are intentionally deferred.
   plane and publish normalized drag events. Release restores a dynamic,
   rotation-locked body with zero angular velocity. A release within one-third
   of a die width of an open side slot snaps flush to the nearest settled die;
-  the dice remain independently draggable.
+  the dice remain independently draggable. The canvas owns touch gestures, and
+  native pointer cancellation/lost-capture events settle a held die at its last
+  accepted position.
 
 Settled dice may still slide when struck. At roll settlement, the roller reports
 placements for every rolled die and any existing die displaced far enough by a
@@ -84,6 +86,10 @@ than respawning at the center.
 
 Equivalent pixel-size changes share the same rounded aspect key, so they do not
 remount the responsive wall body.
+
+Directional shadow bounds are projected into the angled light's camera space.
+They cover the visible floor and dice up to the maximum throw height, including
+the deeper off-center table footprint used by portrait mobile layouts.
 
 ## Multiplayer contract
 
