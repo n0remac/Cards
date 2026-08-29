@@ -13,6 +13,7 @@ export const DICE_TABLE_CONFIG = {
     linearDamping: 0.14,
     angularDamping: 0.18,
     dragHeight: 0.58,
+    snapCaptureRatio: 1 / 3,
   },
   arena: {
     floorThickness: 0.25,

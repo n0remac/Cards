@@ -53,10 +53,13 @@ but selection/grouping and add-new UI are intentionally deferred.
 - `rolling`: dynamic, CCD enabled, all rotations enabled, and supplied throw
   impulse/torque applied once per global roll ID.
 - `settled`: dynamic translation with all rotations locked. The canonical
-  face-up quaternion survives collisions and dragging.
+  face-up quaternion turns the top letter upright toward screen-up and survives
+  collisions and dragging.
 - `held`: kinematic-position-based. Pointer rays intersect a horizontal table
   plane and publish normalized drag events. Release restores a dynamic,
-  rotation-locked body with zero angular velocity.
+  rotation-locked body with zero angular velocity. A release within one-third
+  of a die width of an open side slot snaps flush to the nearest settled die;
+  the dice remain independently draggable.
 
 Settled dice may still slide when struck. At roll settlement, the roller reports
 placements for every rolled die and any existing die displaced far enough by a

@@ -6,6 +6,7 @@ import { createArenaLayout } from './arenaLayout';
 import { DICE_TABLE_CONFIG } from './constants';
 import { Die } from './Die';
 import { DiceArena, ResponsiveArenaCamera } from './DiceArena';
+import { snapReleasedDiePosition } from './diceSnapping';
 import { DiceBodyRegistry, RollObserver } from './RollObserver';
 import { RollSettledEvent } from './rollModel';
 import { ActiveTableRoll, TableDie } from './tableModel';
@@ -77,6 +78,21 @@ function DiceWorld({
       bodies.current.delete(dieId);
     }
   }, [bodies]);
+  const finishDrag = useCallback((
+    dieId: string,
+    interactionId: string,
+    position: NormalizedTablePosition,
+  ) => {
+    const orderedDice = dieOrder.flatMap((orderedDieId) => {
+      const orderedDie = dice[orderedDieId];
+      return orderedDie ? [orderedDie] : [];
+    });
+    onDragEnd(
+      dieId,
+      interactionId,
+      snapReleasedDiePosition(layout, dieId, position, orderedDice),
+    );
+  }, [dice, dieOrder, layout, onDragEnd]);
 
   return (
     <>
@@ -114,7 +130,7 @@ function DiceWorld({
             onBodyRemoved={unregisterBody}
             onDragStart={onDragStart}
             onDragUpdate={onDragUpdate}
-            onDragEnd={onDragEnd}
+            onDragEnd={finishDrag}
           />
         )] : [];
       })}
