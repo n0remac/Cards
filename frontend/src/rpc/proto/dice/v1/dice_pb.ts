@@ -33,53 +33,56 @@ proto3.util.setEnumType(RollMode, "dice.v1.RollMode", [
 ]);
 
 /**
- * @generated from enum dice.v1.DieValue
+ * DieFace identifies the physical upward face. Clients combine it with the
+ * fixed die_definition_id catalog entry to derive the visible letter.
+ *
+ * @generated from enum dice.v1.DieFace
  */
-export enum DieValue {
+export enum DieFace {
   /**
-   * @generated from enum value: DIE_VALUE_UNSPECIFIED = 0;
+   * @generated from enum value: DIE_FACE_UNSPECIFIED = 0;
    */
   UNSPECIFIED = 0,
 
   /**
-   * @generated from enum value: DIE_VALUE_ONE = 1;
+   * @generated from enum value: DIE_FACE_ONE = 1;
    */
   ONE = 1,
 
   /**
-   * @generated from enum value: DIE_VALUE_TWO = 2;
+   * @generated from enum value: DIE_FACE_TWO = 2;
    */
   TWO = 2,
 
   /**
-   * @generated from enum value: DIE_VALUE_THREE = 3;
+   * @generated from enum value: DIE_FACE_THREE = 3;
    */
   THREE = 3,
 
   /**
-   * @generated from enum value: DIE_VALUE_FOUR = 4;
+   * @generated from enum value: DIE_FACE_FOUR = 4;
    */
   FOUR = 4,
 
   /**
-   * @generated from enum value: DIE_VALUE_FIVE = 5;
+   * @generated from enum value: DIE_FACE_FIVE = 5;
    */
   FIVE = 5,
 
   /**
-   * @generated from enum value: DIE_VALUE_SIX = 6;
+   * @generated from enum value: DIE_FACE_SIX = 6;
    */
   SIX = 6,
 }
-// Retrieve enum metadata with: proto3.getEnumType(DieValue)
-proto3.util.setEnumType(DieValue, "dice.v1.DieValue", [
-  { no: 0, name: "DIE_VALUE_UNSPECIFIED" },
-  { no: 1, name: "DIE_VALUE_ONE" },
-  { no: 2, name: "DIE_VALUE_TWO" },
-  { no: 3, name: "DIE_VALUE_THREE" },
-  { no: 4, name: "DIE_VALUE_FOUR" },
-  { no: 5, name: "DIE_VALUE_FIVE" },
-  { no: 6, name: "DIE_VALUE_SIX" },
+// Retrieve enum metadata with: proto3.getEnumType(DieFace)
+proto3.util.setEnumType(DieFace, "dice.v1.DieFace", [
+  { no: 0, name: "DIE_FACE_UNSPECIFIED" },
+  { no: 1, name: "DIE_FACE_ONE" },
+  { no: 2, name: "DIE_FACE_TWO" },
+  { no: 3, name: "DIE_FACE_THREE" },
+  { no: 4, name: "DIE_FACE_FOUR" },
+  { no: 5, name: "DIE_FACE_FIVE" },
+  { no: 6, name: "DIE_FACE_SIX" },
 ]);
 
 /**
@@ -196,7 +199,7 @@ export class DieThrowSpec extends Message<DieThrowSpec> {
   dieIndex = 0;
 
   /**
-   * Legacy initial-position field retained for compatibility. Version 3 uses
+   * Legacy initial-position field retained for compatibility. Version 4 uses
    * table_position for x/z and position.y for the spawn height.
    *
    * @generated from field: dice.v1.Vector3 position = 2;
@@ -228,6 +231,11 @@ export class DieThrowSpec extends Message<DieThrowSpec> {
    */
   tablePosition?: NormalizedTablePosition;
 
+  /**
+   * @generated from field: string die_definition_id = 8;
+   */
+  dieDefinitionId = "";
+
   constructor(data?: PartialMessage<DieThrowSpec>) {
     super();
     proto3.util.initPartial(data, this);
@@ -243,6 +251,7 @@ export class DieThrowSpec extends Message<DieThrowSpec> {
     { no: 5, name: "torque", kind: "message", T: Vector3 },
     { no: 6, name: "die_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 7, name: "table_position", kind: "message", T: NormalizedTablePosition },
+    { no: 8, name: "die_definition_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): DieThrowSpec {
@@ -324,14 +333,19 @@ export class DieResult extends Message<DieResult> {
   dieIndex = 0;
 
   /**
-   * @generated from field: dice.v1.DieValue value = 2;
+   * @generated from field: dice.v1.DieFace face = 2;
    */
-  value = DieValue.UNSPECIFIED;
+  face = DieFace.UNSPECIFIED;
 
   /**
    * @generated from field: string die_id = 3;
    */
   dieId = "";
+
+  /**
+   * @generated from field: string die_definition_id = 4;
+   */
+  dieDefinitionId = "";
 
   constructor(data?: PartialMessage<DieResult>) {
     super();
@@ -342,8 +356,9 @@ export class DieResult extends Message<DieResult> {
   static readonly typeName = "dice.v1.DieResult";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
     { no: 1, name: "die_index", kind: "scalar", T: 13 /* ScalarType.UINT32 */ },
-    { no: 2, name: "value", kind: "enum", T: proto3.getEnumType(DieValue) },
+    { no: 2, name: "face", kind: "enum", T: proto3.getEnumType(DieFace) },
     { no: 3, name: "die_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 4, name: "die_definition_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): DieResult {
@@ -382,11 +397,6 @@ export class RollResult extends Message<RollResult> {
    */
   dice: DieResult[] = [];
 
-  /**
-   * @generated from field: uint32 total = 4;
-   */
-  total = 0;
-
   constructor(data?: PartialMessage<RollResult>) {
     super();
     proto3.util.initPartial(data, this);
@@ -398,7 +408,6 @@ export class RollResult extends Message<RollResult> {
     { no: 1, name: "simulation_version", kind: "scalar", T: 13 /* ScalarType.UINT32 */ },
     { no: 2, name: "roll_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 3, name: "dice", kind: "message", T: DieResult, repeated: true },
-    { no: 4, name: "total", kind: "scalar", T: 13 /* ScalarType.UINT32 */ },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): RollResult {
@@ -471,9 +480,9 @@ export class TableDieState extends Message<TableDieState> {
   dieId = "";
 
   /**
-   * @generated from field: dice.v1.DieValue value = 2;
+   * @generated from field: dice.v1.DieFace face = 2;
    */
-  value = DieValue.UNSPECIFIED;
+  face = DieFace.UNSPECIFIED;
 
   /**
    * @generated from field: dice.v1.NormalizedTablePosition position = 3;
@@ -490,6 +499,11 @@ export class TableDieState extends Message<TableDieState> {
    */
   revision = protoInt64.zero;
 
+  /**
+   * @generated from field: string die_definition_id = 6;
+   */
+  dieDefinitionId = "";
+
   constructor(data?: PartialMessage<TableDieState>) {
     super();
     proto3.util.initPartial(data, this);
@@ -499,10 +513,11 @@ export class TableDieState extends Message<TableDieState> {
   static readonly typeName = "dice.v1.TableDieState";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
     { no: 1, name: "die_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 2, name: "value", kind: "enum", T: proto3.getEnumType(DieValue) },
+    { no: 2, name: "face", kind: "enum", T: proto3.getEnumType(DieFace) },
     { no: 3, name: "position", kind: "message", T: NormalizedTablePosition },
     { no: 4, name: "owner_player_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 5, name: "revision", kind: "scalar", T: 4 /* ScalarType.UINT64 */ },
+    { no: 6, name: "die_definition_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): TableDieState {

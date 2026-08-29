@@ -17,7 +17,7 @@ message Quaternion {
 
 message DieThrowSpec {
   uint32 die_index = 1;
-  // Legacy initial-position field retained for compatibility. Version 3 uses
+  // Legacy initial-position field retained for compatibility. Version 4 uses
   // table_position for x/z and position.y for the spawn height.
   Vector3 position = 2;
   Quaternion rotation = 3;
@@ -25,6 +25,7 @@ message DieThrowSpec {
   Vector3 torque = 5;
   string die_id = 6;
   NormalizedTablePosition table_position = 7;
+  string die_definition_id = 8;
 }
 
 // RollSpec is shared animation input. Clients intentionally do not promise
@@ -41,27 +42,31 @@ enum RollMode {
   ROLL_MODE_REROLL_EXISTING = 2;
 }
 
-enum DieValue {
-  DIE_VALUE_UNSPECIFIED = 0;
-  DIE_VALUE_ONE = 1;
-  DIE_VALUE_TWO = 2;
-  DIE_VALUE_THREE = 3;
-  DIE_VALUE_FOUR = 4;
-  DIE_VALUE_FIVE = 5;
-  DIE_VALUE_SIX = 6;
+// DieFace identifies the physical upward face. Clients combine it with the
+// fixed die_definition_id catalog entry to derive the visible letter.
+enum DieFace {
+  DIE_FACE_UNSPECIFIED = 0;
+  DIE_FACE_ONE = 1;
+  DIE_FACE_TWO = 2;
+  DIE_FACE_THREE = 3;
+  DIE_FACE_FOUR = 4;
+  DIE_FACE_FIVE = 5;
+  DIE_FACE_SIX = 6;
 }
 
 message DieResult {
   uint32 die_index = 1;
-  DieValue value = 2;
+  DieFace face = 2;
   string die_id = 3;
+  string die_definition_id = 4;
 }
 
 message RollResult {
   uint32 simulation_version = 1;
   string roll_id = 2;
   repeated DieResult dice = 3;
-  uint32 total = 4;
+  reserved 4;
+  reserved "total";
 }
 
 message NormalizedTablePosition {
@@ -71,10 +76,11 @@ message NormalizedTablePosition {
 
 message TableDieState {
   string die_id = 1;
-  DieValue value = 2;
+  DieFace face = 2;
   NormalizedTablePosition position = 3;
   string owner_player_id = 4;
   uint64 revision = 5;
+  string die_definition_id = 6;
 }
 
 message DiePlacement {

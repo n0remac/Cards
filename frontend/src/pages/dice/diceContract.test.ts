@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import {
   DieResult,
   DieThrowSpec,
-  DieValue,
+  DieFace,
   DragUpdated,
   NormalizedTablePosition,
   RollMode,
@@ -25,6 +25,7 @@ describe('dice protobuf contract', () => {
         dice: [new DieThrowSpec({
           dieIndex: 0,
           dieId: 'stable-die-id',
+          dieDefinitionId: 'letter-die-01',
           tablePosition: new NormalizedTablePosition({ u: 0.25, v: 0.75 }),
         })],
       });
@@ -48,6 +49,8 @@ describe('dice protobuf contract', () => {
         expect(decoded.payload.value.mode).toBe(mode);
         expect(decoded.payload.value.animationSpec?.dice[0].dieId)
           .toBe('stable-die-id');
+        expect(decoded.payload.value.animationSpec?.dice[0].dieDefinitionId)
+          .toBe('letter-die-01');
         expect(decoded.payload.value.animationSpec?.dice[0].tablePosition?.v)
           .toBeCloseTo(0.75);
       }
@@ -60,8 +63,9 @@ describe('dice protobuf contract', () => {
       revision: 41n,
       dice: [new TableDieState({
         dieId: 'die-a',
+        dieDefinitionId: 'letter-die-05',
         ownerPlayerId: 'player-a',
-        value: DieValue.FIVE,
+        face: DieFace.FIVE,
         position: new NormalizedTablePosition({ u: 0.25, v: 0.75 }),
         revision: 40n,
       })],
@@ -83,15 +87,16 @@ describe('dice protobuf contract', () => {
       rollId: 'roll',
       dice: [new DieResult({
         dieId: 'die-a',
+        dieDefinitionId: 'letter-die-12',
         dieIndex: 0,
-        value: DieValue.SIX,
+        face: DieFace.SIX,
       })],
-      total: 6,
     });
     expect(RollResult.equals(
       RollResult.fromBinary(result.toBinary()),
       result,
     )).toBe(true);
+    expect('total' in result).toBe(false);
 
     const drag = new TableEvent({
       tableId: 'table',

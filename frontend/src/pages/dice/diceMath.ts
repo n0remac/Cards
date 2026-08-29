@@ -1,5 +1,5 @@
 import {
-  DieValue,
+  DieFace,
   Quaternion as ProtoQuaternion,
   Vector3 as ProtoVector3,
 } from '../../rpc/proto/dice/v1/dice_pb';
@@ -7,13 +7,13 @@ import {
   DICE_TABLE_CONFIG,
 } from './constants';
 
-export type PlayableDieValue =
-  | DieValue.ONE
-  | DieValue.TWO
-  | DieValue.THREE
-  | DieValue.FOUR
-  | DieValue.FIVE
-  | DieValue.SIX;
+export type PlayableDieFace =
+  | DieFace.ONE
+  | DieFace.TWO
+  | DieFace.THREE
+  | DieFace.FOUR
+  | DieFace.FIVE
+  | DieFace.SIX;
 
 export type VectorLike = { x: number; y: number; z: number };
 export type QuaternionLike = VectorLike & { w: number };
@@ -22,19 +22,19 @@ export type VectorTuple = [number, number, number];
 const WORLD_UP: VectorLike = { x: 0, y: 1, z: 0 };
 
 const FACE_NORMALS: ReadonlyArray<{
-  value: PlayableDieValue;
+  face: PlayableDieFace;
   normal: VectorLike;
 }> = [
-  { value: DieValue.ONE, normal: { x: 0, y: 1, z: 0 } },
-  { value: DieValue.SIX, normal: { x: 0, y: -1, z: 0 } },
-  { value: DieValue.TWO, normal: { x: 1, y: 0, z: 0 } },
-  { value: DieValue.FIVE, normal: { x: -1, y: 0, z: 0 } },
-  { value: DieValue.THREE, normal: { x: 0, y: 0, z: 1 } },
-  { value: DieValue.FOUR, normal: { x: 0, y: 0, z: -1 } },
+  { face: DieFace.ONE, normal: { x: 0, y: 1, z: 0 } },
+  { face: DieFace.SIX, normal: { x: 0, y: -1, z: 0 } },
+  { face: DieFace.TWO, normal: { x: 1, y: 0, z: 0 } },
+  { face: DieFace.FIVE, normal: { x: -1, y: 0, z: 0 } },
+  { face: DieFace.THREE, normal: { x: 0, y: 0, z: 1 } },
+  { face: DieFace.FOUR, normal: { x: 0, y: 0, z: -1 } },
 ];
 
-export function isPlayableDieValue(value: DieValue): value is PlayableDieValue {
-  return value >= DieValue.ONE && value <= DieValue.SIX;
+export function isPlayableDieFace(face: DieFace): face is PlayableDieFace {
+  return face >= DieFace.ONE && face <= DieFace.SIX;
 }
 
 export function vectorToTuple(vector: ProtoVector3 | undefined): VectorTuple {
@@ -93,7 +93,7 @@ function rotateVector(vector: VectorLike, quaternion: QuaternionLike): VectorLik
   };
 }
 
-export function getUpwardFace(quaternion: QuaternionLike): PlayableDieValue {
+export function getUpwardFace(quaternion: QuaternionLike): PlayableDieFace {
   let bestFace = FACE_NORMALS[0];
   let bestDot = -Infinity;
 
@@ -109,23 +109,23 @@ export function getUpwardFace(quaternion: QuaternionLike): PlayableDieValue {
     }
   }
 
-  return bestFace.value;
+  return bestFace.face;
 }
 
-export function faceUpQuaternion(value: PlayableDieValue): QuaternionLike {
+export function faceUpQuaternion(face: PlayableDieFace): QuaternionLike {
   const halfTurn = Math.SQRT1_2;
-  switch (value) {
-    case DieValue.ONE:
+  switch (face) {
+    case DieFace.ONE:
       return { x: 0, y: 0, z: 0, w: 1 };
-    case DieValue.SIX:
+    case DieFace.SIX:
       return { x: 1, y: 0, z: 0, w: 0 };
-    case DieValue.TWO:
+    case DieFace.TWO:
       return { x: 0, y: 0, z: halfTurn, w: halfTurn };
-    case DieValue.FIVE:
+    case DieFace.FIVE:
       return { x: 0, y: 0, z: -halfTurn, w: halfTurn };
-    case DieValue.THREE:
+    case DieFace.THREE:
       return { x: -halfTurn, y: 0, z: 0, w: halfTurn };
-    case DieValue.FOUR:
+    case DieFace.FOUR:
       return { x: halfTurn, y: 0, z: 0, w: halfTurn };
   }
 }

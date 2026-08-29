@@ -1,10 +1,5 @@
 export const DICE_TABLE_CONFIG = {
-  simulationVersion: 3,
-  count: {
-    minimumPerRoll: 1,
-    maximumPerRoll: 10,
-    defaultPerRoll: 3,
-  },
+  simulationVersion: 4,
   physics: {
     gravity: [0, -9.81, 0] as const,
     timeStep: 1 / 60,
@@ -39,6 +34,7 @@ export const DICE_TABLE_CONFIG = {
     minimumHalfTableWidth: 7.35,
   },
   roll: {
+    maximumDefinitionsPerAdd: 12,
     settleSpeedThreshold: 0.05,
     settleSteps: 20,
     spawnHeightMinimum: 3,
@@ -50,16 +46,18 @@ export const DICE_TABLE_CONFIG = {
     minimumTorqueMagnitude: 6,
     quaternionTolerance: 0.001,
     normalizedSpawnSlots: [
-      [0.2, 0.32],
-      [0.35, 0.32],
-      [0.5, 0.32],
-      [0.65, 0.32],
-      [0.8, 0.32],
-      [0.2, 0.58],
-      [0.35, 0.58],
-      [0.5, 0.58],
-      [0.65, 0.58],
-      [0.8, 0.58],
+      [0.2, 0.27],
+      [0.4, 0.27],
+      [0.6, 0.27],
+      [0.8, 0.27],
+      [0.2, 0.48],
+      [0.4, 0.48],
+      [0.6, 0.48],
+      [0.8, 0.48],
+      [0.2, 0.69],
+      [0.4, 0.69],
+      [0.6, 0.69],
+      [0.8, 0.69],
     ] as const,
   },
   reconciliation: {
@@ -69,6 +67,5 @@ export const DICE_TABLE_CONFIG = {
 } as const;
 
 export const SIMULATION_VERSION = DICE_TABLE_CONFIG.simulationVersion;
-export const MIN_DICE = DICE_TABLE_CONFIG.count.minimumPerRoll;
-export const MAX_DICE = DICE_TABLE_CONFIG.count.maximumPerRoll;
-export const DEFAULT_DICE = DICE_TABLE_CONFIG.count.defaultPerRoll;
+export const MAX_DEFINITIONS_PER_ADD =
+  DICE_TABLE_CONFIG.roll.maximumDefinitionsPerAdd;

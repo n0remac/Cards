@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
   DiePlacement,
-  DieValue,
+  DieFace,
   DragEnded,
   DragStarted,
   DragUpdated,
@@ -9,10 +9,13 @@ import {
   RollCompleted,
   RollMode,
   RollStarted,
+  TableDieState,
   TableEvent,
+  TableSnapshot,
 } from '../../rpc/proto/dice/v1/dice_pb';
 import { createLocalRollSpec, createRollResult } from './rollModel';
-import { PlayableDieValue } from './diceMath';
+import { PlayableDieFace } from './diceMath';
+import { STANDARD_LETTER_DIE_DEFINITION_IDS } from './letterDice';
 import {
   applyTableEvent,
   createInitialDiceTableState,
@@ -29,8 +32,12 @@ function startEvent(
   dieIds: readonly string[],
   state?: DiceTableState,
 ) {
-  const spec = createLocalRollSpec(dieIds.map((dieId) => ({
+  const spec = createLocalRollSpec(dieIds.map((dieId, index) => ({
     dieId,
+    dieDefinitionId: state?.dice[dieId]?.dieDefinitionId ??
+      STANDARD_LETTER_DIE_DEFINITION_IDS[
+        index % STANDARD_LETTER_DIE_DEFINITION_IDS.length
+      ],
     position: state?.dice[dieId]?.position,
   })), rollId, midpointRandom);
   return {
@@ -54,13 +61,13 @@ function startEvent(
 function completeEvent(
   revision: bigint,
   state: DiceTableState,
-  values: readonly PlayableDieValue[],
+  faces: readonly PlayableDieFace[],
   extraPlacements: DiePlacement[] = [],
 ) {
   const active = state.activeRoll!;
   const settled = new Map(active.spec.dice.map((die, index) => [
     die.dieId,
-    values[index]!,
+    faces[index]!,
   ]));
   const result = createRollResult(active.spec, settled);
   const rolledPlacements = active.spec.dice.map((die, index) =>
@@ -93,7 +100,7 @@ function addSettledDice(dieIds: readonly string[]) {
   const rolling = applyTableEvent(initial, started.event);
   return applyTableEvent(
     rolling,
-    completeEvent(2n, rolling, dieIds.map(() => DieValue.THREE)),
+    completeEvent(2n, rolling, dieIds.map(() => DieFace.THREE)),
   );
 }
 
@@ -113,12 +120,13 @@ describe('dice table reducer', () => {
 
     const complete = applyTableEvent(
       rolling,
-      completeEvent(4n, rolling, [DieValue.ONE, DieValue.SIX]),
+      completeEvent(4n, rolling, [DieFace.ONE, DieFace.SIX]),
     );
     expect(complete.dieOrder).toEqual(['die-a', 'die-b', 'die-c']);
-    expect(complete.dice['die-a'].value).toBe(DieValue.THREE);
-    expect(complete.dice['die-b'].value).toBe(DieValue.ONE);
-    expect(complete.dice['die-c'].value).toBe(DieValue.SIX);
+    expect(complete.dice['die-a'].face).toBe(DieFace.THREE);
+    expect(complete.dice['die-b'].face).toBe(DieFace.ONE);
+    expect(complete.dice['die-c'].face).toBe(DieFace.SIX);
+    expect(complete.dice['die-c'].dieDefinitionId).toBe('letter-die-02');
   });
 
   it('rerolls existing stable IDs without replacing or reordering them', () => {
@@ -136,9 +144,11 @@ describe('dice table reducer', () => {
     expect(rolling.dice['die-b'].mode).toBe('rolling');
     const complete = applyTableEvent(
       rolling,
-      completeEvent(4n, rolling, [DieValue.FIVE]),
+      completeEvent(4n, rolling, [DieFace.FIVE]),
     );
-    expect(complete.dice['die-b'].value).toBe(DieValue.FIVE);
+    expect(complete.dice['die-b'].face).toBe(DieFace.FIVE);
+    expect(reroll.spec.dice[0].tablePosition?.u)
+      .toBeCloseTo(settled.dice['die-b'].position.u);
   });
 
   it('enforces one active roll and rejects stale completions', () => {
@@ -148,13 +158,84 @@ describe('dice table reducer', () => {
     const second = startEvent(2n, RollMode.ADD_NEW, 'roll-2', ['die-b']);
     expect(applyTableEvent(rolling, second.event)).toBe(rolling);
 
-    const stale = completeEvent(3n, rolling, [DieValue.ONE]);
+    const stale = completeEvent(3n, rolling, [DieFace.ONE]);
     stale.payload.case === 'rollCompleted' &&
       (stale.payload.value.rollId = 'old-roll');
     expect(applyTableEvent(rolling, stale)).toBe(rolling);
   });
 
-  it('applies a remote completion value and displaced existing placement', () => {
+  it('caps add-new events at twelve while allowing larger rerolls', () => {
+    const thirteenIds = Array.from({ length: 13 }, (_, index) => `die-${index}`);
+    const initial = createInitialDiceTableState(tableId);
+    const oversizedAdd = startEvent(
+      1n,
+      RollMode.ADD_NEW,
+      'roll-1',
+      thirteenIds,
+    );
+    expect(applyTableEvent(initial, oversizedAdd.event)).toBe(initial);
+
+    const settled = addSettledDice(thirteenIds.slice(0, 12));
+    const extraStart = startEvent(
+      3n,
+      RollMode.ADD_NEW,
+      'roll-2',
+      ['extra'],
+    );
+    const withExtraRolling = applyTableEvent(settled, extraStart.event);
+    const withExtra = applyTableEvent(
+      withExtraRolling,
+      completeEvent(4n, withExtraRolling, [DieFace.ONE]),
+    );
+    const rerollAll = startEvent(
+      5n,
+      RollMode.REROLL_EXISTING,
+      'roll-3',
+      withExtra.dieOrder,
+      withExtra,
+    );
+    expect(applyTableEvent(withExtra, rerollAll.event).activeRoll?.spec.dice)
+      .toHaveLength(13);
+  });
+
+  it('rejects remote results and snapshots with unknown definitions', () => {
+    const settled = addSettledDice(['die-a']);
+    const next = startEvent(
+      3n,
+      RollMode.REROLL_EXISTING,
+      'roll-2',
+      ['die-a'],
+      settled,
+    );
+    const rolling = applyTableEvent(settled, next.event);
+    const mismatched = completeEvent(4n, rolling, [DieFace.ONE]);
+    if (mismatched.payload.case === 'rollCompleted') {
+      mismatched.payload.value.result!.dice[0].dieDefinitionId = 'unknown';
+    }
+    expect(applyTableEvent(rolling, mismatched)).toBe(rolling);
+
+    const initial = createInitialDiceTableState(tableId);
+    const snapshot = new TableEvent({
+      tableId,
+      revision: 1n,
+      payload: {
+        case: 'snapshot',
+        value: new TableSnapshot({
+          tableId,
+          revision: 1n,
+          dice: [new TableDieState({
+            dieId: 'die-a',
+            dieDefinitionId: 'unknown',
+            face: DieFace.ONE,
+            position: new NormalizedTablePosition({ u: 0.5, v: 0.5 }),
+          })],
+        }),
+      },
+    });
+    expect(applyTableEvent(initial, snapshot)).toBe(initial);
+  });
+
+  it('applies a remote completion face and displaced existing placement', () => {
     const settled = addSettledDice(['rerolled', 'displaced']);
     const next = startEvent(
       3n,
@@ -164,7 +245,7 @@ describe('dice table reducer', () => {
       settled,
     );
     const rolling = applyTableEvent(settled, next.event);
-    const completed = completeEvent(4n, rolling, [DieValue.SIX], [
+    const completed = completeEvent(4n, rolling, [DieFace.SIX], [
       new DiePlacement({
         dieId: 'displaced',
         position: new NormalizedTablePosition({ u: 0.91, v: 0.12 }),
@@ -174,13 +255,13 @@ describe('dice table reducer', () => {
       completed.payload.value.rollerId = 'remote-player';
     }
     const reconciled = applyTableEvent(rolling, completed);
-    expect(reconciled.dice.rerolled.value).toBe(DieValue.SIX);
+    expect(reconciled.dice.rerolled.face).toBe(DieFace.SIX);
     expect(reconciled.dice.rerolled.canonicalSourcePlayerId)
       .toBe('remote-player');
     expect(reconciled.dice.displaced.position.u).toBeCloseTo(0.91);
   });
 
-  it('moves held dice through sequenced drag events and preserves value', () => {
+  it('moves held dice through sequenced drag events and preserves its face', () => {
     const settled = addSettledDice(['die-a']);
     const drag = (revision: bigint, caseName: 'dragStarted' | 'dragUpdated' | 'dragEnded', sequence: bigint) =>
       new TableEvent({
@@ -210,7 +291,7 @@ describe('dice table reducer', () => {
     expect(moved.dice['die-a'].position.u).toBeCloseTo(0.6);
     const ended = applyTableEvent(moved, drag(5n, 'dragEnded', 2n));
     expect(ended.dice['die-a'].mode).toBe('settled');
-    expect(ended.dice['die-a'].value).toBe(DieValue.THREE);
+    expect(ended.dice['die-a'].face).toBe(DieFace.THREE);
     expect(ended.dice['die-a'].position.u).toBeCloseTo(0.7);
   });
 });

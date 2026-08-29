@@ -104,7 +104,7 @@ export function RollObserver({
       dice: rollBodies.map(({ body, throwSpec }) => ({
         dieId: throwSpec.dieId,
         dieIndex: throwSpec.dieIndex,
-        value: getUpwardFace(body.rotation()),
+        face: getUpwardFace(body.rotation()),
       })),
       placements,
     };

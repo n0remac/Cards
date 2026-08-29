@@ -6,10 +6,13 @@ import {
   RigidBody,
 } from '@react-three/rapier';
 import {
-  CircleGeometry,
+  CanvasTexture,
+  LinearFilter,
   MeshStandardMaterial,
   Plane,
+  PlaneGeometry,
   Quaternion as ThreeQuaternion,
+  SRGBColorSpace,
   Vector3 as ThreeVector3,
 } from 'three';
 import { RoundedBoxGeometry } from 'three/examples/jsm/geometries/RoundedBoxGeometry.js';
@@ -24,10 +27,12 @@ import {
 import { DICE_TABLE_CONFIG } from './constants';
 import {
   faceUpQuaternion,
-  isPlayableDieValue,
+  isPlayableDieFace,
   quaternionToObject,
   vectorToObject,
 } from './diceMath';
+import { getLetterFaceVisuals } from './letterDieVisual';
+import { createLetterMaterialCache } from './letterMaterialCache';
 import { TableDie } from './tableModel';
 import { shouldSnapReconciliation } from './reconciliation';
 
@@ -53,16 +58,6 @@ type DieProps = {
   ) => void;
 };
 
-type PipPoint = readonly [number, number];
-const PIP_PATTERNS: Record<number, readonly PipPoint[]> = {
-  1: [[0, 0]],
-  2: [[-0.2, 0.2], [0.2, -0.2]],
-  3: [[-0.22, 0.22], [0, 0], [0.22, -0.22]],
-  4: [[-0.2, 0.2], [0.2, 0.2], [-0.2, -0.2], [0.2, -0.2]],
-  5: [[-0.22, 0.22], [0.22, 0.22], [0, 0], [-0.22, -0.22], [0.22, -0.22]],
-  6: [[-0.21, 0.25], [0.21, 0.25], [-0.21, 0], [0.21, 0], [-0.21, -0.25], [0.21, -0.25]],
-};
-
 const { die: dieConfig, physics } = DICE_TABLE_CONFIG;
 const DIE_GEOMETRY = new RoundedBoxGeometry(
   dieConfig.size,
@@ -71,51 +66,71 @@ const DIE_GEOMETRY = new RoundedBoxGeometry(
   5,
   0.1,
 );
-const PIP_GEOMETRY = new CircleGeometry(0.075, 18);
+const LETTER_GEOMETRY = new PlaneGeometry(0.68, 0.68);
 const DIE_MATERIAL = new MeshStandardMaterial({
   color: '#f4ead4',
   roughness: 0.42,
   metalness: 0.02,
 });
-const PIP_MATERIAL = new MeshStandardMaterial({
-  color: '#211d19',
-  roughness: 0.58,
+const LETTER_MATERIALS = createLetterMaterialCache((letter) => {
+  const canvas = document.createElement('canvas');
+  canvas.width = 256;
+  canvas.height = 256;
+  const context = canvas.getContext('2d');
+  if (!context) {
+    throw new Error('Could not create a letter texture canvas.');
+  }
+  context.clearRect(0, 0, canvas.width, canvas.height);
+  context.fillStyle = '#211d19';
+  context.font = '900 190px Arial, sans-serif';
+  context.textAlign = 'center';
+  context.textBaseline = 'middle';
+  context.fillText(letter, canvas.width / 2, canvas.height / 2 + 8);
+
+  const texture = new CanvasTexture(canvas);
+  texture.colorSpace = SRGBColorSpace;
+  texture.minFilter = LinearFilter;
+  texture.magFilter = LinearFilter;
+  return new MeshStandardMaterial({
+    map: texture,
+    transparent: true,
+    roughness: 0.58,
+    metalness: 0,
+  });
 });
 
-function FacePips({
-  value,
+function FaceLetter({
+  letter,
   position,
   rotation,
 }: {
-  value: number;
+  letter: string;
   position: [number, number, number];
   rotation: [number, number, number];
 }) {
   return (
-    <group position={position} rotation={rotation}>
-      {PIP_PATTERNS[value].map(([x, y], index) => (
-        <mesh
-          key={index}
-          position={[x, y, 0]}
-          geometry={PIP_GEOMETRY}
-          material={PIP_MATERIAL}
-        />
-      ))}
-    </group>
+    <mesh
+      position={position}
+      rotation={rotation}
+      geometry={LETTER_GEOMETRY}
+      material={LETTER_MATERIALS.get(letter)}
+    />
   );
 }
 
-function DieVisual() {
+function DieVisual({ dieDefinitionId }: { dieDefinitionId: string }) {
   const faceOffset = dieConfig.size / 2 + 0.006;
   return (
     <group dispose={null}>
       <mesh geometry={DIE_GEOMETRY} material={DIE_MATERIAL} castShadow receiveShadow />
-      <FacePips value={1} position={[0, faceOffset, 0]} rotation={[-Math.PI / 2, 0, 0]} />
-      <FacePips value={6} position={[0, -faceOffset, 0]} rotation={[Math.PI / 2, 0, 0]} />
-      <FacePips value={2} position={[faceOffset, 0, 0]} rotation={[0, Math.PI / 2, 0]} />
-      <FacePips value={5} position={[-faceOffset, 0, 0]} rotation={[0, -Math.PI / 2, 0]} />
-      <FacePips value={3} position={[0, 0, faceOffset]} rotation={[0, 0, 0]} />
-      <FacePips value={4} position={[0, 0, -faceOffset]} rotation={[0, Math.PI, 0]} />
+      {getLetterFaceVisuals(dieDefinitionId, faceOffset).map((visual) => (
+        <FaceLetter
+          key={visual.face}
+          letter={visual.letter}
+          position={visual.position}
+          rotation={visual.rotation}
+        />
+      ))}
     </group>
   );
 }
@@ -179,8 +194,8 @@ export function Die({
   const reconciling = useRef(false);
   const reconciliationRevision = useRef<bigint>();
 
-  const canonicalRotation = isPlayableDieValue(die.value)
-    ? faceUpQuaternion(die.value)
+  const canonicalRotation = isPlayableDieFace(die.face)
+    ? faceUpQuaternion(die.face)
     : { x: 0, y: 0, z: 0, w: 1 };
   const initialWorld = normalizedToWorld(layout, die.position);
 
@@ -364,7 +379,7 @@ export function Die({
         onPointerUp={finishDrag}
         onPointerCancel={finishDrag}
       >
-        <DieVisual />
+        <DieVisual dieDefinitionId={die.dieDefinitionId} />
       </group>
     </RigidBody>
   );

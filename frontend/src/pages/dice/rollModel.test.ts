@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
-import { DieValue, RollSpec } from '../../rpc/proto/dice/v1/dice_pb';
-import { DICE_TABLE_CONFIG, MAX_DICE, SIMULATION_VERSION } from './constants';
+import { DieFace, RollSpec } from '../../rpc/proto/dice/v1/dice_pb';
+import { DICE_TABLE_CONFIG, SIMULATION_VERSION } from './constants';
+import { STANDARD_LETTER_DIE_DEFINITION_IDS } from './letterDice';
 import {
   createLocalRollSpec,
   createRollResultFromSettledEvent,
@@ -10,18 +11,26 @@ import {
 
 const midpointRandom = () => 0.5;
 const targets = (count: number): RollTarget[] =>
-  Array.from({ length: count }, (_, index) => ({ dieId: `die-${index}` }));
+  Array.from({ length: count }, (_, index) => ({
+    dieId: `die-${index}`,
+    dieDefinitionId: STANDARD_LETTER_DIE_DEFINITION_IDS[
+      index % STANDARD_LETTER_DIE_DEFINITION_IDS.length
+    ],
+  }));
 
 describe('createLocalRollSpec', () => {
   it('creates stable, indexed, normalized float32 animation inputs', () => {
-    const spec = createLocalRollSpec(targets(MAX_DICE), 'roll-42', midpointRandom);
+    const spec = createLocalRollSpec(targets(12), 'roll-42', midpointRandom);
     expect(spec.simulationVersion).toBe(SIMULATION_VERSION);
     expect(spec.rollId).toBe('roll-42');
     expect(spec.dice.map((die) => die.dieId)).toEqual(
-      targets(MAX_DICE).map((die) => die.dieId),
+      targets(12).map((die) => die.dieId),
     );
     spec.dice.forEach((die, index) => {
       expect(die.dieIndex).toBe(index);
+      expect(die.dieDefinitionId).toBe(
+        STANDARD_LETTER_DIE_DEFINITION_IDS[index],
+      );
       expect(die.tablePosition?.u).toBeGreaterThanOrEqual(0);
       expect(die.tablePosition?.u).toBeLessThanOrEqual(1);
       expect(die.tablePosition?.v).toBeGreaterThanOrEqual(0);
@@ -52,7 +61,11 @@ describe('createLocalRollSpec', () => {
 
   it('uses supplied normalized positions for reroll animation', () => {
     const spec = createLocalRollSpec([
-      { dieId: 'stable-die', position: { u: 0.84, v: 0.72 } },
+      {
+        dieId: 'stable-die',
+        dieDefinitionId: 'letter-die-01',
+        position: { u: 0.84, v: 0.72 },
+      },
     ], 'reroll-1', midpointRandom);
     expect(spec.dice[0].tablePosition?.u).toBeCloseTo(0.84);
     expect(spec.dice[0].tablePosition?.v).toBeCloseTo(0.72);
@@ -65,14 +78,21 @@ describe('createLocalRollSpec', () => {
   });
 
   it('rejects invalid target sets and IDs', () => {
-    expect(() => createLocalRollSpec([], 'roll', midpointRandom)).toThrow(/between/);
-    expect(() => createLocalRollSpec(targets(MAX_DICE + 1), 'roll', midpointRandom))
-      .toThrow(/between/);
+    expect(() => createLocalRollSpec([], 'roll', midpointRandom))
+      .toThrow(/at least one/);
     expect(() => createLocalRollSpec(targets(1), '', midpointRandom)).toThrow(/Roll ID/);
     expect(() => createLocalRollSpec([
-      { dieId: 'same' },
-      { dieId: 'same' },
+      { dieId: 'same', dieDefinitionId: 'letter-die-01' },
+      { dieId: 'same', dieDefinitionId: 'letter-die-02' },
     ], 'roll', midpointRandom)).toThrow(/unique stable ID/);
+    expect(() => createLocalRollSpec([
+      { dieId: 'die', dieDefinitionId: 'unknown' },
+    ], 'roll', midpointRandom)).toThrow(/known letter die definition/);
+  });
+
+  it('allows reroll animation specs to include every die on a larger table', () => {
+    expect(createLocalRollSpec(targets(15), 'reroll-all', midpointRandom).dice)
+      .toHaveLength(15);
   });
 });
 
@@ -88,12 +108,14 @@ describe('validateRollSpec', () => {
     spec.simulationVersion += 1;
     spec.dice[1].dieIndex = 0;
     spec.dice[1].dieId = spec.dice[0].dieId;
+    spec.dice[0].dieDefinitionId = 'unknown';
     spec.dice[0].rotation!.w = 8;
     spec.dice[0].tablePosition!.u = 2;
     const errors = validateRollSpec(spec).join(' ');
     expect(errors).toMatch(/Unsupported simulation version/);
     expect(errors).toMatch(/unique and contiguous/);
     expect(errors).toMatch(/IDs must be non-empty and unique/);
+    expect(errors).toMatch(/known letter die definition/);
     expect(errors).toMatch(/invalid table position/);
     expect(errors).toMatch(/invalid rotation/);
   });
@@ -103,9 +125,9 @@ describe('createRollResultFromSettledEvent', () => {
   it('rejects stale and duplicate reports, then returns stable IDs in roll order', () => {
     const spec = createLocalRollSpec(targets(3), 'roll-7', midpointRandom);
     const dice = [
-      { dieId: 'die-2', dieIndex: 2, value: DieValue.SIX },
-      { dieId: 'die-0', dieIndex: 0, value: DieValue.FOUR },
-      { dieId: 'die-1', dieIndex: 1, value: DieValue.TWO },
+      { dieId: 'die-2', dieIndex: 2, face: DieFace.SIX },
+      { dieId: 'die-0', dieIndex: 0, face: DieFace.FOUR },
+      { dieId: 'die-1', dieIndex: 1, face: DieFace.TWO },
     ] as const;
     expect(createRollResultFromSettledEvent(spec, {
       rollId: 'old-roll',
@@ -123,11 +145,14 @@ describe('createRollResultFromSettledEvent', () => {
       dice,
       placements: [],
     });
-    expect(result?.dice.map((die) => [die.dieId, die.value])).toEqual([
-      ['die-0', DieValue.FOUR],
-      ['die-1', DieValue.TWO],
-      ['die-2', DieValue.SIX],
+    expect(result?.dice.map((die) => [
+      die.dieId,
+      die.dieDefinitionId,
+      die.face,
+    ])).toEqual([
+      ['die-0', 'letter-die-01', DieFace.FOUR],
+      ['die-1', 'letter-die-02', DieFace.TWO],
+      ['die-2', 'letter-die-03', DieFace.SIX],
     ]);
-    expect(result?.total).toBe(12);
   });
 });

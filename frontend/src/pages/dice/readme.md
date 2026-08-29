@@ -1,12 +1,14 @@
-# Dice table
+# Letter dice table
 
-This directory contains the persistent, phone-first D6 table at `/dice`. Rapier
-owns local animation. The rolling player owns the canonical values and final
+This directory contains the persistent, phone-first letter-dice table at
+`/dice`. The standard catalog has twelve stable die definitions and maps each
+definition's written six-letter string directly to physical faces one through
+six. Rapier owns local animation. The rolling player owns the canonical faces and final
 approximate placements that will eventually be shared over a live transport.
 
 Exact physics replay is intentionally not a protocol guarantee. A `RollSpec` is
 shared animation input so phones begin with similar throws. A `RollCompleted`
-event replaces observer-calculated values with the roller-reported values and
+event replaces observer-calculated faces with the roller-reported faces and
 reconciles normalized placements.
 
 ## Responsibilities
@@ -14,13 +16,15 @@ reconciles normalized placements.
 | File | Responsibility |
 | --- | --- |
 | `DiceGame.tsx` | Route presentation, loading/error state, and bottom controls. |
-| `useDiceTable.ts` | UI controller and construction of local domain events. Exposes add-new, reroll, selection, drag, settlement, and remote-event commands. |
+| `letterDice.ts` | Pure fixed catalog, definition validation, and physical-face-to-letter resolution. |
+| `tableCommands.ts` | Pure construction of first-roll, add-new, targeted-reroll, and reroll-all targets. |
+| `useDiceTable.ts` | UI controller and construction of local domain events. Exposes roll-all, definition-based add-new, reroll, selection, drag, settlement, and remote-event commands. |
 | `tableModel.ts` | Pure reducer for the persistent die map, stable ordering, active roll, snapshots, drag sequences, and reconciliation targets. |
 | `tableEventAdapter.ts` | Synchronous loopback adapter with the same publish/receive boundary expected from a future network adapter. |
 | `arenaLayout.ts` | Pure aspect-derived camera, edge walls, playable quadrilateral, floor/shadow bounds, normalized mapping, and containment correction. |
 | `DiceArena.tsx` | Camera and Rapier floor/wall collider ownership. The floor and responsive wall bodies are separate. |
 | `RollObserver.tsx` | Post-step containment, active-roll settlement, face reading, and displaced-die placement reporting. |
-| `Die.tsx` | Stable Rapier body, visual, body-mode transitions, pointer dragging, and result reconciliation. |
+| `Die.tsx` | Stable Rapier body, cached canvas letter materials, body-mode transitions, pointer dragging, and result reconciliation. |
 | `rollModel.ts` | Shared animation input generation and validation plus authoritative result construction. |
 | `diceMath.ts` | Face/quaternion and settlement math with no React or Rapier dependency. |
 
@@ -33,12 +37,16 @@ single-player code path.
 
 The reducer stores dice by stable `dieId`. `dieOrder` controls rendering order,
 while an active roll only identifies the bodies being watched for settlement.
-Starting an add-new roll appends bodies. Starting a reroll reuses existing IDs.
+Each instance keeps a stable `dieId` separate from its fixed
+`dieDefinitionId`. Starting an add-new roll appends bodies. Starting a reroll
+reuses existing IDs and definitions.
 Only one roll can be active, but all prior dice remain mounted and collidable.
 
-The controller exposes `selectedDieIds`, `setSelectedDieIds()`,
-`reroll(dieIds)`, and `rerollSelected()`. Selection/grouping UI is intentionally
-deferred.
+`rollAll()` creates the standard twelve-die catalog on an empty table. On a
+populated table it rerolls every instance from its current normalized position,
+including any extra dice added through the internal `rollNew(definitionIds)`
+capability. The controller also exposes selection and targeted-reroll commands,
+but selection/grouping and add-new UI are intentionally deferred.
 
 ## Body modes
 
@@ -79,16 +87,18 @@ remount the responsive wall body.
 The protobuf schema supports:
 
 - stable die IDs alongside roll-order indices;
+- fixed definition IDs on throw, result, and snapshot entries;
 - add-new and reroll-existing modes;
 - normalized table positions, placements, die state, and snapshots;
 - roll-start and roll-complete events with roller identity, animation input,
-  authoritative values, and changed placements;
+  authoritative physical faces, and changed placements;
 - sequenced drag start/update/end events with player and interaction identity;
 - a revisioned event envelope suitable for snapshot plus event-stream sync.
 
-Simulation version `3` is the first published version of this completed
-foundation. It describes compatible animation input interpretation, not
-lockstep deterministic physics.
+Clients derive visible letters from the shared fixed catalog rather than
+transmitting a redundant mutable letter. Simulation version `4` publishes this
+letter-die interpretation. It describes compatible animation input meaning,
+not lockstep deterministic physics.
 
 ## Verification
 

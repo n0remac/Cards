@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import {
-  DieValue,
+  DieFace,
   Quaternion,
   Vector3,
 } from '../../rpc/proto/dice/v1/dice_pb';
@@ -18,33 +18,33 @@ const halfSqrt = Math.SQRT1_2;
 
 describe('getUpwardFace', () => {
   it.each([
-    [{ x: 0, y: 0, z: 0, w: 1 }, DieValue.ONE],
-    [{ x: 1, y: 0, z: 0, w: 0 }, DieValue.SIX],
-    [{ x: 0, y: 0, z: halfSqrt, w: halfSqrt }, DieValue.TWO],
-    [{ x: 0, y: 0, z: -halfSqrt, w: halfSqrt }, DieValue.FIVE],
-    [{ x: -halfSqrt, y: 0, z: 0, w: halfSqrt }, DieValue.THREE],
-    [{ x: halfSqrt, y: 0, z: 0, w: halfSqrt }, DieValue.FOUR],
-  ])('maps quaternion %o to face %s', (quaternion, value) => {
-    expect(getUpwardFace(quaternion)).toBe(value);
+    [{ x: 0, y: 0, z: 0, w: 1 }, DieFace.ONE],
+    [{ x: 1, y: 0, z: 0, w: 0 }, DieFace.SIX],
+    [{ x: 0, y: 0, z: halfSqrt, w: halfSqrt }, DieFace.TWO],
+    [{ x: 0, y: 0, z: -halfSqrt, w: halfSqrt }, DieFace.FIVE],
+    [{ x: -halfSqrt, y: 0, z: 0, w: halfSqrt }, DieFace.THREE],
+    [{ x: halfSqrt, y: 0, z: 0, w: halfSqrt }, DieFace.FOUR],
+  ])('maps quaternion %o to face %s', (quaternion, face) => {
+    expect(getUpwardFace(quaternion)).toBe(face);
   });
 
   it('keeps opposite face pairs summing to seven', () => {
-    expect(DieValue.ONE + DieValue.SIX).toBe(7);
-    expect(DieValue.TWO + DieValue.FIVE).toBe(7);
-    expect(DieValue.THREE + DieValue.FOUR).toBe(7);
+    expect(DieFace.ONE + DieFace.SIX).toBe(7);
+    expect(DieFace.TWO + DieFace.FIVE).toBe(7);
+    expect(DieFace.THREE + DieFace.FOUR).toBe(7);
   });
 
-  it('creates a canonical face-up quaternion for every playable value', () => {
-    const values = [
-      DieValue.ONE,
-      DieValue.TWO,
-      DieValue.THREE,
-      DieValue.FOUR,
-      DieValue.FIVE,
-      DieValue.SIX,
+  it('creates a canonical face-up quaternion for every playable face', () => {
+    const faces = [
+      DieFace.ONE,
+      DieFace.TWO,
+      DieFace.THREE,
+      DieFace.FOUR,
+      DieFace.FIVE,
+      DieFace.SIX,
     ] as const;
-    for (const value of values) {
-      expect(getUpwardFace(faceUpQuaternion(value))).toBe(value);
+    for (const face of faces) {
+      expect(getUpwardFace(faceUpQuaternion(face))).toBe(face);
     }
   });
 });
@@ -75,7 +75,7 @@ describe('advanceRollSettling', () => {
   it('settles the roll only after every die is stable for 20 shared steps', () => {
     let stableSteps = 0;
     for (let step = 1; step <= DICE_TABLE_CONFIG.roll.settleSteps; step += 1) {
-      const progress = advanceRollSettling(stableSteps, atRest(10));
+      const progress = advanceRollSettling(stableSteps, atRest(12));
       stableSteps = progress.stableSteps;
       expect(progress.settled).toBe(step === DICE_TABLE_CONFIG.roll.settleSteps);
     }

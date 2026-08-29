@@ -1,7 +1,5 @@
 import React, { Component, ErrorInfo, ReactNode, useCallback, useState } from 'react';
-import { MAX_DICE, MIN_DICE } from './constants';
 import { DiceScene } from './DiceScene';
-import { orderedValues } from './rollModel';
 import { useDiceTable } from './useDiceTable';
 
 type SceneStatus = 'loading' | 'ready' | 'unsupported' | 'error';
@@ -54,10 +52,9 @@ const WOOD_GRAIN = {
 export default function DiceGame() {
   const controller = useDiceTable();
   const [sceneStatus, setSceneStatus] = useState<SceneStatus>('loading');
-  const values = orderedValues(controller.lastResult);
-  const countLocked = controller.phase === 'rolling';
-  const rollDisabled = sceneStatus !== 'ready' || countLocked;
-  const rollingCount = controller.activeRoll?.spec.dice.length ?? controller.count;
+  const rollDisabled = sceneStatus !== 'ready' || controller.phase === 'rolling';
+  const rollingCount = controller.activeRoll?.spec.dice.length ?? 0;
+  const hasDice = controller.dieOrder.length > 0;
 
   const markReady = useCallback(() => setSceneStatus('ready'), []);
   const markUnsupported = useCallback(() => setSceneStatus('unsupported'), []);
@@ -70,12 +67,14 @@ export default function DiceGame() {
       : sceneStatus === 'error'
         ? 'The physics engine could not initialize.'
         : controller.phase === 'rolling'
-          ? `Rolling ${rollingCount} ${rollingCount === 1 ? 'die' : 'dice'}…`
+          ? `Rolling ${rollingCount} letter ${rollingCount === 1 ? 'die' : 'dice'}…`
           : controller.phase === 'settled'
-            ? `${values.join(' + ')} =`
-            : 'Choose how many new dice to add.';
+            ? 'Arrange the letters or roll again.'
+            : 'Roll the twelve letter dice.';
 
-  const rollLabel = controller.phase === 'rolling' ? 'Rolling…' : 'Roll new dice';
+  const rollLabel = controller.phase === 'rolling'
+    ? 'Rolling…'
+    : hasDice ? 'Reroll all dice' : 'Roll letter dice';
 
   return (
     <main
@@ -83,7 +82,7 @@ export default function DiceGame() {
       style={WOOD_GRAIN}
     >
       <section
-        aria-label="Dice table"
+        aria-label="Letter dice table"
         className="relative flex h-full min-h-0 flex-col shadow-2xl shadow-black/60"
       >
         <div className="relative min-h-0 flex-1 overflow-hidden rounded-t-lg bg-[#185438] shadow-[inset_0_0_0_1px_rgba(255,255,255,0.08),inset_0_8px_18px_rgba(0,0,0,0.32)] sm:rounded-t-xl">
@@ -104,10 +103,10 @@ export default function DiceGame() {
 
           <header className="pointer-events-none absolute left-4 top-4 z-20 sm:left-6 sm:top-6">
             <p className="text-[0.62rem] font-bold uppercase tracking-[0.28em] text-emerald-100/70">
-              Physics table
+              Letter table
             </p>
             <h1 className="mt-0.5 text-2xl font-black uppercase tracking-[0.08em] text-stone-50 [text-shadow:0_2px_8px_rgba(0,0,0,0.55)] sm:text-3xl">
-              Dice
+              Letter Dice
             </h1>
           </header>
 
@@ -127,55 +126,14 @@ export default function DiceGame() {
             <p className="min-w-0 truncate text-xs font-medium tracking-wide text-stone-200/80 sm:text-sm">
               {statusText}
             </p>
-            {controller.lastResult && (
-              <p className="flex shrink-0 items-baseline gap-1.5" aria-label={`Total ${controller.lastResult.total}`}>
-                <span className="text-[0.6rem] font-bold uppercase tracking-[0.18em] text-emerald-200/70">
-                  Total
-                </span>
-                <strong className="text-2xl leading-none tabular-nums text-emerald-200">
-                  {controller.lastResult.total}
-                </strong>
-              </p>
-            )}
           </div>
 
-          <div className="flex items-center gap-2.5 py-2 sm:gap-4 sm:py-3">
-            <div
-              className="flex shrink-0 items-center rounded-xl border border-[#9b6848]/60 bg-[#25130d]/70 p-1 shadow-inner shadow-black/40"
-              aria-label="Number of dice"
-              role="group"
-            >
-              <button
-                type="button"
-                aria-label="Remove one die"
-                disabled={countLocked || controller.count <= MIN_DICE}
-                onClick={() => controller.changeCount(-1)}
-                className="grid h-10 w-10 place-items-center rounded-lg text-xl font-semibold text-stone-100 transition hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-emerald-300 disabled:cursor-not-allowed disabled:opacity-30 sm:h-11 sm:w-11"
-              >
-                −
-              </button>
-              <output
-                aria-label={`${controller.count} ${controller.count === 1 ? 'die' : 'dice'} selected`}
-                className="min-w-8 text-center text-xl font-black tabular-nums text-[#f4dfb4] sm:min-w-10 sm:text-2xl"
-              >
-                {controller.count}
-              </output>
-              <button
-                type="button"
-                aria-label="Add one die"
-                disabled={countLocked || controller.count >= MAX_DICE}
-                onClick={() => controller.changeCount(1)}
-                className="grid h-10 w-10 place-items-center rounded-lg text-xl font-semibold text-stone-100 transition hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-emerald-300 disabled:cursor-not-allowed disabled:opacity-30 sm:h-11 sm:w-11"
-              >
-                +
-              </button>
-            </div>
-
+          <div className="py-2 sm:py-3">
             <button
               type="button"
               disabled={rollDisabled}
-              onClick={() => controller.rollNew()}
-              className="h-12 min-w-0 flex-1 rounded-xl border border-[#fff1ca]/60 bg-[#efd8a7] px-3 text-sm font-black uppercase tracking-[0.12em] text-[#173c2a] shadow-lg shadow-black/35 transition hover:bg-[#ffe9bb] focus:outline-none focus:ring-2 focus:ring-emerald-300 focus:ring-offset-2 focus:ring-offset-[#422317] disabled:cursor-not-allowed disabled:border-stone-600 disabled:bg-stone-700 disabled:text-stone-400 sm:h-14 sm:text-base"
+              onClick={controller.rollAll}
+              className="h-12 w-full rounded-xl border border-[#fff1ca]/60 bg-[#efd8a7] px-3 text-sm font-black uppercase tracking-[0.12em] text-[#173c2a] shadow-lg shadow-black/35 transition hover:bg-[#ffe9bb] focus:outline-none focus:ring-2 focus:ring-emerald-300 focus:ring-offset-2 focus:ring-offset-[#422317] disabled:cursor-not-allowed disabled:border-stone-600 disabled:bg-stone-700 disabled:text-stone-400 sm:h-14 sm:text-base"
             >
               {rollLabel}
             </button>

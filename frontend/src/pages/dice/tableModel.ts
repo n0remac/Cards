@@ -1,23 +1,25 @@
 import {
+  DieFace,
   DieThrowSpec,
-  DieValue,
   NormalizedTablePosition,
   RollMode,
   RollResult,
   RollSpec,
   TableEvent,
 } from '../../rpc/proto/dice/v1/dice_pb';
-import { DEFAULT_DICE, MAX_DICE, MIN_DICE } from './constants';
-import { isPlayableDieValue, PlayableDieValue } from './diceMath';
+import { MAX_DEFINITIONS_PER_ADD } from './constants';
+import { isPlayableDieFace, PlayableDieFace } from './diceMath';
+import { isKnownLetterDieDefinitionId } from './letterDice';
 import { validateRollSpec } from './rollModel';
 
 export type DieBodyMode = 'rolling' | 'settled' | 'held';
 
 export type TableDie = {
   dieId: string;
+  dieDefinitionId: string;
   ownerPlayerId: string;
   revision: bigint;
-  value: DieValue;
+  face: DieFace;
   position: NormalizedTablePosition;
   mode: DieBodyMode;
   activeRollId?: string;
@@ -41,7 +43,6 @@ export type ActiveTableRoll = {
 export type DiceTableState = {
   tableId: string;
   revision: bigint;
-  count: number;
   dice: Readonly<Record<string, TableDie>>;
   dieOrder: readonly string[];
   activeRoll?: ActiveTableRoll;
@@ -51,7 +52,6 @@ export type DiceTableState = {
 
 export type DiceTableAction =
   | { type: 'event'; event: TableEvent }
-  | { type: 'change-count'; delta: number }
   | { type: 'select'; dieIds: readonly string[] };
 
 export function createInitialDiceTableState(
@@ -60,7 +60,6 @@ export function createInitialDiceTableState(
   return {
     tableId,
     revision: 0n,
-    count: DEFAULT_DICE,
     dice: {},
     dieOrder: [],
     selectedDieIds: [],
@@ -98,8 +97,11 @@ function applyRollStarted(
   const targetIds = spec.dice.map((die) => die.dieId);
   const isAdd = started.mode === RollMode.ADD_NEW;
   const targetsAreValid = isAdd
-    ? targetIds.every((dieId) => !state.dice[dieId])
-    : targetIds.every((dieId) => Boolean(state.dice[dieId]));
+    ? spec.dice.length <= MAX_DEFINITIONS_PER_ADD &&
+      targetIds.every((dieId) => !state.dice[dieId])
+    : spec.dice.every((throwSpec) =>
+      state.dice[throwSpec.dieId]?.dieDefinitionId ===
+        throwSpec.dieDefinitionId);
   if (!targetsAreValid) {
     return state;
   }
@@ -114,9 +116,10 @@ function applyRollStarted(
     const existing = dice[throwSpec.dieId];
     dice[throwSpec.dieId] = {
       dieId: throwSpec.dieId,
+      dieDefinitionId: throwSpec.dieDefinitionId,
       ownerPlayerId: existing?.ownerPlayerId || started.rollerId,
       revision: event.revision,
-      value: existing?.value ?? DieValue.UNSPECIFIED,
+      face: existing?.face ?? DieFace.UNSPECIFIED,
       position,
       mode: 'rolling',
       activeRollId: started.rollId,
@@ -158,16 +161,23 @@ function applyRollCompleted(
     return state;
   }
 
-  const expected = new Set(state.activeRoll.spec.dice.map((die) => die.dieId));
+  const expected = new Map(state.activeRoll.spec.dice.map((die) => [
+    die.dieId,
+    die,
+  ]));
   const resultIds = result.dice.map((die) => die.dieId);
   if (result.dice.length !== expected.size ||
       new Set(resultIds).size !== expected.size ||
-      result.dice.some((die) =>
-        !expected.has(die.dieId) || !isPlayableDieValue(die.value)) ||
-      result.total !== result.dice.reduce((total, die) => total + die.value, 0)) {
+      result.dice.some((die) => {
+        const expectedDie = expected.get(die.dieId);
+        return !expectedDie || die.dieIndex !== expectedDie.dieIndex ||
+          die.dieDefinitionId !== expectedDie.dieDefinitionId ||
+          !isKnownLetterDieDefinitionId(die.dieDefinitionId) ||
+          !isPlayableDieFace(die.face);
+      })) {
     return state;
   }
-  const resultById = new Map(result.dice.map((die) => [die.dieId, die.value]));
+  const resultById = new Map(result.dice.map((die) => [die.dieId, die.face]));
   const placementById = new Map(completed.changedPlacements.flatMap((placement) => {
     const position = clonePosition(placement.position);
     return position ? [[placement.dieId, position] as const] : [];
@@ -175,12 +185,12 @@ function applyRollCompleted(
   const dice = { ...state.dice };
 
   for (const [dieId, die] of Object.entries(dice)) {
-    const canonicalValue = resultById.get(dieId);
+    const canonicalFace = resultById.get(dieId);
     const placement = placementById.get(dieId);
-    if (canonicalValue !== undefined) {
+    if (canonicalFace !== undefined) {
       dice[dieId] = {
         ...die,
-        value: canonicalValue,
+        face: canonicalFace,
         revision: event.revision,
         position: placement ?? die.position,
         mode: 'settled',
@@ -287,15 +297,17 @@ function applySnapshot(state: DiceTableState, event: TableEvent): DiceTableState
   const dieOrder: string[] = [];
   for (const entry of snapshot.dice) {
     const position = clonePosition(entry.position);
-    if (!entry.dieId || !position || !isPlayableDieValue(entry.value) ||
+    if (!entry.dieId || !position || !isPlayableDieFace(entry.face) ||
+        !isKnownLetterDieDefinitionId(entry.dieDefinitionId) ||
         dice[entry.dieId]) {
       return state;
     }
     dice[entry.dieId] = {
       dieId: entry.dieId,
+      dieDefinitionId: entry.dieDefinitionId,
       ownerPlayerId: entry.ownerPlayerId,
       revision: entry.revision,
-      value: entry.value,
+      face: entry.face,
       position,
       mode: 'settled',
     };
@@ -341,21 +353,11 @@ export function diceTableReducer(
   if (action.type === 'event') {
     return applyTableEvent(state, action.event);
   }
-  if (action.type === 'change-count') {
-    if (state.activeRoll) {
-      return state;
-    }
-    return {
-      ...state,
-      count: Math.min(MAX_DICE, Math.max(MIN_DICE, state.count + action.delta)),
-    };
-  }
   const selectedDieIds = [...new Set(action.dieIds)]
-    .filter((dieId) => state.dice[dieId]?.mode === 'settled')
-    .slice(0, MAX_DICE);
+    .filter((dieId) => state.dice[dieId]?.mode === 'settled');
   return { ...state, selectedDieIds };
 }
 
-export function playableTableValue(die: TableDie): PlayableDieValue | undefined {
-  return isPlayableDieValue(die.value) ? die.value : undefined;
+export function playableTableFace(die: TableDie): PlayableDieFace | undefined {
+  return isPlayableDieFace(die.face) ? die.face : undefined;
 }

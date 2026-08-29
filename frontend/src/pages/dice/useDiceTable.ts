@@ -10,10 +10,17 @@ import {
   RollStarted,
   TableEvent,
 } from '../../rpc/proto/dice/v1/dice_pb';
-import { MAX_DICE, MIN_DICE } from './constants';
+import { MAX_DEFINITIONS_PER_ADD } from './constants';
+import { LetterDieDefinitionId } from './letterDice';
+import {
+  createAddRollTargets,
+  createRerollTargets,
+  createRollAllRequest,
+} from './tableCommands';
 import {
   createRollResultFromSettledEvent,
   createLocalRollSpec,
+  RollTarget,
   RollSettledEvent,
 } from './rollModel';
 import {
@@ -41,8 +48,8 @@ function uniqueId(prefix: string): string {
 export type DiceTableController = DiceTableState & {
   localPlayerId: string;
   phase: 'idle' | 'rolling' | 'settled';
-  changeCount: (delta: number) => void;
-  rollNew: (count?: number) => boolean;
+  rollAll: () => boolean;
+  rollNew: (definitionIds: readonly LetterDieDefinitionId[]) => boolean;
   reroll: (dieIds: readonly string[]) => boolean;
   rerollSelected: () => boolean;
   setSelectedDieIds: (dieIds: readonly string[]) => void;
@@ -98,27 +105,20 @@ export function useDiceTable(
     [localAdapter],
   );
 
-  const changeCount = useCallback((delta: number) => {
-    dispatch({ type: 'change-count', delta });
-  }, []);
-
-  const startRoll = useCallback((mode: RollMode, dieIds: readonly string[]) => {
+  const startRoll = useCallback((mode: RollMode, targets: readonly RollTarget[]) => {
     const current = stateRef.current;
-    if (current.activeRoll || dieIds.length < MIN_DICE || dieIds.length > MAX_DICE) {
+    if (current.activeRoll || targets.length === 0 ||
+        (mode === RollMode.ADD_NEW &&
+         targets.length > MAX_DEFINITIONS_PER_ADD)) {
       return false;
     }
     const rollId = uniqueId('roll');
-    const targets = dieIds.map((dieId) => ({
-      dieId,
-      position: mode === RollMode.REROLL_EXISTING
-        ? current.dice[dieId]?.position
-        : undefined,
-    }));
-    if (targets.some(({ position }) =>
-      mode === RollMode.REROLL_EXISTING && !position)) {
+    let animationSpec;
+    try {
+      animationSpec = createLocalRollSpec(targets, rollId);
+    } catch {
       return false;
     }
-    const animationSpec = createLocalRollSpec(targets, rollId);
     localAdapter.publish({
       case: 'rollStarted',
       value: new RollStarted({ rollId, rollerId: playerId, mode, animationSpec }),
@@ -126,13 +126,23 @@ export function useDiceTable(
     return true;
   }, [localAdapter, playerId]);
 
-  const rollNew = useCallback((count = stateRef.current.count) => {
-    const dieIds = Array.from({ length: count }, () => uniqueId('die'));
-    return startRoll(RollMode.ADD_NEW, dieIds);
+  const rollNew = useCallback((definitionIds: readonly LetterDieDefinitionId[]) => {
+    const targets = createAddRollTargets(definitionIds, () => uniqueId('die'));
+    return targets ? startRoll(RollMode.ADD_NEW, targets) : false;
   }, [startRoll]);
 
-  const reroll = useCallback((dieIds: readonly string[]) =>
-    startRoll(RollMode.REROLL_EXISTING, [...new Set(dieIds)]), [startRoll]);
+  const reroll = useCallback((dieIds: readonly string[]) => {
+    const targets = createRerollTargets(stateRef.current, dieIds);
+    return targets ? startRoll(RollMode.REROLL_EXISTING, targets) : false;
+  }, [startRoll]);
+
+  const rollAll = useCallback(() => {
+    const request = createRollAllRequest(
+      stateRef.current,
+      () => uniqueId('die'),
+    );
+    return request ? startRoll(request.mode, request.targets) : false;
+  }, [startRoll]);
 
   const reportSettled = useCallback((event: RollSettledEvent) => {
     const current = stateRef.current;
@@ -211,8 +221,8 @@ export function useDiceTable(
   return {
     ...state,
     localPlayerId: playerId,
-    phase: state.activeRoll ? 'rolling' : state.lastResult ? 'settled' : 'idle',
-    changeCount,
+    phase: state.activeRoll ? 'rolling' : state.dieOrder.length ? 'settled' : 'idle',
+    rollAll,
     rollNew,
     reroll,
     rerollSelected: () => reroll(stateRef.current.selectedDieIds),

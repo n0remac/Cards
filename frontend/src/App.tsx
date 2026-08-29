@@ -19,7 +19,7 @@ const DiceGame = React.lazy(() => import('./pages/dice/DiceGame'));
 
 const DiceRouteFallback = () => (
     <main className="grid h-[100dvh] place-items-center bg-[#185438] text-emerald-50">
-        Loading dice…
+        Loading letter dice…
     </main>
 );
 
@@ -46,7 +46,7 @@ function SiteLayout({ isLoggedIn }: { isLoggedIn: boolean }) {
                         <Link to="/poetry" className="block text-white text-center py-3 px-4 no-underline">Poetry</Link>
                     </li>
                     <li className="float-left">
-                        <Link to="/dice" className="block text-white text-center py-3 px-4 no-underline">Dice</Link>
+                        <Link to="/dice" className="block text-white text-center py-3 px-4 no-underline">Letter Dice</Link>
                     </li>
                 </ul>
             </nav>

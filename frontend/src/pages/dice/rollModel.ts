@@ -7,23 +7,20 @@ import {
   RollSpec,
   Vector3,
 } from '../../rpc/proto/dice/v1/dice_pb';
-import {
-  DICE_TABLE_CONFIG,
-  MAX_DICE,
-  MIN_DICE,
-  SIMULATION_VERSION,
-} from './constants';
-import { isPlayableDieValue, PlayableDieValue } from './diceMath';
+import { DICE_TABLE_CONFIG, SIMULATION_VERSION } from './constants';
+import { isPlayableDieFace, PlayableDieFace } from './diceMath';
+import { isKnownLetterDieDefinitionId } from './letterDice';
 
 export type RandomSource = () => number;
 export type RollTarget = {
   dieId: string;
+  dieDefinitionId: string;
   position?: Pick<NormalizedTablePosition, 'u' | 'v'>;
 };
 export type SettledDie = {
   dieId: string;
   dieIndex: number;
-  value: PlayableDieValue;
+  face: PlayableDieFace;
 };
 export type SettledPlacement = {
   dieId: string;
@@ -94,12 +91,13 @@ function normalizedSpawnPosition(
 ): NormalizedTablePosition {
   const { normalizedSpawnSlots, spawnJitter } = DICE_TABLE_CONFIG.roll;
   const fallback = normalizedSpawnSlots[dieIndex] ?? normalizedSpawnSlots[0];
-  const source = target.position ?? { u: fallback[0], v: fallback[1] };
+  const source = target.position ?? {
+    u: fallback[0] + randomBetween(random, -spawnJitter, spawnJitter),
+    v: fallback[1] + randomBetween(random, -spawnJitter, spawnJitter),
+  };
   return new NormalizedTablePosition({
-    u: float32(Math.min(0.96, Math.max(0.04,
-      source.u + randomBetween(random, -spawnJitter, spawnJitter)))),
-    v: float32(Math.min(0.96, Math.max(0.04,
-      source.v + randomBetween(random, -spawnJitter, spawnJitter)))),
+    u: float32(Math.min(0.96, Math.max(0.04, source.u))),
+    v: float32(Math.min(0.96, Math.max(0.04, source.v))),
   });
 }
 
@@ -108,8 +106,8 @@ export function createLocalRollSpec(
   rollId: string,
   random: RandomSource = Math.random,
 ): RollSpec {
-  if (targets.length < MIN_DICE || targets.length > MAX_DICE) {
-    throw new Error(`A roll must contain between ${MIN_DICE} and ${MAX_DICE} dice.`);
+  if (targets.length === 0) {
+    throw new Error('A roll must contain at least one die.');
   }
   if (!rollId.trim()) {
     throw new Error('Roll ID must not be empty.');
@@ -117,6 +115,10 @@ export function createLocalRollSpec(
   if (new Set(targets.map(({ dieId }) => dieId)).size !== targets.length ||
       targets.some(({ dieId }) => !dieId.trim())) {
     throw new Error('Every rolled die must have a unique stable ID.');
+  }
+  if (targets.some(({ dieDefinitionId }) =>
+    !isKnownLetterDieDefinitionId(dieDefinitionId))) {
+    throw new Error('Every rolled die must use a known letter die definition.');
   }
 
   const {
@@ -131,6 +133,7 @@ export function createLocalRollSpec(
     return new DieThrowSpec({
       dieIndex,
       dieId: target.dieId,
+      dieDefinitionId: target.dieDefinitionId,
       tablePosition,
       position: createVector(tablePosition.u, height, tablePosition.v),
       rotation: createUniformQuaternion(random),
@@ -185,8 +188,8 @@ export function validateRollSpec(spec: RollSpec): string[] {
   if (!spec.rollId.trim()) {
     errors.push('Roll ID must not be empty.');
   }
-  if (spec.dice.length < MIN_DICE || spec.dice.length > MAX_DICE) {
-    errors.push(`A roll must contain between ${MIN_DICE} and ${MAX_DICE} dice.`);
+  if (spec.dice.length === 0) {
+    errors.push('A roll must contain at least one die.');
   }
 
   const sortedIndices = spec.dice.map((die) => die.dieIndex).sort((a, b) => a - b);
@@ -197,6 +200,10 @@ export function validateRollSpec(spec: RollSpec): string[] {
   if (dieIds.some((dieId) => !dieId.trim()) ||
       new Set(dieIds).size !== dieIds.length) {
     errors.push('Die IDs must be non-empty and unique.');
+  }
+  if (spec.dice.some(({ dieDefinitionId }) =>
+    !isKnownLetterDieDefinitionId(dieDefinitionId))) {
+    errors.push('Every die must use a known letter die definition.');
   }
 
   for (const die of spec.dice) {
@@ -228,24 +235,28 @@ export function assertValidRollSpec(spec: RollSpec): void {
 
 export function createRollResult(
   spec: RollSpec,
-  settled: ReadonlyMap<string, PlayableDieValue>,
+  settled: ReadonlyMap<string, PlayableDieFace>,
 ): RollResult {
   assertValidRollSpec(spec);
   if (settled.size !== spec.dice.length) {
     throw new Error('Cannot complete a roll before every die has settled.');
   }
   const dice = spec.dice.map((die) => {
-    const value = settled.get(die.dieId);
-    if (value === undefined || !isPlayableDieValue(value)) {
+    const face = settled.get(die.dieId);
+    if (face === undefined || !isPlayableDieFace(face)) {
       throw new Error(`Missing a valid result for die ${die.dieId}.`);
     }
-    return new DieResult({ dieIndex: die.dieIndex, dieId: die.dieId, value });
+    return new DieResult({
+      dieIndex: die.dieIndex,
+      dieId: die.dieId,
+      dieDefinitionId: die.dieDefinitionId,
+      face,
+    });
   }).sort((a, b) => a.dieIndex - b.dieIndex);
   return new RollResult({
     simulationVersion: spec.simulationVersion,
     rollId: spec.rollId,
     dice,
-    total: dice.reduce((total, die) => total + die.value, 0),
   });
 }
 
@@ -257,21 +268,13 @@ export function createRollResultFromSettledEvent(
     return undefined;
   }
   const expectedIds = new Set(spec.dice.map((die) => die.dieId));
-  const settled = new Map<string, PlayableDieValue>();
+  const settled = new Map<string, PlayableDieFace>();
   for (const die of event.dice) {
     if (!expectedIds.has(die.dieId) || settled.has(die.dieId) ||
-        !isPlayableDieValue(die.value)) {
+        !isPlayableDieFace(die.face)) {
       return undefined;
     }
-    settled.set(die.dieId, die.value);
+    settled.set(die.dieId, die.face);
   }
   return createRollResult(spec, settled);
-}
-
-export function orderedValues(result: RollResult | undefined): PlayableDieValue[] {
-  if (!result) {
-    return [];
-  }
-  return [...result.dice].sort((a, b) => a.dieIndex - b.dieIndex)
-    .map((die) => die.value).filter(isPlayableDieValue);
 }
