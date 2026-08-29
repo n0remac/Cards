@@ -48,9 +48,53 @@ describe('ArenaLayout', () => {
     const portrait = getArenaLayout(390, 844);
     const landscape = getArenaLayout(844, 390);
     expect(portrait.floor).toEqual(landscape.floor);
+    expect(portrait.visualFloor).not.toEqual(landscape.visualFloor);
     expect(portrait.aspectKey).not.toBe(landscape.aspectKey);
     expect(portrait.walls).not.toEqual(landscape.walls);
   });
+
+  it.each(viewports)(
+    'fits the segmented visual floor around the $name viewport in front of the camera',
+    ({ width, height }) => {
+      const layout = getArenaLayout(width, height);
+      const { center, width: floorWidth, depth } = layout.visualFloor;
+      const halfWidth = floorWidth / 2;
+      const halfDepth = depth / 2;
+      const left = center[0] - halfWidth;
+      const right = center[0] + halfWidth;
+      const top = center[2] - halfDepth;
+      const bottom = center[2] + halfDepth;
+      const padding = DICE_TABLE_CONFIG.arena.visualFloorPadding;
+
+      for (const point of layout.screenBoundary) {
+        expect(point.x - left).toBeGreaterThanOrEqual(padding - 1e-7);
+        expect(right - point.x).toBeGreaterThanOrEqual(padding - 1e-7);
+        expect(point.z - top).toBeGreaterThanOrEqual(padding - 1e-7);
+        expect(bottom - point.z).toBeGreaterThanOrEqual(padding - 1e-7);
+      }
+
+      const camera = new PerspectiveCamera(
+        layout.camera.fov,
+        layout.aspect,
+        0.1,
+        160,
+      );
+      camera.position.set(...layout.camera.position);
+      camera.lookAt(0, 0, 0);
+      camera.updateProjectionMatrix();
+      camera.updateMatrixWorld(true);
+      for (const x of [left, right]) {
+        for (const z of [top, bottom]) {
+          const corner = new Vector3(x, 0, z);
+          const cameraSpace = corner.clone().applyMatrix4(camera.matrixWorldInverse);
+          const projected = corner.clone().project(camera);
+          expect(cameraSpace.z).toBeLessThan(-camera.near);
+          expect(projected.toArray().every(Number.isFinite)).toBe(true);
+        }
+      }
+      expect(DICE_TABLE_CONFIG.arena.visualFloorSegments).toBe(16);
+    },
+  );
 
   it('remaps settled positions across orientation changes without a center reset', () => {
     const portrait = getArenaLayout(390, 844);

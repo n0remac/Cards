@@ -21,8 +21,8 @@ reconciles normalized placements.
 | `useDiceTable.ts` | UI controller and construction of local domain events. Exposes roll-all, definition-based add-new, reroll, selection, drag, settlement, and remote-event commands. |
 | `tableModel.ts` | Pure reducer for the persistent die map, stable ordering, active roll, snapshots, drag sequences, and reconciliation targets. |
 | `tableEventAdapter.ts` | Synchronous loopback adapter with the same publish/receive boundary expected from a future network adapter. |
-| `arenaLayout.ts` | Pure aspect-derived camera, edge walls, playable quadrilateral, floor/shadow bounds, normalized mapping, and containment correction. |
-| `DiceArena.tsx` | Camera and Rapier floor/wall collider ownership. The floor and responsive wall bodies are separate. |
+| `arenaLayout.ts` | Pure aspect-derived camera, edge walls, playable quadrilateral, visual-floor/shadow bounds, normalized mapping, and containment correction. |
+| `DiceArena.tsx` | Camera, fitted visual floor, and Rapier floor/wall collider ownership. The visual receiver and physics floor are separate. |
 | `RollObserver.tsx` | Post-step containment, active-roll settlement, face reading, and displaced-die placement reporting. |
 | `Die.tsx` | Stable Rapier body, cached canvas letter materials, body-mode transitions, pointer dragging, and result reconciliation. |
 | `rollModel.ts` | Shared animation input generation and validation plus authoritative result construction. |
@@ -86,6 +86,11 @@ than respawning at the center.
 
 Equivalent pixel-size changes share the same rounded aspect key, so they do not
 remount the responsive wall body.
+
+The shadow-receiving floor is a viewport-fitted, subdivided plane. It stays in
+front of the camera and avoids interpolating shadow coordinates across the two
+screen-spanning triangles of the much larger physics floor. Rapier retains its
+fixed 160-by-160 floor collider independently of the rendered receiver.
 
 Directional shadow bounds are projected into the angled light's camera space.
 They cover the visible floor and dice up to the maximum throw height, including

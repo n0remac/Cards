@@ -18,6 +18,8 @@ export const DICE_TABLE_CONFIG = {
   arena: {
     floorThickness: 0.25,
     floorHalfExtent: 80,
+    visualFloorPadding: 1,
+    visualFloorSegments: 16,
     wallThickness: 0.28,
     wallHeight: 1.45,
     containmentPadding: 0.04,
