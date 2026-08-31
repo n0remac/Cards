@@ -25,6 +25,7 @@ reconciles normalized placements.
 | `DiceArena.tsx` | Camera and Rapier floor/wall collider ownership. The floor and responsive wall bodies are separate. |
 | `RollObserver.tsx` | Post-step containment, active-roll settlement, face reading, and displaced-die placement reporting. |
 | `Die.tsx` | Stable Rapier body, cached canvas letter materials, body-mode transitions, pointer dragging, and result reconciliation. |
+| `dieSnapping.ts` | Pure open-edge selection for half-width drag snapping without overlapping occupied positions. |
 | `rollModel.ts` | Shared animation input generation and validation plus authoritative result construction. |
 | `diceMath.ts` | Face/quaternion and settlement math with no React or Rapier dependency. |
 
@@ -55,8 +56,9 @@ but selection/grouping and add-new UI are intentionally deferred.
 - `settled`: dynamic translation with all rotations locked. The canonical
   face-up quaternion survives collisions and dragging.
 - `held`: kinematic-position-based. Pointer rays intersect a horizontal table
-  plane and publish normalized drag events. Release restores a dynamic,
-  rotation-locked body with zero angular velocity.
+  plane and publish normalized drag events. When the die is within half a die
+  width of an open neighboring edge, its center snaps into exact edge alignment.
+  Release restores a dynamic, rotation-locked body with zero angular velocity.
 
 Settled dice may still slide when struck. At roll settlement, the roller reports
 placements for every rolled die and any existing die displaced far enough by a

@@ -56,6 +56,10 @@ type DieProps = {
     interactionId: string,
     position: NormalizedTablePosition,
   ) => void;
+  snapDragPosition: (
+    dieId: string,
+    position: NormalizedTablePosition,
+  ) => NormalizedTablePosition;
 };
 
 const { die: dieConfig, physics } = DICE_TABLE_CONFIG;
@@ -185,6 +189,7 @@ export function Die({
   onDragStart,
   onDragUpdate,
   onDragEnd,
+  snapDragPosition,
 }: DieProps) {
   const bodyRef = useRef<RapierRigidBody>(null);
   const appliedRollId = useRef<string>();
@@ -322,9 +327,13 @@ export function Die({
     event.stopPropagation();
     const position = pointerTablePosition(event, layout);
     if (position) {
-      onDragUpdate(die.dieId, interactionId, position);
+      onDragUpdate(
+        die.dieId,
+        interactionId,
+        snapDragPosition(die.dieId, position),
+      );
     }
-  }, [die.dieId, layout, onDragUpdate]);
+  }, [die.dieId, layout, onDragUpdate, snapDragPosition]);
 
   const finishDrag = useCallback((event: ThreeEvent<PointerEvent>) => {
     const interactionId = dragInteractionId.current;
@@ -332,11 +341,12 @@ export function Die({
       return;
     }
     event.stopPropagation();
-    const position = pointerTablePosition(event, layout) ?? die.position;
+    const pointerPosition = pointerTablePosition(event, layout) ?? die.position;
+    const position = snapDragPosition(die.dieId, pointerPosition);
     dragInteractionId.current = undefined;
     onDragEnd(die.dieId, interactionId, position);
     pointerCaptureTarget(event).releasePointerCapture(event.pointerId);
-  }, [die.dieId, die.position, layout, onDragEnd]);
+  }, [die.dieId, die.position, layout, onDragEnd, snapDragPosition]);
 
   return (
     <RigidBody

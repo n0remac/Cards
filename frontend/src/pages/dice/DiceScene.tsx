@@ -2,10 +2,17 @@ import React, { Suspense, useCallback, useEffect, useMemo, useRef } from 'react'
 import { Canvas, useThree } from '@react-three/fiber';
 import { Physics, RapierRigidBody } from '@react-three/rapier';
 import { NormalizedTablePosition } from '../../rpc/proto/dice/v1/dice_pb';
-import { createArenaLayout } from './arenaLayout';
+import {
+  clampNormalizedPosition,
+  createArenaLayout,
+  isWorldPositionInsideArena,
+  normalizedToWorld,
+  worldToNormalized,
+} from './arenaLayout';
 import { DICE_TABLE_CONFIG } from './constants';
 import { Die } from './Die';
 import { DiceArena, ResponsiveArenaCamera } from './DiceArena';
+import { snapToAdjacentDie } from './dieSnapping';
 import { DiceBodyRegistry, RollObserver } from './RollObserver';
 import { RollSettledEvent } from './rollModel';
 import { ActiveTableRoll, TableDie } from './tableModel';
@@ -77,6 +84,28 @@ function DiceWorld({
       bodies.current.delete(dieId);
     }
   }, [bodies]);
+  const snapDragPosition = useCallback((
+    dieId: string,
+    position: NormalizedTablePosition,
+  ) => {
+    const targets = Object.entries(dice).flatMap(([targetId, targetDie]) => {
+      if (targetId === dieId || targetDie.mode === 'rolling') {
+        return [];
+      }
+      const bodyPosition = bodies.current.get(targetId)?.translation();
+      return [bodyPosition
+        ? { x: bodyPosition.x, z: bodyPosition.z }
+        : normalizedToWorld(layout, targetDie.position)];
+    });
+    const snapped = snapToAdjacentDie(
+      normalizedToWorld(layout, position),
+      targets,
+      DICE_TABLE_CONFIG.die.size,
+    );
+    return isWorldPositionInsideArena(layout, snapped)
+      ? clampNormalizedPosition(worldToNormalized(layout, snapped))
+      : position;
+  }, [bodies, dice, layout]);
 
   return (
     <>
@@ -115,6 +144,7 @@ function DiceWorld({
             onDragStart={onDragStart}
             onDragUpdate={onDragUpdate}
             onDragEnd={onDragEnd}
+            snapDragPosition={snapDragPosition}
           />
         )] : [];
       })}
