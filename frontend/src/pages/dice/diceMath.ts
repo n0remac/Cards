@@ -113,6 +113,8 @@ export function getUpwardFace(quaternion: QuaternionLike): PlayableDieFace {
 }
 
 export function faceUpQuaternion(face: PlayableDieFace): QuaternionLike {
+  // World -Z projects toward screen-up for both responsive arena cameras.
+  // The extra yaw on side faces keeps the written top letter upright.
   const halfTurn = Math.SQRT1_2;
   switch (face) {
     case DieFace.ONE:
@@ -120,13 +122,13 @@ export function faceUpQuaternion(face: PlayableDieFace): QuaternionLike {
     case DieFace.SIX:
       return { x: 1, y: 0, z: 0, w: 0 };
     case DieFace.TWO:
-      return { x: 0, y: 0, z: halfTurn, w: halfTurn };
+      return { x: -0.5, y: -0.5, z: 0.5, w: 0.5 };
     case DieFace.FIVE:
-      return { x: 0, y: 0, z: -halfTurn, w: halfTurn };
+      return { x: -0.5, y: 0.5, z: -0.5, w: 0.5 };
     case DieFace.THREE:
       return { x: -halfTurn, y: 0, z: 0, w: halfTurn };
     case DieFace.FOUR:
-      return { x: halfTurn, y: 0, z: 0, w: halfTurn };
+      return { x: 0, y: halfTurn, z: -halfTurn, w: 0 };
   }
 }
 

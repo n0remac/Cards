@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useRef } from 'react';
-import { ThreeEvent, useFrame } from '@react-three/fiber';
+import { ThreeEvent, useFrame, useThree } from '@react-three/fiber';
 import {
   CuboidCollider,
   RapierRigidBody,
@@ -25,6 +25,7 @@ import {
   worldToNormalized,
 } from './arenaLayout';
 import { DICE_TABLE_CONFIG } from './constants';
+import { createDragPointerTracker } from './dragPointerTracker';
 import {
   faceUpQuaternion,
   isPlayableDieFace,
@@ -175,6 +176,7 @@ function pointerTablePosition(
 
 function pointerCaptureTarget(event: ThreeEvent<PointerEvent>) {
   return event.target as unknown as {
+    hasPointerCapture: (pointerId: number) => boolean;
     setPointerCapture: (pointerId: number) => void;
     releasePointerCapture: (pointerId: number) => void;
   };
@@ -191,11 +193,14 @@ export function Die({
   onDragEnd,
   snapDragPosition,
 }: DieProps) {
+  const { gl } = useThree();
   const bodyRef = useRef<RapierRigidBody>(null);
   const appliedRollId = useRef<string>();
   const previousAspectKey = useRef(layout.aspectKey);
   const previousMode = useRef<TableDie['mode']>();
-  const dragInteractionId = useRef<string>();
+  const dragPointerTracker = useRef(createDragPointerTracker());
+  const latestDragPosition = useRef(die.position);
+  const onDragEndRef = useRef(onDragEnd);
   const reconciling = useRef(false);
   const reconciliationRevision = useRef<bigint>();
 
@@ -203,6 +208,11 @@ export function Die({
     ? faceUpQuaternion(die.face)
     : { x: 0, y: 0, z: 0, w: 1 };
   const initialWorld = normalizedToWorld(layout, die.position);
+
+  onDragEndRef.current = onDragEnd;
+  if (die.mode !== 'held') {
+    latestDragPosition.current = die.position;
+  }
 
   useEffect(() => {
     const body = bodyRef.current;
@@ -212,6 +222,28 @@ export function Die({
     onBodyReady(die.dieId, body);
     return () => onBodyRemoved(die.dieId, body);
   }, [die.dieId, onBodyReady, onBodyRemoved]);
+
+  useEffect(() => {
+    // R3F clears captured intersections on cancellation without forwarding the
+    // object's onPointerCancel handler, so recover the drag at the DOM target.
+    const finishInterruptedDrag = (event: PointerEvent) => {
+      const interactionId = dragPointerTracker.current.finish(event.pointerId);
+      if (interactionId) {
+        onDragEndRef.current(
+          die.dieId,
+          interactionId,
+          latestDragPosition.current,
+        );
+      }
+    };
+    const canvas = gl.domElement;
+    canvas.addEventListener('pointercancel', finishInterruptedDrag);
+    canvas.addEventListener('lostpointercapture', finishInterruptedDrag);
+    return () => {
+      canvas.removeEventListener('pointercancel', finishInterruptedDrag);
+      canvas.removeEventListener('lostpointercapture', finishInterruptedDrag);
+    };
+  }, [die.dieId, gl]);
 
   useEffect(() => {
     const body = bodyRef.current;
@@ -320,32 +352,35 @@ export function Die({
   });
 
   const moveDrag = useCallback((event: ThreeEvent<PointerEvent>) => {
-    const interactionId = dragInteractionId.current;
+    const interactionId = dragPointerTracker.current.interactionFor(
+      event.pointerId,
+    );
     if (!interactionId) {
       return;
     }
     event.stopPropagation();
     const position = pointerTablePosition(event, layout);
     if (position) {
-      onDragUpdate(
-        die.dieId,
-        interactionId,
-        snapDragPosition(die.dieId, position),
-      );
+      const snappedPosition = snapDragPosition(die.dieId, position);
+      latestDragPosition.current = snappedPosition;
+      onDragUpdate(die.dieId, interactionId, snappedPosition);
     }
   }, [die.dieId, layout, onDragUpdate, snapDragPosition]);
 
   const finishDrag = useCallback((event: ThreeEvent<PointerEvent>) => {
-    const interactionId = dragInteractionId.current;
+    const interactionId = dragPointerTracker.current.finish(event.pointerId);
     if (!interactionId) {
       return;
     }
     event.stopPropagation();
     const pointerPosition = pointerTablePosition(event, layout) ?? die.position;
     const position = snapDragPosition(die.dieId, pointerPosition);
-    dragInteractionId.current = undefined;
+    latestDragPosition.current = position;
     onDragEnd(die.dieId, interactionId, position);
-    pointerCaptureTarget(event).releasePointerCapture(event.pointerId);
+    const captureTarget = pointerCaptureTarget(event);
+    if (captureTarget.hasPointerCapture(event.pointerId)) {
+      captureTarget.releasePointerCapture(event.pointerId);
+    }
   }, [die.dieId, die.position, layout, onDragEnd, snapDragPosition]);
 
   return (
@@ -381,13 +416,13 @@ export function Die({
           const position = pointerTablePosition(event, layout) ?? die.position;
           const interactionId = onDragStart(die.dieId, position);
           if (interactionId) {
-            dragInteractionId.current = interactionId;
+            latestDragPosition.current = position;
+            dragPointerTracker.current.begin(event.pointerId, interactionId);
             pointerCaptureTarget(event).setPointerCapture(event.pointerId);
           }
         }}
         onPointerMove={moveDrag}
         onPointerUp={finishDrag}
-        onPointerCancel={finishDrag}
       >
         <DieVisual dieDefinitionId={die.dieDefinitionId} />
       </group>

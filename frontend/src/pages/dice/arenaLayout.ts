@@ -1,4 +1,11 @@
-import { PerspectiveCamera, Plane, Raycaster, Vector2, Vector3 } from 'three';
+import {
+  OrthographicCamera,
+  PerspectiveCamera,
+  Plane,
+  Raycaster,
+  Vector2,
+  Vector3,
+} from 'three';
 import { NormalizedTablePosition } from '../../rpc/proto/dice/v1/dice_pb';
 import { DICE_TABLE_CONFIG } from './constants';
 import { VectorLike, VectorTuple } from './diceMath';
@@ -31,8 +38,18 @@ export type ArenaLayout = {
     center: VectorTuple;
     halfExtents: VectorTuple;
   };
+  visualFloor: {
+    center: VectorTuple;
+    width: number;
+    depth: number;
+  };
   recoveryBounds: { minimumY: number };
-  shadowBounds: { halfExtent: number };
+  shadowBounds: {
+    left: number;
+    right: number;
+    top: number;
+    bottom: number;
+  };
 };
 
 export type ContainedMotion = {
@@ -180,6 +197,50 @@ function buildWalls(boundary: ArenaQuadrilateral): readonly ArenaWall[] {
   });
 }
 
+function createShadowBounds(
+  boundary: ArenaQuadrilateral,
+): ArenaLayout['shadowBounds'] {
+  const shadowCamera = new OrthographicCamera();
+  shadowCamera.position.set(...DICE_TABLE_CONFIG.lighting.directionalPosition);
+  shadowCamera.lookAt(0, 0, 0);
+  shadowCamera.updateMatrixWorld(true);
+
+  const maximumCasterHeight = DICE_TABLE_CONFIG.roll.spawnHeightMaximum +
+    DICE_TABLE_CONFIG.die.size / 2;
+  const lightSpacePoints = boundary.flatMap(({ x, z }) => [
+    new Vector3(x, 0, z),
+    new Vector3(x, maximumCasterHeight, z),
+  ]).map((point) => point.applyMatrix4(shadowCamera.matrixWorldInverse));
+  const xs = lightSpacePoints.map(({ x }) => x);
+  const ys = lightSpacePoints.map(({ y }) => y);
+  const padding = DICE_TABLE_CONFIG.lighting.shadowPadding;
+
+  return {
+    left: Math.min(...xs) - padding,
+    right: Math.max(...xs) + padding,
+    top: Math.max(...ys) + padding,
+    bottom: Math.min(...ys) - padding,
+  };
+}
+
+function createVisualFloor(
+  boundary: ArenaQuadrilateral,
+): ArenaLayout['visualFloor'] {
+  const xs = boundary.map(({ x }) => x);
+  const zs = boundary.map(({ z }) => z);
+  const minX = Math.min(...xs);
+  const maxX = Math.max(...xs);
+  const minZ = Math.min(...zs);
+  const maxZ = Math.max(...zs);
+  const padding = DICE_TABLE_CONFIG.arena.visualFloorPadding;
+
+  return {
+    center: [(minX + maxX) / 2, 0, (minZ + maxZ) / 2],
+    width: maxX - minX + padding * 2,
+    depth: maxZ - minZ + padding * 2,
+  };
+}
+
 export function createArenaLayout(aspect: number): ArenaLayout {
   if (!Number.isFinite(aspect) || aspect <= 0) {
     throw new Error('The dice table aspect ratio must be positive.');
@@ -191,14 +252,6 @@ export function createArenaLayout(aspect: number): ArenaLayout {
     DICE_TABLE_CONFIG.arena.wallThickness +
     DICE_TABLE_CONFIG.arena.containmentPadding;
   const playableQuadrilateral = insetQuadrilateral(screenBoundary, centerInset);
-  const xs = screenBoundary.map((point) => point.x);
-  const zs = screenBoundary.map((point) => point.z);
-  const minX = Math.min(...xs);
-  const maxX = Math.max(...xs);
-  const minZ = Math.min(...zs);
-  const maxZ = Math.max(...zs);
-  const shadowHalfWidth = (maxX - minX) / 2 + 2;
-  const shadowHalfDepth = (maxZ - minZ) / 2 + 2;
 
   return {
     aspect,
@@ -219,12 +272,11 @@ export function createArenaLayout(aspect: number): ArenaLayout {
         DICE_TABLE_CONFIG.arena.floorHalfExtent,
       ],
     },
+    visualFloor: createVisualFloor(screenBoundary),
     recoveryBounds: {
       minimumY: DICE_TABLE_CONFIG.arena.recoveryMinimumY,
     },
-    shadowBounds: {
-      halfExtent: Math.max(shadowHalfWidth, shadowHalfDepth),
-    },
+    shadowBounds: createShadowBounds(screenBoundary),
   };
 }
 

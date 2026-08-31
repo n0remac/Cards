@@ -17,6 +17,8 @@ export const DICE_TABLE_CONFIG = {
   arena: {
     floorThickness: 0.25,
     floorHalfExtent: 80,
+    visualFloorPadding: 1,
+    visualFloorSegments: 16,
     wallThickness: 0.28,
     wallHeight: 1.45,
     containmentPadding: 0.04,
@@ -32,6 +34,10 @@ export const DICE_TABLE_CONFIG = {
     mobileFov: 48,
     mobileAspectBreakpoint: 0.9,
     minimumHalfTableWidth: 7.35,
+  },
+  lighting: {
+    directionalPosition: [-6, 25, 7] as const,
+    shadowPadding: 2,
   },
   roll: {
     maximumDefinitionsPerAdd: 12,

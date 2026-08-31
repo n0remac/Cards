@@ -21,8 +21,8 @@ reconciles normalized placements.
 | `useDiceTable.ts` | UI controller and construction of local domain events. Exposes roll-all, definition-based add-new, reroll, selection, drag, settlement, and remote-event commands. |
 | `tableModel.ts` | Pure reducer for the persistent die map, stable ordering, active roll, snapshots, drag sequences, and reconciliation targets. |
 | `tableEventAdapter.ts` | Synchronous loopback adapter with the same publish/receive boundary expected from a future network adapter. |
-| `arenaLayout.ts` | Pure aspect-derived camera, edge walls, playable quadrilateral, floor/shadow bounds, normalized mapping, and containment correction. |
-| `DiceArena.tsx` | Camera and Rapier floor/wall collider ownership. The floor and responsive wall bodies are separate. |
+| `arenaLayout.ts` | Pure aspect-derived camera, edge walls, playable quadrilateral, visual-floor/shadow bounds, normalized mapping, and containment correction. |
+| `DiceArena.tsx` | Camera, fitted visual floor, and Rapier floor/wall collider ownership. The visual receiver and physics floor are separate. |
 | `RollObserver.tsx` | Post-step containment, active-roll settlement, face reading, and displaced-die placement reporting. |
 | `Die.tsx` | Stable Rapier body, cached canvas letter materials, body-mode transitions, pointer dragging, and result reconciliation. |
 | `dieSnapping.ts` | Pure open-edge selection for half-width drag snapping without overlapping occupied positions. |
@@ -54,11 +54,15 @@ but selection/grouping and add-new UI are intentionally deferred.
 - `rolling`: dynamic, CCD enabled, all rotations enabled, and supplied throw
   impulse/torque applied once per global roll ID.
 - `settled`: dynamic translation with all rotations locked. The canonical
-  face-up quaternion survives collisions and dragging.
+  face-up quaternion turns the top letter upright toward screen-up and survives
+  collisions and dragging.
 - `held`: kinematic-position-based. Pointer rays intersect a horizontal table
-  plane and publish normalized drag events. When the die is within half a die
-  width of an open neighboring edge, its center snaps into exact edge alignment.
-  Release restores a dynamic, rotation-locked body with zero angular velocity.
+  plane and publish normalized drag events. Within half a die width of an open
+  neighboring edge, the held die snaps into exact alignment while it is moved
+  and when it is released. Release restores a dynamic, rotation-locked body
+  with zero angular velocity. The canvas owns touch gestures, and native pointer
+  cancellation/lost-capture events settle a held die at its last accepted
+  position.
 
 Settled dice may still slide when struck. At roll settlement, the roller reports
 placements for every rolled die and any existing die displaced far enough by a
@@ -83,6 +87,15 @@ than respawning at the center.
 
 Equivalent pixel-size changes share the same rounded aspect key, so they do not
 remount the responsive wall body.
+
+The shadow-receiving floor is a viewport-fitted, subdivided plane. It stays in
+front of the camera and avoids interpolating shadow coordinates across the two
+screen-spanning triangles of the much larger physics floor. Rapier retains its
+fixed 160-by-160 floor collider independently of the rendered receiver.
+
+Directional shadow bounds are projected into the angled light's camera space.
+They cover the visible floor and dice up to the maximum throw height, including
+the deeper off-center table footprint used by portrait mobile layouts.
 
 ## Multiplayer contract
 

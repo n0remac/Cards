@@ -1,8 +1,9 @@
 import { DieFace } from '../../rpc/proto/dice/v1/dice_pb';
+import type { PlayableDieFace } from './diceMath';
 import { letterForFace } from './letterDice';
 
 export type LetterFaceVisual = {
-  face: DieFace;
+  face: PlayableDieFace;
   letter: string;
   position: [number, number, number];
   rotation: [number, number, number];

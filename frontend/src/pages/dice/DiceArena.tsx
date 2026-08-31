@@ -26,10 +26,18 @@ export function DiceArena({ layout }: { layout: ArenaLayout }) {
   const { arena, physics } = DICE_TABLE_CONFIG;
   return (
     <group>
-      <mesh position={layout.floor.center} receiveShadow>
-        <boxGeometry args={layout.floor.halfExtents.map(
-          (halfExtent) => halfExtent * 2,
-        ) as [number, number, number]} />
+      <mesh
+        key={`visual-floor-${layout.aspectKey}`}
+        position={layout.visualFloor.center}
+        rotation={[-Math.PI / 2, 0, 0]}
+        receiveShadow
+      >
+        <planeGeometry args={[
+          layout.visualFloor.width,
+          layout.visualFloor.depth,
+          arena.visualFloorSegments,
+          arena.visualFloorSegments,
+        ]} />
         <meshStandardMaterial color="#1d6847" roughness={0.96} />
       </mesh>
 
