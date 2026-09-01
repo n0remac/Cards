@@ -70,6 +70,11 @@ export const DICE_TABLE_CONFIG = {
     easing: 0.18,
     positionTolerance: 0.035,
   },
+  letterStrings: {
+    minimumAxisDistanceRatio: 0.65,
+    maximumAxisDistanceRatio: 1.35,
+    maximumCrossAxisOffsetRatio: 0.35,
+  },
 } as const;
 
 export const SIMULATION_VERSION = DICE_TABLE_CONFIG.simulationVersion;

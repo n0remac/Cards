@@ -26,6 +26,8 @@ reconciles normalized placements.
 | `RollObserver.tsx` | Post-step containment, active-roll settlement, face reading, and displaced-die placement reporting. |
 | `Die.tsx` | Stable Rapier body, cached canvas letter materials, body-mode transitions, pointer dragging, and result reconciliation. |
 | `dieSnapping.ts` | Pure open-edge selection for half-width drag snapping without overlapping occupied positions. |
+| `letterStringDetection.ts` | Pure tolerant adjacency graph, maximal string derivation, and normalized crossword-grid layout. |
+| `LetterStringObserver.tsx` | Live Rapier-position adapter that resolves playable faces and reports changed strings and shapes. |
 | `rollModel.ts` | Shared animation input generation and validation plus authoritative result construction. |
 | `diceMath.ts` | Face/quaternion and settlement math with no React or Rapier dependency. |
 
@@ -67,6 +69,23 @@ but selection/grouping and add-new UI are intentionally deferred.
 Settled dice may still slide when struck. At roll settlement, the roller reports
 placements for every rolled die and any existing die displaced far enough by a
 collision.
+
+## Live letter strings
+
+`LetterStringObserver` reads the current Rapier body positions after physics
+steps, so its output follows held dice and collision-displaced settled dice
+rather than relying on potentially stale normalized placements. Rolling dice and
+bodies without playable faces are omitted. It only reports to React when the
+detected result changes.
+
+The pure detector builds separate horizontal and vertical adjacency graphs.
+Centers must be between `0.65` and `1.35` die widths apart on the word axis and
+within `0.35` die widths on the cross axis. Each connected component becomes one
+maximal two-or-more-letter string; horizontal strings read left-to-right and
+vertical strings read top-to-bottom. The combined directional graph also assigns
+integer row and column steps to every connected die, normalizes each disconnected
+formation to its own compact grid, and drives the temporary lower-left crossword
+preview. Dictionary validation is intentionally deferred.
 
 ## Arena and resizing
 

@@ -22,6 +22,8 @@ import { DICE_TABLE_CONFIG } from './constants';
 import { Die } from './Die';
 import { DiceArena, ResponsiveArenaCamera } from './DiceArena';
 import { snapToAdjacentDie } from './dieSnapping';
+import type { DetectedLetterLayout } from './letterStringDetection';
+import { LetterStringObserver } from './LetterStringObserver';
 import { DiceBodyRegistry, RollObserver } from './RollObserver';
 import { RollSettledEvent } from './rollModel';
 import { ActiveTableRoll, TableDie } from './tableModel';
@@ -46,6 +48,7 @@ type DiceSceneProps = {
     interactionId: string,
     position: NormalizedTablePosition,
   ) => void;
+  onDetectedLayoutChanged: (layout: DetectedLetterLayout) => void;
   onReady: () => void;
   onWebGLUnavailable: () => void;
 };
@@ -105,6 +108,7 @@ function DiceWorld({
   onDragStart,
   onDragUpdate,
   onDragEnd,
+  onDetectedLayoutChanged,
 }: Omit<DiceSceneProps, 'onReady' | 'onWebGLUnavailable'> & {
   bodies: DiceBodyRegistry;
 }) {
@@ -159,6 +163,12 @@ function DiceWorld({
         bodies={bodies}
         layout={layout}
         onSettled={onSettled}
+      />
+      <LetterStringObserver
+        dice={dice}
+        dieOrder={dieOrder}
+        bodies={bodies}
+        onLayoutChanged={onDetectedLayoutChanged}
       />
       {dieOrder.flatMap((dieId) => {
         const die = dice[dieId];

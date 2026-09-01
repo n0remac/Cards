@@ -1,5 +1,6 @@
 import React, { Component, ErrorInfo, ReactNode, useCallback, useState } from 'react';
 import { DiceScene } from './DiceScene';
+import type { DetectedLetterLayout } from './letterStringDetection';
 import { useDiceTable } from './useDiceTable';
 
 type SceneStatus = 'loading' | 'ready' | 'unsupported' | 'error';
@@ -52,6 +53,10 @@ const WOOD_GRAIN = {
 export default function DiceGame() {
   const controller = useDiceTable();
   const [sceneStatus, setSceneStatus] = useState<SceneStatus>('loading');
+  const [detectedLayout, setDetectedLayout] = useState<DetectedLetterLayout>({
+    strings: [],
+    crosswords: [],
+  });
   const rollDisabled = sceneStatus !== 'ready' || controller.phase === 'rolling';
   const rollingCount = controller.activeRoll?.spec.dice.length ?? 0;
   const hasDice = controller.dieOrder.length > 0;
@@ -96,6 +101,7 @@ export default function DiceGame() {
               onDragStart={controller.startDrag}
               onDragUpdate={controller.updateDrag}
               onDragEnd={controller.endDrag}
+              onDetectedLayoutChanged={setDetectedLayout}
               onReady={markReady}
               onWebGLUnavailable={markUnsupported}
             />
@@ -109,6 +115,44 @@ export default function DiceGame() {
               Letter Dice
             </h1>
           </header>
+
+          <aside
+            aria-label="Detected crossword layout"
+            className="pointer-events-none absolute bottom-4 left-4 z-20 max-w-[calc(100%-2rem)] rounded-lg border border-emerald-100/25 bg-[#0e2f22]/85 px-3 py-2 text-stone-100 shadow-lg shadow-black/30 backdrop-blur-sm sm:bottom-6 sm:left-6"
+          >
+            <p className="text-[0.58rem] font-bold uppercase tracking-[0.22em] text-emerald-100/65">
+              Detected crossword
+            </p>
+            {detectedLayout.crosswords.length === 0 ? (
+              <p className="mt-1 text-xs text-stone-300">No connected crossword</p>
+            ) : (
+              <div className="mt-2 space-y-2">
+                {detectedLayout.crosswords.map((crossword) => (
+                  <div
+                    key={crossword.cells.map(({ dieId }) => dieId).join(':')}
+                    className="grid gap-0.5"
+                    style={{
+                      gridTemplateColumns: `repeat(${crossword.width}, 1.125rem)`,
+                      gridTemplateRows: `repeat(${crossword.height}, 1.125rem)`,
+                    }}
+                  >
+                    {crossword.cells.map(({ dieId, letter, row, column }) => (
+                      <span
+                        key={dieId}
+                        className="grid h-[1.125rem] w-[1.125rem] place-items-center rounded-sm border border-stone-100/40 bg-[#f4ead4] font-mono text-[0.625rem] font-black text-[#211d19] shadow-sm"
+                        style={{
+                          gridColumnStart: column + 1,
+                          gridRowStart: row + 1,
+                        }}
+                      >
+                        {letter}
+                      </span>
+                    ))}
+                  </div>
+                ))}
+              </div>
+            )}
+          </aside>
 
           {sceneStatus === 'loading' && (
             <div className="pointer-events-none absolute inset-0 z-10 grid place-items-center bg-[#164a33]/90 text-sm font-medium tracking-wide text-emerald-50">
