@@ -28,6 +28,8 @@ reconciles normalized placements.
 | `dieSnapping.ts` | Pure open-edge selection for half-width drag snapping without overlapping occupied positions. |
 | `letterStringDetection.ts` | Pure tolerant adjacency graph, maximal string derivation, and normalized crossword-grid layout. |
 | `LetterStringObserver.tsx` | Live Rapier-position adapter that resolves playable faces and reports changed strings and shapes. |
+| `crosswordValidation.ts` | Pure dictionary validation for formed words, die coverage, and single-component connectivity. |
+| `useWordDictionary.ts` | Browser adapter that parses, loads, and caches the bundled line-delimited Scrabble dictionary. |
 | `rollModel.ts` | Shared animation input generation and validation plus authoritative result construction. |
 | `diceMath.ts` | Face/quaternion and settlement math with no React or Rapier dependency. |
 
@@ -85,7 +87,22 @@ maximal two-or-more-letter string; horizontal strings read left-to-right and
 vertical strings read top-to-bottom. The combined directional graph also assigns
 integer row and column steps to every connected die, normalizes each disconnected
 formation to its own compact grid, and drives the temporary lower-left crossword
-preview. Dictionary validation is intentionally deferred.
+preview. Scoring is intentionally deferred.
+
+The bundled `scrabbleDictionary.txt` is an exact copy of
+[`redbo/scrabble`'s `dictionary.txt`](https://github.com/redbo/scrabble/blob/05748fb060b6e20480424b9113c1610066daca3c/dictionary.txt)
+at commit `05748fb060b6e20480424b9113c1610066daca3c`. Its 178,691 unique
+uppercase A-Z words are stored one per line; the downloaded file's SHA-256 is
+`eda7bc8b86a534de8065a7d0cc091dc918d400475061749d05a5711afda12a3b`.
+The production build copies this 1.76 MB plaintext asset beside the app. The
+dice route fetches it once, validates its format, and caches a lookup set in the
+browser.
+
+A green check is shown only when there is exactly one detected formation, that
+formation contains every current table die, every die belongs to at least one
+valid word, and every maximal horizontal and vertical word is present in the
+dictionary. The preview lists valid words in green and invalid words in red while
+the formation is being edited.
 
 ## Arena and resizing
 

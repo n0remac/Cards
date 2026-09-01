@@ -1,7 +1,9 @@
 import React, { Component, ErrorInfo, ReactNode, useCallback, useState } from 'react';
+import { validateCrossword } from './crosswordValidation';
 import { DiceScene } from './DiceScene';
 import type { DetectedLetterLayout } from './letterStringDetection';
 import { useDiceTable } from './useDiceTable';
+import { useWordDictionary } from './useWordDictionary';
 
 type SceneStatus = 'loading' | 'ready' | 'unsupported' | 'error';
 
@@ -52,6 +54,7 @@ const WOOD_GRAIN = {
 
 export default function DiceGame() {
   const controller = useDiceTable();
+  const dictionary = useWordDictionary();
   const [sceneStatus, setSceneStatus] = useState<SceneStatus>('loading');
   const [detectedLayout, setDetectedLayout] = useState<DetectedLetterLayout>({
     strings: [],
@@ -60,6 +63,13 @@ export default function DiceGame() {
   const rollDisabled = sceneStatus !== 'ready' || controller.phase === 'rolling';
   const rollingCount = controller.activeRoll?.spec.dice.length ?? 0;
   const hasDice = controller.dieOrder.length > 0;
+  const validation = dictionary.status === 'ready'
+    ? validateCrossword(
+      detectedLayout,
+      controller.dieOrder,
+      dictionary.words,
+    )
+    : undefined;
 
   const markReady = useCallback(() => setSceneStatus('ready'), []);
   const markUnsupported = useCallback(() => setSceneStatus('unsupported'), []);
@@ -118,11 +128,32 @@ export default function DiceGame() {
 
           <aside
             aria-label="Detected crossword layout"
+            aria-live="polite"
             className="pointer-events-none absolute bottom-4 left-4 z-20 max-w-[calc(100%-2rem)] rounded-lg border border-emerald-100/25 bg-[#0e2f22]/85 px-3 py-2 text-stone-100 shadow-lg shadow-black/30 backdrop-blur-sm sm:bottom-6 sm:left-6"
           >
-            <p className="text-[0.58rem] font-bold uppercase tracking-[0.22em] text-emerald-100/65">
-              Detected crossword
-            </p>
+            <div className="flex items-center justify-between gap-3">
+              <p className="text-[0.58rem] font-bold uppercase tracking-[0.22em] text-emerald-100/65">
+                Detected crossword
+              </p>
+              {validation?.isValid && (
+                <span
+                  aria-label="Valid contiguous crossword"
+                  className="grid h-6 w-6 place-items-center rounded-full border border-emerald-200/70 bg-emerald-500 text-base font-black leading-none text-white shadow-sm shadow-emerald-950/40"
+                >
+                  ✓
+                </span>
+              )}
+            </div>
+            {dictionary.status === 'loading' && (
+              <p className="mt-1 text-[0.65rem] text-stone-300">
+                Loading dictionary…
+              </p>
+            )}
+            {dictionary.status === 'error' && (
+              <p className="mt-1 text-[0.65rem] text-amber-200">
+                Dictionary unavailable
+              </p>
+            )}
             {detectedLayout.crosswords.length === 0 ? (
               <p className="mt-1 text-xs text-stone-300">No connected crossword</p>
             ) : (
@@ -149,6 +180,20 @@ export default function DiceGame() {
                       </span>
                     ))}
                   </div>
+                ))}
+              </div>
+            )}
+            {validation && validation.words.length > 0 && (
+              <div className="mt-2 flex max-w-64 flex-wrap gap-1">
+                {validation.words.map(({ direction, text, dieIds, isValid }) => (
+                  <span
+                    key={`${direction}:${dieIds.join(':')}`}
+                    className={isValid
+                      ? 'rounded bg-emerald-500/25 px-1.5 py-0.5 font-mono text-[0.6rem] font-bold text-emerald-100'
+                      : 'rounded bg-red-500/25 px-1.5 py-0.5 font-mono text-[0.6rem] font-bold text-red-100'}
+                  >
+                    {text}
+                  </span>
                 ))}
               </div>
             )}

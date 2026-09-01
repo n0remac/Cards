@@ -44,6 +44,7 @@ const runTailwindBuild = (watch) => {
           ".woff": "file",
           ".html": "copy",
           ".json": "copy",
+          ".txt": "file",
           ".ico": "copy",
       },
       plugins: [
