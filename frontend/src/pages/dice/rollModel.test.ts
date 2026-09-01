@@ -59,6 +59,16 @@ describe('createLocalRollSpec', () => {
     expect(RollSpec.equals(first, second)).toBe(true);
   });
 
+  it('keeps the initial linear impulse within compact-roll limits', () => {
+    const maximum = createLocalRollSpec(targets(1), 'maximum-force', () => 1)
+      .dice[0].impulse;
+    const minimum = createLocalRollSpec(targets(1), 'minimum-force', () => 0)
+      .dice[0].impulse;
+
+    expect(maximum).toMatchObject({ x: 1.5, y: 1, z: 1.5 });
+    expect(minimum).toMatchObject({ x: -1.5, y: 0, z: -1.5 });
+  });
+
   it('uses supplied normalized positions for reroll animation', () => {
     const spec = createLocalRollSpec([
       {
