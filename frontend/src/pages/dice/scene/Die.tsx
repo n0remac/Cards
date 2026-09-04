@@ -1,69 +1,51 @@
 import React, { useCallback, useEffect, useRef } from 'react';
 import { ThreeEvent, useFrame, useThree } from '@react-three/fiber';
 import {
-  CuboidCollider,
-  RapierRigidBody,
-  RigidBody,
-} from '@react-three/rapier';
-import {
   CanvasTexture,
+  Group,
   LinearFilter,
   MeshStandardMaterial,
   Plane,
   PlaneGeometry,
-  Quaternion as ThreeQuaternion,
+  Quaternion,
   SRGBColorSpace,
-  Vector3 as ThreeVector3,
+  Vector3,
 } from 'three';
 import { RoundedBoxGeometry } from 'three/examples/jsm/geometries/RoundedBoxGeometry.js';
-import { NormalizedTablePosition } from '../../../rpc/proto/dice/v1/dice_pb';
 import {
-  ArenaLayout,
-  clampNormalizedPosition,
-  containArenaMotion,
-  normalizedToWorld,
-  worldToNormalized,
-} from './arenaLayout';
+  TablePoint,
+} from '../../../rpc/proto/dice/v1/dice_pb';
 import { DICE_TABLE_CONFIG } from '../constants';
 import { createDragPointerTracker } from './dragPointerTracker';
-import {
-  faceUpQuaternion,
-  isPlayableDieFace,
-  quaternionToObject,
-  vectorToObject,
-} from '../table/diceMath';
 import { getLetterFaceVisuals } from './letterDieVisual';
 import { createLetterMaterialCache } from './letterMaterialCache';
 import { TableDie } from '../table/tableModel';
-import { shouldSnapReconciliation } from './reconciliation';
+import { ownerTint } from './ownerTint';
+import { snapToAdjacentDie } from './dieSnapping';
+import { PhysicsFrameBuffer } from '../sync/frameInterpolation';
+import { DieTouchCoordinator, RenderOrigin } from './TableCamera';
 
 type DieProps = {
   die: TableDie;
-  layout: ArenaLayout;
+  dice: Readonly<Record<string, TableDie>>;
   localPlayerId: string;
-  onBodyReady: (dieId: string, body: RapierRigidBody) => void;
-  onBodyRemoved: (dieId: string, body: RapierRigidBody) => void;
-  onDragStart: (
-    dieId: string,
-    position: NormalizedTablePosition,
-  ) => string | undefined;
+  frames: PhysicsFrameBuffer;
+  renderOrigin: RenderOrigin;
+  dieTouch: DieTouchCoordinator;
+  onDragStart: (dieId: string, target: TablePoint) => string | undefined;
   onDragUpdate: (
     dieId: string,
     interactionId: string,
-    position: NormalizedTablePosition,
+    target: TablePoint,
   ) => void;
   onDragEnd: (
     dieId: string,
     interactionId: string,
-    position: NormalizedTablePosition,
+    target: TablePoint,
   ) => void;
-  snapDragPosition: (
-    dieId: string,
-    position: NormalizedTablePosition,
-  ) => NormalizedTablePosition;
 };
 
-const { die: dieConfig, physics } = DICE_TABLE_CONFIG;
+const dieConfig = DICE_TABLE_CONFIG.die;
 const DIE_GEOMETRY = new RoundedBoxGeometry(
   dieConfig.size,
   dieConfig.size,
@@ -72,26 +54,34 @@ const DIE_GEOMETRY = new RoundedBoxGeometry(
   0.1,
 );
 const LETTER_GEOMETRY = new PlaneGeometry(0.68, 0.68);
-const DIE_MATERIAL = new MeshStandardMaterial({
-  color: '#f4ead4',
-  roughness: 0.42,
-  metalness: 0.02,
-});
+const DIE_MATERIALS = new Map<string, MeshStandardMaterial>();
+
+export function ownerDieMaterial(ownerPlayerId: string): MeshStandardMaterial {
+  const tint = ownerTint(ownerPlayerId);
+  let material = DIE_MATERIALS.get(tint);
+  if (!material) {
+    material = new MeshStandardMaterial({
+      color: tint,
+      roughness: 0.42,
+      metalness: 0.02,
+    });
+    DIE_MATERIALS.set(tint, material);
+  }
+  return material;
+}
+
 const LETTER_MATERIALS = createLetterMaterialCache((letter) => {
   const canvas = document.createElement('canvas');
   canvas.width = 256;
   canvas.height = 256;
   const context = canvas.getContext('2d');
-  if (!context) {
-    throw new Error('Could not create a letter texture canvas.');
-  }
+  if (!context) throw new Error('Could not create a letter texture canvas.');
   context.clearRect(0, 0, canvas.width, canvas.height);
   context.fillStyle = '#211d19';
   context.font = '900 190px Arial, sans-serif';
   context.textAlign = 'center';
   context.textBaseline = 'middle';
   context.fillText(letter, canvas.width / 2, canvas.height / 2 + 8);
-
   const texture = new CanvasTexture(canvas);
   texture.colorSpace = SRGBColorSpace;
   texture.minFilter = LinearFilter;
@@ -123,12 +113,17 @@ function FaceLetter({
   );
 }
 
-function DieVisual({ dieDefinitionId }: { dieDefinitionId: string }) {
+function DieVisual({ die }: { die: TableDie }) {
   const faceOffset = dieConfig.size / 2 + 0.006;
   return (
     <group dispose={null}>
-      <mesh geometry={DIE_GEOMETRY} material={DIE_MATERIAL} castShadow receiveShadow />
-      {getLetterFaceVisuals(dieDefinitionId, faceOffset).map((visual) => (
+      <mesh
+        geometry={DIE_GEOMETRY}
+        material={ownerDieMaterial(die.ownerPlayerId)}
+        castShadow
+        receiveShadow
+      />
+      {getLetterFaceVisuals(die.dieDefinitionId, faceOffset).map((visual) => (
         <FaceLetter
           key={visual.face}
           letter={visual.letter}
@@ -138,40 +133,6 @@ function DieVisual({ dieDefinitionId }: { dieDefinitionId: string }) {
       ))}
     </group>
   );
-}
-
-export function applyThrowToBody(
-  body: RapierRigidBody,
-  die: TableDie,
-  layout: ArenaLayout,
-) {
-  if (!die.throwSpec?.position || !die.throwSpec.tablePosition) {
-    return;
-  }
-  const world = normalizedToWorld(layout, die.throwSpec.tablePosition);
-  body.setEnabledRotations(true, true, true, true);
-  body.setTranslation({ x: world.x, y: die.throwSpec.position.y, z: world.z }, true);
-  body.setRotation(quaternionToObject(die.throwSpec.rotation), true);
-  body.setLinvel({ x: 0, y: 0, z: 0 }, true);
-  body.setAngvel({ x: 0, y: 0, z: 0 }, true);
-  body.resetForces(true);
-  body.resetTorques(true);
-  body.applyImpulse(vectorToObject(die.throwSpec.impulse), true);
-  body.applyTorqueImpulse(vectorToObject(die.throwSpec.torque), true);
-  body.wakeUp();
-}
-
-function pointerTablePosition(
-  event: ThreeEvent<PointerEvent>,
-  layout: ArenaLayout,
-): NormalizedTablePosition | undefined {
-  const hit = event.ray.intersectPlane(
-    new Plane(new ThreeVector3(0, 1, 0), -dieConfig.dragHeight),
-    new ThreeVector3(),
-  );
-  return hit
-    ? clampNormalizedPosition(worldToNormalized(layout, { x: hit.x, z: hit.z }))
-    : undefined;
 }
 
 function pointerCaptureTarget(event: ThreeEvent<PointerEvent>) {
@@ -184,248 +145,162 @@ function pointerCaptureTarget(event: ThreeEvent<PointerEvent>) {
 
 export function Die({
   die,
-  layout,
+  dice,
   localPlayerId,
-  onBodyReady,
-  onBodyRemoved,
+  frames,
+  renderOrigin,
+  dieTouch,
   onDragStart,
   onDragUpdate,
   onDragEnd,
-  snapDragPosition,
 }: DieProps) {
+  const group = useRef<Group>(null);
+  const initialized = useRef(false);
   const { gl } = useThree();
-  const bodyRef = useRef<RapierRigidBody>(null);
-  const appliedRollId = useRef<string>();
-  const previousAspectKey = useRef(layout.aspectKey);
-  const previousMode = useRef<TableDie['mode']>();
-  const dragPointerTracker = useRef(createDragPointerTracker());
-  const latestDragPosition = useRef(die.position);
+  const dragPointers = useRef(createDragPointerTracker());
+  const latestTarget = useRef(new TablePoint({
+    x: die.transform.position?.x,
+    z: die.transform.position?.z,
+  }));
   const onDragEndRef = useRef(onDragEnd);
-  const reconciling = useRef(false);
-  const reconciliationRevision = useRef<bigint>();
-
-  const canonicalRotation = isPlayableDieFace(die.face)
-    ? faceUpQuaternion(die.face)
-    : { x: 0, y: 0, z: 0, w: 1 };
-  const initialWorld = normalizedToWorld(layout, die.position);
-
   onDragEndRef.current = onDragEnd;
-  if (die.mode !== 'held') {
-    latestDragPosition.current = die.position;
-  }
 
-  useEffect(() => {
-    const body = bodyRef.current;
-    if (!body) {
-      return;
+  const pointerTablePoint = useCallback((event: ThreeEvent<PointerEvent>) => {
+    const hit = event.ray.intersectPlane(
+      new Plane(new Vector3(0, 1, 0), -dieConfig.dragHeight),
+      new Vector3(),
+    );
+    if (!hit) return undefined;
+    return new TablePoint({
+      x: Math.min(10_000, Math.max(-10_000,
+        hit.x + renderOrigin.current.x)),
+      z: Math.min(10_000, Math.max(-10_000,
+        hit.z + renderOrigin.current.z)),
+    });
+  }, [renderOrigin]);
+
+  const snapPoint = useCallback((point: TablePoint) => {
+    const targets = Object.values(dice).flatMap((candidate) => {
+      const position = candidate.transform.position;
+      return candidate.dieId === die.dieId || candidate.mode === 'rolling' ||
+        !position ? [] : [{ x: position.x, z: position.z }];
+    });
+    return new TablePoint(snapToAdjacentDie(
+      point,
+      targets,
+      dieConfig.size,
+    ));
+  }, [dice, die.dieId]);
+
+  const cancelPointerDrag = useCallback((pointerId: number) => {
+    const interactionId = dragPointers.current.finish(pointerId);
+    if (interactionId) {
+      onDragEndRef.current(die.dieId, interactionId, latestTarget.current);
     }
-    onBodyReady(die.dieId, body);
-    return () => onBodyRemoved(die.dieId, body);
-  }, [die.dieId, onBodyReady, onBodyRemoved]);
+  }, [die.dieId]);
 
   useEffect(() => {
-    // R3F clears captured intersections on cancellation without forwarding the
-    // object's onPointerCancel handler, so recover the drag at the DOM target.
-    const finishInterruptedDrag = (event: PointerEvent) => {
-      const interactionId = dragPointerTracker.current.finish(event.pointerId);
-      if (interactionId) {
-        onDragEndRef.current(
-          die.dieId,
-          interactionId,
-          latestDragPosition.current,
-        );
-      }
+    const finishInterrupted = (event: PointerEvent) => {
+      cancelPointerDrag(event.pointerId);
     };
     const canvas = gl.domElement;
-    canvas.addEventListener('pointercancel', finishInterruptedDrag);
-    canvas.addEventListener('lostpointercapture', finishInterruptedDrag);
+    canvas.addEventListener('pointercancel', finishInterrupted);
+    canvas.addEventListener('lostpointercapture', finishInterrupted);
     return () => {
-      canvas.removeEventListener('pointercancel', finishInterruptedDrag);
-      canvas.removeEventListener('lostpointercapture', finishInterruptedDrag);
+      canvas.removeEventListener('pointercancel', finishInterrupted);
+      canvas.removeEventListener('lostpointercapture', finishInterrupted);
     };
-  }, [die.dieId, gl]);
-
-  useEffect(() => {
-    const body = bodyRef.current;
-    if (!body) {
-      return;
-    }
-
-    const aspectChanged = previousAspectKey.current !== layout.aspectKey;
-    previousAspectKey.current = layout.aspectKey;
-    if (die.mode === 'rolling') {
-      body.setEnabledRotations(true, true, true, true);
-      if (die.activeRollId && appliedRollId.current !== die.activeRollId) {
-        appliedRollId.current = die.activeRollId;
-        applyThrowToBody(body, die, layout);
-      } else if (aspectChanged) {
-        const corrected = containArenaMotion(layout, body.translation(), body.linvel());
-        if (corrected.corrected) {
-          body.setTranslation(corrected.position, true);
-          body.setLinvel(corrected.velocity, true);
-        }
-      }
-    } else {
-      body.setEnabledRotations(false, false, false, true);
-      body.setAngvel({ x: 0, y: 0, z: 0 }, true);
-      const target = normalizedToWorld(layout, die.position);
-      if (die.mode === 'held') {
-        body.setNextKinematicTranslation({
-          x: target.x,
-          y: dieConfig.dragHeight,
-          z: target.z,
-        });
-        body.setRotation(canonicalRotation, true);
-      } else if (previousMode.current === undefined ||
-                 previousMode.current === 'held' || aspectChanged) {
-        body.setTranslation({
-          x: target.x,
-          y: dieConfig.dragHeight,
-          z: target.z,
-        }, true);
-        body.setRotation(canonicalRotation, true);
-        body.setLinvel({ x: 0, y: 0, z: 0 }, true);
-      }
-    }
-    previousMode.current = die.mode;
-  }, [canonicalRotation.x, canonicalRotation.y, canonicalRotation.z,
-    canonicalRotation.w, die, layout]);
-
-  useEffect(() => {
-    if (!die.canonicalRevision ||
-        reconciliationRevision.current === die.canonicalRevision) {
-      return;
-    }
-    reconciliationRevision.current = die.canonicalRevision;
-    reconciling.current = die.canonicalSourcePlayerId !== localPlayerId;
-    if (!reconciling.current) {
-      const body = bodyRef.current;
-      const target = normalizedToWorld(layout, die.position);
-      body?.setTranslation({ x: target.x, y: dieConfig.dragHeight, z: target.z }, true);
-      body?.setRotation(canonicalRotation, true);
-    }
-  }, [canonicalRotation.x, canonicalRotation.y, canonicalRotation.z,
-    canonicalRotation.w, die.canonicalRevision, die.canonicalSourcePlayerId,
-    die.position, layout, localPlayerId]);
+  }, [cancelPointerDrag, gl]);
 
   useFrame((_, delta) => {
-    const body = bodyRef.current;
-    if (!body || !reconciling.current || die.mode !== 'settled') {
+    const rendered = group.current;
+    if (!rendered) return;
+    const locallyPredicted = die.mode === 'held' &&
+      die.interaction?.playerId === localPlayerId;
+    const transform = locallyPredicted
+      ? die.transform
+      : frames.sample(die.dieId) ?? die.transform;
+    if (!transform.position || !transform.rotation) return;
+    const targetPosition = new Vector3(
+      transform.position.x,
+      transform.position.y,
+      transform.position.z,
+    );
+    const targetRotation = new Quaternion(
+      transform.rotation.x,
+      transform.rotation.y,
+      transform.rotation.z,
+      transform.rotation.w,
+    ).normalize();
+    if (!initialized.current || locallyPredicted) {
+      rendered.position.copy(targetPosition);
+      rendered.quaternion.copy(targetRotation);
+      initialized.current = true;
       return;
     }
-    const target = normalizedToWorld(layout, die.position);
-    const current = body.translation();
-    const outside = shouldSnapReconciliation(layout, current);
-    const distance = Math.hypot(current.x - target.x, current.z - target.z);
-    const alpha = outside ? 1 : 1 - Math.pow(
-      1 - DICE_TABLE_CONFIG.reconciliation.easing,
-      delta * 60,
-    );
-    body.setTranslation({
-      x: current.x + (target.x - current.x) * alpha,
-      y: current.y + (dieConfig.dragHeight - current.y) * alpha,
-      z: current.z + (target.z - current.z) * alpha,
-    }, true);
-
-    const currentRotation = body.rotation();
-    const easedRotation = new ThreeQuaternion(
-      currentRotation.x,
-      currentRotation.y,
-      currentRotation.z,
-      currentRotation.w,
-    ).slerp(new ThreeQuaternion(
-      canonicalRotation.x,
-      canonicalRotation.y,
-      canonicalRotation.z,
-      canonicalRotation.w,
-    ), alpha);
-    body.setRotation(easedRotation, true);
-    if (distance < DICE_TABLE_CONFIG.reconciliation.positionTolerance &&
-        easedRotation.angleTo(new ThreeQuaternion(
-          canonicalRotation.x,
-          canonicalRotation.y,
-          canonicalRotation.z,
-          canonicalRotation.w,
-        )) < 0.01) {
-      reconciling.current = false;
-    }
+    const alpha = 1 - Math.pow(0.65, delta * 60);
+    rendered.position.lerp(targetPosition, alpha);
+    rendered.quaternion.slerp(targetRotation, alpha);
   });
 
   const moveDrag = useCallback((event: ThreeEvent<PointerEvent>) => {
-    const interactionId = dragPointerTracker.current.interactionFor(
-      event.pointerId,
-    );
-    if (!interactionId) {
+    if (dieTouch.move(event)) {
+      event.stopPropagation();
       return;
     }
+    const interactionId = dragPointers.current.interactionFor(event.pointerId);
+    if (!interactionId) return;
     event.stopPropagation();
-    const position = pointerTablePosition(event, layout);
-    if (position) {
-      const snappedPosition = snapDragPosition(die.dieId, position);
-      latestDragPosition.current = snappedPosition;
-      onDragUpdate(die.dieId, interactionId, snappedPosition);
+    const point = pointerTablePoint(event);
+    if (point) {
+      latestTarget.current = snapPoint(point);
+      onDragUpdate(die.dieId, interactionId, latestTarget.current);
     }
-  }, [die.dieId, layout, onDragUpdate, snapDragPosition]);
+  }, [die.dieId, dieTouch, onDragUpdate, pointerTablePoint, snapPoint]);
 
   const finishDrag = useCallback((event: ThreeEvent<PointerEvent>) => {
-    const interactionId = dragPointerTracker.current.finish(event.pointerId);
-    if (!interactionId) {
-      return;
+    const cameraOwned = dieTouch.end(event);
+    const interactionId = dragPointers.current.finish(event.pointerId);
+    if (interactionId && !cameraOwned) {
+      event.stopPropagation();
+      const point = pointerTablePoint(event);
+      latestTarget.current = point ? snapPoint(point) : latestTarget.current;
+      onDragEnd(die.dieId, interactionId, latestTarget.current);
     }
-    event.stopPropagation();
-    const pointerPosition = pointerTablePosition(event, layout) ?? die.position;
-    const position = snapDragPosition(die.dieId, pointerPosition);
-    latestDragPosition.current = position;
-    onDragEnd(die.dieId, interactionId, position);
-    const captureTarget = pointerCaptureTarget(event);
-    if (captureTarget.hasPointerCapture(event.pointerId)) {
-      captureTarget.releasePointerCapture(event.pointerId);
+    const target = pointerCaptureTarget(event);
+    if (target.hasPointerCapture(event.pointerId)) {
+      target.releasePointerCapture(event.pointerId);
     }
-  }, [die.dieId, die.position, layout, onDragEnd, snapDragPosition]);
+  }, [die.dieId, dieTouch, onDragEnd, pointerTablePoint, snapPoint]);
 
   return (
-    <RigidBody
-      ref={bodyRef}
-      type={die.mode === 'held' ? 'kinematicPosition' : 'dynamic'}
-      colliders={false}
-      position={[initialWorld.x, dieConfig.dragHeight, initialWorld.z]}
-      linearDamping={dieConfig.linearDamping}
-      angularDamping={dieConfig.angularDamping}
-      enabledRotations={die.mode === 'rolling'
-        ? [true, true, true]
-        : [false, false, false]}
-      ccd
-      canSleep
+    <group
+      ref={group}
+      onPointerDown={(event) => {
+        if (die.mode !== 'settled' || die.ownerPlayerId !== localPlayerId) return;
+        event.stopPropagation();
+        const cameraOwned = dieTouch.start(
+          event,
+          () => cancelPointerDrag(event.pointerId),
+        );
+        if (cameraOwned) {
+          pointerCaptureTarget(event).setPointerCapture(event.pointerId);
+          return;
+        }
+        const point = pointerTablePoint(event);
+        if (!point) return;
+        latestTarget.current = snapPoint(point);
+        const interactionId = onDragStart(die.dieId, latestTarget.current);
+        if (interactionId) {
+          dragPointers.current.begin(event.pointerId, interactionId);
+          pointerCaptureTarget(event).setPointerCapture(event.pointerId);
+        }
+      }}
+      onPointerMove={moveDrag}
+      onPointerUp={finishDrag}
+      onPointerCancel={finishDrag}
     >
-      <CuboidCollider
-        args={[
-          dieConfig.colliderHalfExtent,
-          dieConfig.colliderHalfExtent,
-          dieConfig.colliderHalfExtent,
-        ]}
-        mass={dieConfig.mass}
-        friction={physics.friction}
-        restitution={physics.restitution}
-      />
-      <group
-        onPointerDown={(event) => {
-          if (die.mode !== 'settled') {
-            return;
-          }
-          event.stopPropagation();
-          const position = pointerTablePosition(event, layout) ?? die.position;
-          const interactionId = onDragStart(die.dieId, position);
-          if (interactionId) {
-            latestDragPosition.current = position;
-            dragPointerTracker.current.begin(event.pointerId, interactionId);
-            pointerCaptureTarget(event).setPointerCapture(event.pointerId);
-          }
-        }}
-        onPointerMove={moveDrag}
-        onPointerUp={finishDrag}
-      >
-        <DieVisual dieDefinitionId={die.dieDefinitionId} />
-      </group>
-    </RigidBody>
+      <DieVisual die={die} />
+    </group>
   );
 }

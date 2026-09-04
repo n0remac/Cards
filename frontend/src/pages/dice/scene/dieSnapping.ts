@@ -1,4 +1,4 @@
-import { ArenaPoint } from './arenaLayout';
+export type TablePosition = { x: number; z: number };
 
 const EDGE_DIRECTIONS = [
   { x: 1, z: 0 },
@@ -8,8 +8,8 @@ const EDGE_DIRECTIONS = [
 ] as const;
 
 function overlapsDie(
-  position: ArenaPoint,
-  target: ArenaPoint,
+  position: TablePosition,
+  target: TablePosition,
   dieWidth: number,
 ): boolean {
   return Math.abs(position.x - target.x) < dieWidth - 1e-7 &&
@@ -17,10 +17,10 @@ function overlapsDie(
 }
 
 export function snapToAdjacentDie(
-  position: ArenaPoint,
-  targetPositions: readonly ArenaPoint[],
+  position: TablePosition,
+  targetPositions: readonly TablePosition[],
   dieWidth: number,
-): ArenaPoint {
+): TablePosition {
   const snapDistance = dieWidth / 2;
   let closestPosition = position;
   let closestDistanceSquared = Number.POSITIVE_INFINITY;

@@ -1,163 +1,117 @@
 # Letter dice table
 
-This directory contains the persistent, phone-first letter-dice table at
-`/dice`. The standard catalog has twelve stable die definitions and maps each
-definition's written six-letter string directly to physical faces one through
-six. Rapier owns local animation. The rolling player owns the canonical faces and final
-approximate placements that will eventually be shared over a live transport.
+This directory contains the browser half of the shared letter-dice table at
+`/dice`. Browsers render the room and send user intent; the Rust dice service is
+the sole authority for physics, positions, orientations, faces, rolls, drags,
+and settlement.
 
-Exact physics replay is intentionally not a protocol guarantee. A `RollSpec` is
-shared animation input so phones begin with similar throws. A `RollCompleted`
-event replaces observer-calculated faces with the roller-reported faces and
-reconciles normalized placements.
+The service uses absolute double-precision world coordinates. Clients buffer
+authoritative 20 Hz frames and render about 100 ms behind the server, so network
+timing may differ while every player still converges on the same world state.
 
 ## Responsibilities
 
 | File or directory | Responsibility |
 | --- | --- |
-| `DiceGame.tsx` | Route presentation, loading/error state, and bottom controls. |
-| `constants.ts` | Configuration shared by the table, scene, and word-detection areas. |
-| `table/` | Persistent table state, commands, roll contracts, the letter-die catalog, and the client controller/event adapter. |
-| `table/letterDice.ts` | Pure fixed catalog, definition validation, and physical-face-to-letter resolution. |
-| `table/tableCommands.ts` | Pure construction of first-roll, add-new, targeted-reroll, and reroll-all targets. |
-| `table/useDiceTable.ts` | UI controller and construction of local domain events. Exposes roll-all, definition-based add-new, reroll, selection, drag, settlement, and remote-event commands. |
-| `table/tableModel.ts` | Pure reducer for the persistent die map, stable ordering, active roll, snapshots, drag sequences, and reconciliation targets. |
-| `table/tableEventAdapter.ts` | Synchronous loopback adapter with the same publish/receive boundary expected from a future network adapter. |
-| `table/rollModel.ts` | Shared animation input generation and validation plus authoritative result construction. |
-| `table/diceMath.ts` | Face/quaternion and settlement math with no React or Rapier dependency. |
-| `scene/` | React Three Fiber/Rapier rendering, physics observation, dragging, snapping, and visual reconciliation. |
-| `scene/arenaLayout.ts` | Pure aspect-derived camera, edge walls, playable quadrilateral, visual-floor/shadow bounds, normalized mapping, and containment correction. |
-| `scene/DiceArena.tsx` | Camera, fitted visual floor, and Rapier floor/wall collider ownership. The visual receiver and physics floor are separate. |
-| `scene/RollObserver.tsx` | Post-step containment, active-roll settlement, face reading, and displaced-die placement reporting. |
-| `scene/Die.tsx` | Stable Rapier body, cached canvas letter materials, body-mode transitions, pointer dragging, and result reconciliation. |
-| `scene/dieSnapping.ts` | Pure open-edge selection for half-width drag snapping without overlapping occupied positions. |
-| `scene/LetterStringObserver.tsx` | Live Rapier-position adapter that resolves playable faces and reports changed strings and shapes. |
+| `DiceGame.tsx` | Route presentation, room status, roll controls, and camera actions. |
+| `constants.ts` | Small view and word-detection constants shared inside the feature. |
+| `table/` | Canonical client-side table model, command construction, die catalog, and controller. |
+| `table/tableModel.ts` | Pure reducer for welcome snapshots and revisioned lifecycle events. |
+| `table/tableCommands.ts` | Pure construction of add-new and owned-dice reroll commands. |
+| `table/useDiceTable.ts` | UI controller for transport messages, pending commands, drag prediction, and ownership. |
+| `sync/` | Feature-local transport adapters and authoritative-frame interpolation. |
+| `sync/webSocketTableTransport.ts` | Binary protobuf WebSocket, resume-token storage, reconnects, lifecycle revision checks, and stale-frame filtering. |
+| `sync/frameInterpolation.ts` | Six-tick frame buffer and position/quaternion interpolation without extrapolation. |
+| `scene/` | React Three Fiber rendering, field/camera gestures, meshes, owner tinting, and visual drag prediction. |
+| `scene/TableCamera.ts` | Fixed-angle camera, coordinate rebasing, bounds-aware pan/zoom, and fit transitions. |
+| `scene/DiceArena.tsx` | Large felt receiver centered under the local render origin; it has no walls or physics. |
+| `scene/Die.tsx` | Mesh-only die rendering, ownership-gated pointer input, and world-space drag targets. |
+| `scene/LetterStringObserver.tsx` | Adapter from authoritative settled die state to pure word detection. |
 | `words/` | Letter-string detection, crossword validation, and the bundled dictionary adapter and asset. |
-| `words/letterStringDetection.ts` | Pure tolerant adjacency graph, maximal string derivation, and normalized crossword-grid layout. |
-| `words/crosswordValidation.ts` | Pure dictionary validation for formed words, die coverage, and single-component connectivity. |
-| `words/useWordDictionary.ts` | Browser adapter that parses, loads, and caches the bundled line-delimited Scrabble dictionary. |
 
-## State and events
+The shared protocol is
+[`proto/dice/v1/dice.proto`](../../../../proto/dice/v1/dice.proto). Go and
+TypeScript generated outputs are committed, and the Rust service compiles that
+same schema with `prost-build`.
 
-All table mutations use revisioned protobuf `TableEvent` values. The local
-adapter immediately loops those events back into the reducer; a future
-WebSocket adapter can deliver the same messages without introducing a second
-single-player code path.
+## Authority and synchronization
 
-The reducer stores dice by stable `dieId`. `dieOrder` controls rendering order,
-while an active roll only identifies the bodies being watched for settlement.
-Each instance keeps a stable `dieId` separate from its fixed
-`dieDefinitionId`. Starting an add-new roll appends bodies. Starting a reroll
-reuses existing IDs and definitions.
-Only one roll can be active, but all prior dice remain mounted and collidable.
+Every visitor joins one process-local room. The Rust room actor serializes
+connections, commands, fixed 60 Hz Rapier simulation, snapshots, lifecycle
+events, and 20 Hz complete-world frames. A private resume token in
+`localStorage` restores anonymous ownership after reload; multiple tabs with the
+same token share that identity.
 
-`rollAll()` creates the standard twelve-die catalog on an empty table. On a
-populated table it rerolls every instance from its current normalized position,
-including any extra dice added through the internal `rollNew(definitionIds)`
-capability. The controller also exposes selection and targeted-reroll commands,
-but selection/grouping and add-new UI are intentionally deferred.
+Lifecycle events have consecutive room revisions. A client reconnects if it
+observes a gap, and the next `Welcome` replaces canonical state from a complete
+snapshot. Physics frames have an independent increasing tick: stale frames are
+discarded and missing frames are never extrapolated. Superseded frames may be
+coalesced for slow sockets, while lifecycle events remain reliable.
 
-## Body modes
+An empty `ADD_NEW` command asks the server to allocate the standard twelve dice.
+Later rolls contain only the IDs of the local player's settled dice. The server
+creates the launch transforms and velocities, simulates all cross-player
+collisions, derives the final faces, snaps the final orientations, and publishes
+the results. Concurrent player rolls settle together after the shared world is
+quiet.
 
-- `rolling`: dynamic, CCD enabled, all rotations enabled, and supplied throw
-  impulse/torque applied once per global roll ID.
-- `settled`: dynamic translation with all rotations locked. The canonical
-  face-up quaternion turns the top letter upright toward screen-up and survives
-  collisions and dragging.
-- `held`: kinematic-position-based. Pointer rays intersect a horizontal table
-  plane and publish normalized drag events. Within half a die width of an open
-  neighboring edge, the held die snaps into exact alignment while it is moved
-  and when it is released. Release restores a dynamic, rotation-locked body
-  with zero angular velocity. The canvas owns touch gestures, and native pointer
-  cancellation/lost-capture events settle a held die at its last accepted
-  position.
+Dragging is also authoritative. The owner sees an immediate visual-only overlay
+while targets are sent at no more than 30 Hz plus a final target. The service
+moves a kinematic body at tick boundaries and returns it to a rotation-locked
+dynamic body at drag end. Rejection, disconnect, or a replacement snapshot
+clears the local prediction.
 
-Settled dice may still slide when struck. At roll settlement, the roller reports
-placements for every rolled die and any existing die displaced far enough by a
-collision.
+## Field and camera
+
+The physical world has an infinite floor and no walls. Canonical table bounds
+are the monotonic union of every dice AABB seen by the service, with a 16-by-12
+minimum. They constrain camera targets and determine how far the user can zoom
+out, but they do not create a visible or physical edge.
+
+The camera keeps a fixed tilt and azimuth. Desktop users left-drag empty felt to
+pan and wheel to zoom around the pointer. On touch devices, one finger drags an
+owned die and two fingers pan and pinch; adding a second finger ends an active
+die drag before the camera gesture takes over. “My dice” and “Fit table” animate
+to calculated views without changing shared state. Remote activity never moves
+an established local camera.
+
+Rendering is rebased around the local camera target before values reach WebGL,
+preserving GPU precision while the protocol and reducer retain absolute f64
+coordinates. A large felt plane follows that render origin so no edge appears
+while panning.
 
 ## Live letter strings
 
-`LetterStringObserver` reads the current Rapier body positions after physics
-steps, so its output follows held dice and collision-displaced settled dice
-rather than relying on potentially stale normalized placements. Rolling dice and
-bodies without playable faces are omitted. It only reports to React when the
-detected result changes.
+Only authoritative settled dice participate in word detection. The pure
+detector builds horizontal and vertical adjacency graphs from absolute X/Z
+centers, using the die width as its tolerance scale. It remains shared across
+all owners and reports only when the derived layout changes.
 
-The pure detector builds separate horizontal and vertical adjacency graphs.
-Centers must be between `0.65` and `1.35` die widths apart on the word axis and
-within `0.35` die widths on the cross axis. Each connected component becomes one
-maximal two-or-more-letter string; horizontal strings read left-to-right and
-vertical strings read top-to-bottom. The combined directional graph also assigns
-integer row and column steps to every connected die, normalizes each disconnected
-formation to its own compact grid, and drives the temporary lower-left crossword
-preview. Scoring is intentionally deferred.
+The bundled `scrabbleDictionary.txt` is an exact copy of `redbo/scrabble`'s
+`dictionary.txt` at commit `05748fb060b6e20480424b9113c1610066daca3c`. Its
+178,691 unique uppercase A-Z words are stored one per line. The route loads and
+caches the set in the browser.
 
-The bundled `scrabbleDictionary.txt` is an exact copy of
-[`redbo/scrabble`'s `dictionary.txt`](https://github.com/redbo/scrabble/blob/05748fb060b6e20480424b9113c1610066daca3c/dictionary.txt)
-at commit `05748fb060b6e20480424b9113c1610066daca3c`. Its 178,691 unique
-uppercase A-Z words are stored one per line; the downloaded file's SHA-256 is
-`eda7bc8b86a534de8065a7d0cc091dc918d400475061749d05a5711afda12a3b`.
-The production build copies this 1.76 MB plaintext asset beside the app. The
-dice route fetches it once, validates its format, and caches a lookup set in the
-browser.
+## Services and verification
 
-A green check is shown only when there is exactly one detected formation, that
-formation contains every current table die, every die belongs to at least one
-valid word, and every maximal horizontal and vertical word is present in the
-dictionary. The preview lists valid words in green and invalid words in red while
-the formation is being edited.
+Start the private physics service with:
 
-## Arena and resizing
+```sh
+cargo run -p cards-dice-service
+```
 
-`ArenaLayout` depends only on the viewport aspect ratio. The camera projects the
-four screen corners onto the table plane, and those projections are the wall
-collider centerlines. The CSS wood border is therefore the visible wall at every
-screen size; the Rapier walls do not remain at a fixed center tray.
+It listens on `DICE_SERVICE_ADDR` (default `127.0.0.1:8081`) and exposes
+`/healthz`. The public Go server proxies `/dice/ws` to `DICE_SERVICE_URL`
+(default `http://127.0.0.1:8081`) and returns 503 when that service is
+unavailable.
 
-The playable quadrilateral is inset by the die radius and wall thickness. Table
-positions use normalized `u/v` coordinates over this quadrilateral. On an aspect
-change, settled/held dice remap from their normalized positions while rolling
-dice are contained in the new shape.
+Use the following checks before release:
 
-Walls are intentionally short. Fast or airborne dice that cross a collider are
-projected just inside the nearest playable edge and their outward velocity is
-reflected and damped. A fallen die keeps its edge-relative x/z position rather
-than respawning at the center.
-
-Equivalent pixel-size changes share the same rounded aspect key, so they do not
-remount the responsive wall body.
-
-The shadow-receiving floor is a viewport-fitted, subdivided plane. It stays in
-front of the camera and avoids interpolating shadow coordinates across the two
-screen-spanning triangles of the much larger physics floor. Rapier retains its
-fixed 160-by-160 floor collider independently of the rendered receiver.
-
-Directional shadow bounds are projected into the angled light's camera space.
-They cover the visible floor and dice up to the maximum throw height, including
-the deeper off-center table footprint used by portrait mobile layouts.
-
-## Multiplayer contract
-
-The protobuf schema supports:
-
-- stable die IDs alongside roll-order indices;
-- fixed definition IDs on throw, result, and snapshot entries;
-- add-new and reroll-existing modes;
-- normalized table positions, placements, die state, and snapshots;
-- roll-start and roll-complete events with roller identity, animation input,
-  authoritative physical faces, and changed placements;
-- sequenced drag start/update/end events with player and interaction identity;
-- a revisioned event envelope suitable for snapshot plus event-stream sync.
-
-Clients derive visible letters from the shared fixed catalog rather than
-transmitting a redundant mutable letter. Simulation version `4` publishes this
-letter-die interpretation. It describes compatible animation input meaning,
-not lockstep deterministic physics.
-
-## Verification
-
-`npm test` covers reducer transitions, contract binary round trips, normalized
-mapping properties, representative viewport ratios, all four edge walls,
-containment correction, canonical face quaternions, and direct Rapier CCD/body
-mode behavior. `npm run build` produces the browser bundle.
+```sh
+cargo fmt --check
+cargo clippy --workspace --all-targets -- -D warnings
+cargo test --workspace
+go test ./pkg/dice .
+npm test
+npm run build
+```

@@ -1,63 +1,52 @@
 import { describe, expect, it } from 'vitest';
-import {
-  DieFace,
-  NormalizedTablePosition,
-  RollMode,
-} from '../../../rpc/proto/dice/v1/dice_pb';
+import { DieFace, RollMode } from '../../../rpc/proto/dice/v1/dice_pb';
 import { STANDARD_LETTER_DIE_DEFINITION_IDS } from './letterDice';
 import {
-  createAddRollTargets,
+  createRerollTargetIds,
   createRollAllRequest,
+  isStandardFirstRoll,
 } from './tableCommands';
-import { createInitialDiceTableState, DiceTableState } from './tableModel';
+import {
+  createInitialDiceTableState,
+  DiceTableState,
+  identityWorldTransform,
+} from './tableModel';
+
+function stateWithDice(owners: readonly string[]): DiceTableState {
+  const dieOrder = owners.map((_, index) => `die-${index}`);
+  return {
+    ...createInitialDiceTableState(),
+    dieOrder,
+    dice: Object.fromEntries(dieOrder.map((dieId, index) => [dieId, {
+      dieId,
+      dieDefinitionId: STANDARD_LETTER_DIE_DEFINITION_IDS[
+        index % STANDARD_LETTER_DIE_DEFINITION_IDS.length
+      ],
+      ownerPlayerId: owners[index],
+      revision: 1n,
+      face: DieFace.ONE,
+      transform: identityWorldTransform(index, 0.5, 0),
+      mode: 'settled' as const,
+    }])),
+  };
+}
 
 describe('table roll commands', () => {
-  it('creates the standard twelve definitions on the first roll', () => {
-    let nextId = 0;
+  it('asks the server to allocate the first standard twelve', () => {
     const request = createRollAllRequest(
-      createInitialDiceTableState(),
-      () => `instance-${nextId += 1}`,
+      createInitialDiceTableState(), 'player-a',
     );
-
-    expect(request?.mode).toBe(RollMode.ADD_NEW);
-    expect(request?.targets.map(({ dieDefinitionId }) => dieDefinitionId))
-      .toEqual(STANDARD_LETTER_DIE_DEFINITION_IDS);
-    expect(new Set(request?.targets.map(({ dieId }) => dieId)).size).toBe(12);
+    expect(request).toEqual({ mode: RollMode.ADD_NEW, targetDieIds: [] });
+    expect(isStandardFirstRoll(STANDARD_LETTER_DIE_DEFINITION_IDS)).toBe(true);
   });
 
-  it('rerolls every stable instance, including extras, at current positions', () => {
-    const dieOrder = Array.from({ length: 13 }, (_, index) => `die-${index}`);
-    const state: DiceTableState = {
-      ...createInitialDiceTableState(),
-      dieOrder,
-      dice: Object.fromEntries(dieOrder.map((dieId, index) => [dieId, {
-        dieId,
-        dieDefinitionId: STANDARD_LETTER_DIE_DEFINITION_IDS[
-          index % STANDARD_LETTER_DIE_DEFINITION_IDS.length
-        ],
-        ownerPlayerId: 'player',
-        revision: 1n,
-        face: DieFace.ONE,
-        position: new NormalizedTablePosition({
-          u: 0.1 + index * 0.01,
-          v: 0.8 - index * 0.01,
-        }),
-        mode: 'settled',
-      }])),
-    };
-
-    const request = createRollAllRequest(state, () => 'unused');
-    expect(request?.mode).toBe(RollMode.REROLL_EXISTING);
-    expect(request?.targets).toHaveLength(13);
-    expect(request?.targets.map(({ dieId }) => dieId)).toEqual(dieOrder);
-    expect(request?.targets[12].position).toBe(state.dice['die-12'].position);
-  });
-
-  it('keeps definition-based additions capped at twelve', () => {
-    expect(createAddRollTargets([], () => 'die')).toBeUndefined();
-    expect(createAddRollTargets([
-      ...STANDARD_LETTER_DIE_DEFINITION_IDS,
-      'letter-die-01',
-    ], () => 'die')).toBeUndefined();
+  it('rerolls only the local player’s settled dice', () => {
+    const state = stateWithDice(['player-a', 'player-b', 'player-a']);
+    expect(createRollAllRequest(state, 'player-a')).toEqual({
+      mode: RollMode.REROLL_EXISTING,
+      targetDieIds: ['die-0', 'die-2'],
+    });
+    expect(createRerollTargetIds(state, ['die-1'], 'player-a'))
+      .toBeUndefined();
   });
 });

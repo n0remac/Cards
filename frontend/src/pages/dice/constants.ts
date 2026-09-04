@@ -1,74 +1,7 @@
 export const DICE_TABLE_CONFIG = {
-  simulationVersion: 4,
-  physics: {
-    gravity: [0, -9.81, 0] as const,
-    timeStep: 1 / 60,
-    friction: 0.7,
-    restitution: 0.35,
-  },
   die: {
     size: 1,
-    colliderHalfExtent: 0.48,
-    mass: 1,
-    linearDamping: 0.14,
-    angularDamping: 0.18,
     dragHeight: 0.58,
-  },
-  arena: {
-    floorThickness: 0.25,
-    floorHalfExtent: 80,
-    visualFloorPadding: 1,
-    visualFloorSegments: 16,
-    wallThickness: 0.28,
-    wallHeight: 1.45,
-    containmentPadding: 0.04,
-    recoveryMinimumY: -2.5,
-    reflectedVelocity: 0.42,
-    tangentVelocity: 0.72,
-    aspectKeyPrecision: 4,
-  },
-  camera: {
-    desktopPosition: [0, 24, 12] as const,
-    desktopFov: 42,
-    mobilePosition: [0, 32, 16] as const,
-    mobileFov: 48,
-    mobileAspectBreakpoint: 0.9,
-    minimumHalfTableWidth: 7.35,
-  },
-  lighting: {
-    directionalPosition: [-6, 25, 7] as const,
-    shadowPadding: 2,
-  },
-  roll: {
-    maximumDefinitionsPerAdd: 12,
-    settleSpeedThreshold: 0.05,
-    settleSteps: 20,
-    spawnHeightMinimum: 3,
-    spawnHeightMaximum: 5,
-    spawnJitter: 0.018,
-    horizontalImpulseMaximum: 1,
-    verticalImpulseMaximum: 1,
-    torqueMaximum: 3,
-    minimumTorqueMagnitude: 1,
-    quaternionTolerance: 0.001,
-    normalizedSpawnSlots: [
-      [0.2, 0.27],
-      [0.4, 0.27],
-      [0.6, 0.27],
-      [0.8, 0.27],
-      [0.2, 0.48],
-      [0.4, 0.48],
-      [0.6, 0.48],
-      [0.8, 0.48],
-      [0.2, 0.69],
-      [0.4, 0.69],
-      [0.6, 0.69],
-      [0.8, 0.69],
-    ] as const,
-  },
-  reconciliation: {
-    easing: 0.18,
-    positionTolerance: 0.035,
   },
   letterStrings: {
     minimumAxisDistanceRatio: 0.65,
@@ -76,7 +9,3 @@ export const DICE_TABLE_CONFIG = {
     maximumCrossAxisOffsetRatio: 0.35,
   },
 } as const;
-
-export const SIMULATION_VERSION = DICE_TABLE_CONFIG.simulationVersion;
-export const MAX_DEFINITIONS_PER_ADD =
-  DICE_TABLE_CONFIG.roll.maximumDefinitionsPerAdd;

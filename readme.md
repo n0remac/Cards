@@ -13,6 +13,7 @@ Welcome to our unique AI-powered trading card game, where every card is a one-of
 ### Prerequisites
 - Node.js
 - Go (Golang)
+- Rust 1.96 (the pinned toolchain is installed automatically by rustup)
 
 ### Setting Up the Project
 
@@ -23,17 +24,13 @@ Welcome to our unique AI-powered trading card game, where every card is a one-of
    ```
 
 2. **Set Up the Frontend (React)**
-   - Navigate to the frontend directory:
-     ```bash
-     cd frontend
-     ```
-   - Install dependencies:
+   - From the repository root, install dependencies:
      ```bash
      npm install
      ```
    - Start the React development server:
      ```bash
-     npm start
+     npm run dev
      ```
 
 3. **Set Up the Backend (Go)**
@@ -44,8 +41,16 @@ Welcome to our unique AI-powered trading card game, where every card is a one-of
      ```
    - Run the Go server:
      ```bash
-     go run main.go
+     go run .
      ```
 
-4. **Access the Game**
-   - Open your browser and navigate to `http://localhost:3000` (or the port specified for your React app).
+4. **Start the Dice Physics Service**
+   - The `/dice` route uses a separately running authoritative Rust service:
+     ```bash
+     cargo run -p cards-dice-service
+     ```
+   - The Go server proxies `/dice/ws` to `http://127.0.0.1:8081` by default.
+     Override that private upstream with `DICE_SERVICE_URL` when needed.
+
+5. **Access the Game**
+   - Open your browser at the URL printed by the frontend development server.

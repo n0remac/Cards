@@ -4,6 +4,7 @@ import { useDiceTable } from './table/useDiceTable';
 import { validateCrossword } from './words/crosswordValidation';
 import type { DetectedLetterLayout } from './words/letterStringDetection';
 import { useWordDictionary } from './words/useWordDictionary';
+import type { CameraViewRequest } from './scene/TableCamera';
 
 type SceneStatus = 'loading' | 'ready' | 'unsupported' | 'error';
 
@@ -60,9 +61,15 @@ export default function DiceGame() {
     strings: [],
     crosswords: [],
   });
-  const rollDisabled = sceneStatus !== 'ready' || controller.phase === 'rolling';
-  const rollingCount = controller.activeRoll?.spec.dice.length ?? 0;
-  const hasDice = controller.dieOrder.length > 0;
+  const [viewRequest, setViewRequest] = useState<CameraViewRequest>({
+    version: 0,
+    kind: 'mine',
+  });
+  const rollDisabled = sceneStatus !== 'ready' || !controller.roomReady ||
+    controller.pendingRoll || controller.localRollActive;
+  const rollingCount = Object.values(controller.activeRolls).find((roll) =>
+    roll.rollerId === controller.localPlayerId)?.targetDieIds.length ?? 0;
+  const hasDice = controller.ownedDieIds.length > 0;
   const validation = dictionary.status === 'ready'
     ? validateCrossword(
       detectedLayout,
@@ -74,22 +81,33 @@ export default function DiceGame() {
   const markReady = useCallback(() => setSceneStatus('ready'), []);
   const markUnsupported = useCallback(() => setSceneStatus('unsupported'), []);
   const markError = useCallback(() => setSceneStatus('error'), []);
+  const requestView = useCallback((kind: CameraViewRequest['kind']) => {
+    setViewRequest((current) => ({ kind, version: current.version + 1 }));
+  }, []);
 
   const statusText = sceneStatus === 'loading'
-    ? 'Loading the physics engine…'
+    ? 'Loading the shared table…'
     : sceneStatus === 'unsupported'
       ? 'WebGL is unavailable in this browser.'
       : sceneStatus === 'error'
-        ? 'The physics engine could not initialize.'
-        : controller.phase === 'rolling'
+        ? 'The 3D table could not initialize.'
+        : !controller.roomReady
+          ? controller.connectionStatus === 'offline'
+            ? 'You are offline. Waiting to reconnect…'
+            : controller.connectionStatus === 'reconnecting'
+              ? 'Reconnecting to the shared table…'
+              : 'Connecting to the shared table…'
+        : controller.localRollActive
           ? `Rolling ${rollingCount} letter ${rollingCount === 1 ? 'die' : 'dice'}…`
+          : controller.activeRollCount > 0
+            ? `${controller.activeRollCount} other ${controller.activeRollCount === 1 ? 'roll is' : 'rolls are'} active.`
           : controller.phase === 'settled'
             ? 'Arrange the letters or roll again.'
             : 'Roll the twelve letter dice.';
 
-  const rollLabel = controller.phase === 'rolling'
+  const rollLabel = controller.localRollActive || controller.pendingRoll
     ? 'Rolling…'
-    : hasDice ? 'Reroll all dice' : 'Roll letter dice';
+    : hasDice ? 'Reroll your dice' : 'Roll your dice';
 
   return (
     <main
@@ -105,9 +123,11 @@ export default function DiceGame() {
             <DiceScene
               dice={controller.dice}
               dieOrder={controller.dieOrder}
-              activeRoll={controller.activeRoll}
+              bounds={controller.bounds}
+              latestPhysicsFrame={controller.latestPhysicsFrame}
               localPlayerId={controller.localPlayerId}
-              onSettled={controller.reportSettled}
+              roomGeneration={controller.roomGeneration}
+              viewRequest={viewRequest}
               onDragStart={controller.startDrag}
               onDragUpdate={controller.updateDrag}
               onDragEnd={controller.endDrag}
@@ -125,6 +145,25 @@ export default function DiceGame() {
               Letter Dice
             </h1>
           </header>
+
+          <div className="absolute right-4 top-4 z-20 flex gap-2 sm:right-6 sm:top-6">
+            <button
+              type="button"
+              onClick={() => requestView('mine')}
+              disabled={!controller.roomReady || controller.ownedDieIds.length === 0}
+              className="rounded-lg border border-emerald-100/30 bg-[#0e2f22]/80 px-3 py-2 text-[0.65rem] font-bold uppercase tracking-wider text-emerald-50 shadow-lg backdrop-blur-sm hover:bg-[#164a33] disabled:cursor-not-allowed disabled:opacity-40"
+            >
+              My dice
+            </button>
+            <button
+              type="button"
+              onClick={() => requestView('table')}
+              disabled={!controller.roomReady}
+              className="rounded-lg border border-emerald-100/30 bg-[#0e2f22]/80 px-3 py-2 text-[0.65rem] font-bold uppercase tracking-wider text-emerald-50 shadow-lg backdrop-blur-sm hover:bg-[#164a33] disabled:cursor-not-allowed disabled:opacity-40"
+            >
+              Fit table
+            </button>
+          </div>
 
           <aside
             aria-label="Detected crossword layout"
@@ -201,7 +240,7 @@ export default function DiceGame() {
 
           {sceneStatus === 'loading' && (
             <div className="pointer-events-none absolute inset-0 z-10 grid place-items-center bg-[#164a33]/90 text-sm font-medium tracking-wide text-emerald-50">
-              Loading physics…
+              Loading table…
             </div>
           )}
         </div>
@@ -210,12 +249,21 @@ export default function DiceGame() {
           <div
             className="flex min-h-9 items-center justify-between gap-3 border-b border-[#96613d]/45 px-1 pb-1.5"
             aria-live="polite"
-            aria-busy={controller.phase === 'rolling'}
+            aria-busy={controller.localRollActive}
           >
             <p className="min-w-0 truncate text-xs font-medium tracking-wide text-stone-200/80 sm:text-sm">
               {statusText}
             </p>
+            <span className="shrink-0 text-[0.65rem] font-bold uppercase tracking-wider text-stone-300/70">
+              {controller.connectionStatus} · {controller.activeRollCount} active
+            </span>
           </div>
+
+          {controller.connectionError && (
+            <p className="px-1 pt-1.5 text-xs text-amber-200" role="status">
+              {controller.connectionError}
+            </p>
+          )}
 
           <div className="py-2 sm:py-3">
             <button

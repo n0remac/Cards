@@ -1,59 +1,44 @@
-import React, {
-  Suspense,
-  useCallback,
-  useEffect,
-  useLayoutEffect,
-  useMemo,
-  useRef,
-} from 'react';
-import { Canvas, useThree } from '@react-three/fiber';
-import { Physics, RapierRigidBody } from '@react-three/rapier';
-import { DirectionalLight } from 'three';
-import { NormalizedTablePosition } from '../../../rpc/proto/dice/v1/dice_pb';
+import React, { Suspense, useEffect, useMemo, useRef } from 'react';
+import { Canvas } from '@react-three/fiber';
+import { Group } from 'three';
 import {
-  ArenaLayout,
-  clampNormalizedPosition,
-  createArenaLayout,
-  isWorldPositionInsideArena,
-  normalizedToWorld,
-  worldToNormalized,
-} from './arenaLayout';
-import { DICE_TABLE_CONFIG } from '../constants';
+  PhysicsFrame,
+  TableBounds,
+  TablePoint,
+} from '../../../rpc/proto/dice/v1/dice_pb';
+import { TableDie } from '../table/tableModel';
+import { DetectedLetterLayout } from '../words/letterStringDetection';
+import { createPhysicsFrameBuffer } from '../sync/frameInterpolation';
+import { DiceArena } from './DiceArena';
 import { Die } from './Die';
-import { DiceArena, ResponsiveArenaCamera } from './DiceArena';
-import { snapToAdjacentDie } from './dieSnapping';
-import type { DetectedLetterLayout } from '../words/letterStringDetection';
 import { LetterStringObserver } from './LetterStringObserver';
-import { DiceBodyRegistry, RollObserver } from './RollObserver';
-import { RollSettledEvent } from '../table/rollModel';
-import { ActiveTableRoll, TableDie } from '../table/tableModel';
+import { CameraViewRequest, useTableCamera } from './TableCamera';
 
 type DiceSceneProps = {
   dice: Readonly<Record<string, TableDie>>;
   dieOrder: readonly string[];
-  activeRoll?: ActiveTableRoll;
+  bounds: TableBounds;
+  latestPhysicsFrame?: PhysicsFrame;
   localPlayerId: string;
-  onSettled: (event: RollSettledEvent) => void;
-  onDragStart: (
-    dieId: string,
-    position: NormalizedTablePosition,
-  ) => string | undefined;
+  roomGeneration: number;
+  viewRequest: CameraViewRequest;
+  onDragStart: (dieId: string, target: TablePoint) => string | undefined;
   onDragUpdate: (
     dieId: string,
     interactionId: string,
-    position: NormalizedTablePosition,
+    target: TablePoint,
   ) => void;
   onDragEnd: (
     dieId: string,
     interactionId: string,
-    position: NormalizedTablePosition,
+    target: TablePoint,
   ) => void;
   onDetectedLayoutChanged: (layout: DetectedLetterLayout) => void;
   onReady: () => void;
   onWebGLUnavailable: () => void;
 };
 
-function PhysicsReady({ onReady }: { onReady: () => void }) {
+function SceneReady({ onReady }: { onReady: () => void }) {
   useEffect(() => onReady(), [onReady]);
   return null;
 }
@@ -67,160 +52,92 @@ function WebGLFallback({ onUnavailable }: { onUnavailable: () => void }) {
   );
 }
 
-function ArenaDirectionalLight({ layout }: { layout: ArenaLayout }) {
-  const lightRef = useRef<DirectionalLight>(null);
-  const directionalLight = DICE_TABLE_CONFIG.lighting;
-
-  useLayoutEffect(() => {
-    const shadow = lightRef.current?.shadow;
-    if (!shadow) {
-      return;
-    }
-    Object.assign(shadow.camera, layout.shadowBounds);
-    shadow.camera.updateProjectionMatrix();
-    shadow.needsUpdate = true;
-  }, [layout]);
-
-  return (
-    <directionalLight
-      ref={lightRef}
-      castShadow
-      position={[...directionalLight.directionalPosition]}
-      intensity={2.2}
-      color="#ffe5bd"
-      shadow-mapSize-width={1024}
-      shadow-mapSize-height={1024}
-      shadow-camera-left={layout.shadowBounds.left}
-      shadow-camera-right={layout.shadowBounds.right}
-      shadow-camera-top={layout.shadowBounds.top}
-      shadow-camera-bottom={layout.shadowBounds.bottom}
-    />
-  );
-}
-
-function DiceWorld({
-  dice,
-  dieOrder,
-  activeRoll,
-  localPlayerId,
-  bodies,
-  onSettled,
-  onDragStart,
-  onDragUpdate,
-  onDragEnd,
-  onDetectedLayoutChanged,
-}: Omit<DiceSceneProps, 'onReady' | 'onWebGLUnavailable'> & {
-  bodies: DiceBodyRegistry;
-}) {
-  const { size } = useThree();
-  const aspectKey = (size.width / size.height).toFixed(
-    DICE_TABLE_CONFIG.arena.aspectKeyPrecision,
-  );
-  const layout = useMemo(
-    () => createArenaLayout(Number(aspectKey)),
-    [aspectKey],
-  );
-  const registerBody = useCallback((dieId: string, body: RapierRigidBody) => {
-    bodies.current.set(dieId, body);
-  }, [bodies]);
-  const unregisterBody = useCallback((dieId: string, body: RapierRigidBody) => {
-    if (bodies.current.get(dieId) === body) {
-      bodies.current.delete(dieId);
-    }
-  }, [bodies]);
-  const snapDragPosition = useCallback((
-    dieId: string,
-    position: NormalizedTablePosition,
-  ) => {
-    const targets = Object.entries(dice).flatMap(([targetId, targetDie]) => {
-      if (targetId === dieId || targetDie.mode === 'rolling') {
-        return [];
-      }
-      const bodyPosition = bodies.current.get(targetId)?.translation();
-      return [bodyPosition
-        ? { x: bodyPosition.x, z: bodyPosition.z }
-        : normalizedToWorld(layout, targetDie.position)];
-    });
-    const snapped = snapToAdjacentDie(
-      normalizedToWorld(layout, position),
-      targets,
-      DICE_TABLE_CONFIG.die.size,
-    );
-    return isWorldPositionInsideArena(layout, snapped)
-      ? clampNormalizedPosition(worldToNormalized(layout, snapped))
-      : position;
-  }, [bodies, dice, layout]);
+function DiceWorld(props: Omit<DiceSceneProps,
+  'onReady' | 'onWebGLUnavailable'>) {
+  const worldGroup = useRef<Group>(null);
+  const frames = useMemo(() => createPhysicsFrameBuffer(), []);
+  useEffect(() => frames.clear(), [frames, props.roomGeneration]);
+  useEffect(() => {
+    if (props.latestPhysicsFrame) frames.push(props.latestPhysicsFrame);
+  }, [frames, props.latestPhysicsFrame]);
+  const ownedTransforms = props.dieOrder.flatMap((dieId) => {
+    const die = props.dice[dieId];
+    return die?.ownerPlayerId === props.localPlayerId ? [die.transform] : [];
+  });
+  const { renderOrigin, dieTouch, feltHandlers } = useTableCamera({
+    bounds: props.bounds,
+    ownedTransforms,
+    resetKey: props.roomGeneration,
+    viewRequest: props.viewRequest,
+    worldGroup,
+  });
 
   return (
     <>
-      <ResponsiveArenaCamera layout={layout} />
       <hemisphereLight color="#fff4dc" groundColor="#1b1511" intensity={1.15} />
-      <ArenaDirectionalLight layout={layout} />
-      <DiceArena layout={layout} />
-      <RollObserver
-        activeRoll={activeRoll}
-        dice={dice}
-        bodies={bodies}
-        layout={layout}
-        onSettled={onSettled}
+      <directionalLight
+        castShadow
+        position={[-8, 28, 10]}
+        intensity={2.2}
+        color="#ffe5bd"
+        shadow-mapSize-width={1024}
+        shadow-mapSize-height={1024}
+        shadow-camera-left={-80}
+        shadow-camera-right={80}
+        shadow-camera-top={80}
+        shadow-camera-bottom={-80}
       />
+      <group ref={worldGroup}>
+        <DiceArena
+          renderOrigin={renderOrigin}
+          feltHandlers={feltHandlers}
+        />
+        {props.dieOrder.flatMap((dieId) => {
+          const die = props.dice[dieId];
+          return die ? [(
+            <Die
+              key={dieId}
+              die={die}
+              dice={props.dice}
+              localPlayerId={props.localPlayerId}
+              frames={frames}
+              renderOrigin={renderOrigin}
+              dieTouch={dieTouch}
+              onDragStart={props.onDragStart}
+              onDragUpdate={props.onDragUpdate}
+              onDragEnd={props.onDragEnd}
+            />
+          )] : [];
+        })}
+      </group>
       <LetterStringObserver
-        dice={dice}
-        dieOrder={dieOrder}
-        bodies={bodies}
-        onLayoutChanged={onDetectedLayoutChanged}
+        dice={props.dice}
+        dieOrder={props.dieOrder}
+        onLayoutChanged={props.onDetectedLayoutChanged}
       />
-      {dieOrder.flatMap((dieId) => {
-        const die = dice[dieId];
-        return die ? [(
-          <Die
-            key={dieId}
-            die={die}
-            layout={layout}
-            localPlayerId={localPlayerId}
-            onBodyReady={registerBody}
-            onBodyRemoved={unregisterBody}
-            onDragStart={onDragStart}
-            onDragUpdate={onDragUpdate}
-            onDragEnd={onDragEnd}
-            snapDragPosition={snapDragPosition}
-          />
-        )] : [];
-      })}
     </>
   );
 }
 
 export function DiceScene(props: DiceSceneProps) {
-  const bodies = useRef<Map<string, RapierRigidBody>>(new Map());
-  const markReady = useCallback(props.onReady, [props.onReady]);
-  const camera = DICE_TABLE_CONFIG.camera;
-
   return (
     <Canvas
       shadows
       style={{ touchAction: 'none' }}
       dpr={[1, 1.75]}
       camera={{
-        position: [...camera.desktopPosition],
-        fov: camera.desktopFov,
+        position: [0, 24, 12],
+        fov: 42,
         near: 0.1,
-        far: 160,
+        far: 100_000,
       }}
       gl={{ antialias: true }}
       fallback={<WebGLFallback onUnavailable={props.onWebGLUnavailable} />}
     >
       <color attach="background" args={['#1d6847']} />
-      <fog attach="fog" args={['#1d6847', 42, 74]} />
       <Suspense fallback={null}>
-        <Physics
-          gravity={[...DICE_TABLE_CONFIG.physics.gravity]}
-          timeStep={DICE_TABLE_CONFIG.physics.timeStep}
-          colliders={false}
-        >
-          <PhysicsReady onReady={markReady} />
-          <DiceWorld {...props} bodies={bodies} />
-        </Physics>
+        <SceneReady onReady={props.onReady} />
+        <DiceWorld {...props} />
       </Suspense>
     </Canvas>
   );

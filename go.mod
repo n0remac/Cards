@@ -6,6 +6,7 @@ require (
 	github.com/bufbuild/connect-go v1.10.0
 	github.com/bufbuild/connect-grpcreflect-go v1.1.0
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
+	github.com/gorilla/websocket v1.5.3
 	github.com/sashabaranov/go-openai v1.17.9
 	github.com/upper/db/v4 v4.7.0
 	golang.org/x/crypto v0.15.0

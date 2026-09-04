@@ -1,5 +1,7 @@
 node_modules/
 frontend/build/
 frontend/dist/
+frontend/*.tsbuildinfo
+/target/
 */card_images/*
 mydatabase.db

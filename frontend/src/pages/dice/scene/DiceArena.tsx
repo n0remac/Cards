@@ -1,71 +1,39 @@
-import React, { useEffect } from 'react';
-import { CuboidCollider, RigidBody } from '@react-three/rapier';
-import { useThree } from '@react-three/fiber';
-import { PerspectiveCamera } from 'three';
-import { ArenaLayout } from './arenaLayout';
-import { DICE_TABLE_CONFIG } from '../constants';
+import React, { useRef } from 'react';
+import { ThreeEvent, useFrame } from '@react-three/fiber';
+import { Mesh } from 'three';
+import { RenderOrigin } from './TableCamera';
 
-export function ResponsiveArenaCamera({ layout }: { layout: ArenaLayout }) {
-  const { camera } = useThree();
+type FeltHandlers = {
+  onPointerDown: (event: ThreeEvent<PointerEvent>) => void;
+  onPointerMove: (event: ThreeEvent<PointerEvent>) => void;
+  onPointerUp: (event: ThreeEvent<PointerEvent>) => void;
+  onPointerCancel: (event: ThreeEvent<PointerEvent>) => void;
+  onWheel: (event: ThreeEvent<WheelEvent>) => void;
+};
 
-  useEffect(() => {
-    if (!(camera instanceof PerspectiveCamera)) {
-      return;
+export function DiceArena({
+  renderOrigin,
+  feltHandlers,
+}: {
+  renderOrigin: RenderOrigin;
+  feltHandlers: FeltHandlers;
+}) {
+  const felt = useRef<Mesh>(null);
+  useFrame(() => {
+    if (felt.current) {
+      felt.current.position.x = renderOrigin.current.x;
+      felt.current.position.z = renderOrigin.current.z;
     }
-    camera.position.set(...layout.camera.position);
-    camera.fov = layout.camera.fov;
-    camera.aspect = layout.aspect;
-    camera.lookAt(0, 0, 0);
-    camera.updateProjectionMatrix();
-  }, [camera, layout]);
-
-  return null;
-}
-
-export function DiceArena({ layout }: { layout: ArenaLayout }) {
-  const { arena, physics } = DICE_TABLE_CONFIG;
+  });
   return (
-    <group>
-      <mesh
-        key={`visual-floor-${layout.aspectKey}`}
-        position={layout.visualFloor.center}
-        rotation={[-Math.PI / 2, 0, 0]}
-        receiveShadow
-      >
-        <planeGeometry args={[
-          layout.visualFloor.width,
-          layout.visualFloor.depth,
-          arena.visualFloorSegments,
-          arena.visualFloorSegments,
-        ]} />
-        <meshStandardMaterial color="#1d6847" roughness={0.96} />
-      </mesh>
-
-      <RigidBody type="fixed" colliders={false}>
-        <CuboidCollider
-          args={layout.floor.halfExtents}
-          position={layout.floor.center}
-          friction={physics.friction}
-          restitution={physics.restitution}
-        />
-      </RigidBody>
-
-      <RigidBody key={layout.aspectKey} type="fixed" colliders={false}>
-        {layout.walls.map((wall, index) => (
-          <CuboidCollider
-            key={index}
-            args={[
-              wall.halfLength + arena.wallThickness,
-              arena.wallHeight / 2,
-              arena.wallThickness / 2,
-            ]}
-            position={wall.center}
-            rotation={wall.rotation}
-            friction={physics.friction}
-            restitution={physics.restitution}
-          />
-        ))}
-      </RigidBody>
-    </group>
+    <mesh
+      ref={felt}
+      rotation={[-Math.PI / 2, 0, 0]}
+      receiveShadow
+      {...feltHandlers}
+    >
+      <planeGeometry args={[30_000, 30_000, 1, 1]} />
+      <meshStandardMaterial color="#1d6847" roughness={0.96} />
+    </mesh>
   );
 }

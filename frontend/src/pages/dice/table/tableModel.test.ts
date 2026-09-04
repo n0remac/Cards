@@ -1,297 +1,159 @@
 import { describe, expect, it } from 'vitest';
 import {
-  DiePlacement,
+  ActiveRoll,
   DieFace,
+  DieMotionState,
+  DieResult,
+  DieTransform,
   DragEnded,
   DragStarted,
-  DragUpdated,
-  NormalizedTablePosition,
+  PhysicsFrame,
   RollCompleted,
   RollMode,
+  RollResult,
   RollStarted,
+  TableBounds,
   TableDieState,
   TableEvent,
+  TablePoint,
   TableSnapshot,
 } from '../../../rpc/proto/dice/v1/dice_pb';
-import { createLocalRollSpec, createRollResult } from './rollModel';
-import { PlayableDieFace } from './diceMath';
-import { STANDARD_LETTER_DIE_DEFINITION_IDS } from './letterDice';
 import {
+  applyPhysicsFrame,
   applyTableEvent,
+  applyTableSnapshot,
   createInitialDiceTableState,
-  DiceTableState,
+  identityWorldTransform,
 } from './tableModel';
 
-const midpointRandom = () => 0.5;
-const tableId = 'table';
+const bounds = new TableBounds({ minX: -8, maxX: 8, minZ: -6, maxZ: 6 });
 
-function startEvent(
-  revision: bigint,
-  mode: RollMode,
-  rollId: string,
-  dieIds: readonly string[],
-  state?: DiceTableState,
+function die(
+  dieId: string,
+  ownerPlayerId: string,
+  x: number,
+  motion = DieMotionState.SETTLED,
 ) {
-  const spec = createLocalRollSpec(dieIds.map((dieId, index) => ({
+  return new TableDieState({
     dieId,
-    dieDefinitionId: state?.dice[dieId]?.dieDefinitionId ??
-      STANDARD_LETTER_DIE_DEFINITION_IDS[
-        index % STANDARD_LETTER_DIE_DEFINITION_IDS.length
-      ],
-    position: state?.dice[dieId]?.position,
-  })), rollId, midpointRandom);
-  return {
-    spec,
-    event: new TableEvent({
-      tableId,
-      revision,
-      payload: {
-        case: 'rollStarted',
-        value: new RollStarted({
-          rollId,
-          rollerId: 'player-a',
-          mode,
-          animationSpec: spec,
-        }),
-      },
-    }),
-  };
+    ownerPlayerId,
+    dieDefinitionId: 'letter-die-01',
+    face: motion === DieMotionState.ROLLING ? DieFace.UNSPECIFIED : DieFace.ONE,
+    revision: 1n,
+    motion,
+    transform: identityWorldTransform(x, motion === DieMotionState.ROLLING ? 3 : 0.5, 0),
+  });
 }
 
-function completeEvent(
-  revision: bigint,
-  state: DiceTableState,
-  faces: readonly PlayableDieFace[],
-  extraPlacements: DiePlacement[] = [],
-) {
-  const active = state.activeRoll!;
-  const settled = new Map(active.spec.dice.map((die, index) => [
-    die.dieId,
-    faces[index]!,
-  ]));
-  const result = createRollResult(active.spec, settled);
-  const rolledPlacements = active.spec.dice.map((die, index) =>
-    new DiePlacement({
-      dieId: die.dieId,
-      position: new NormalizedTablePosition({
-        u: 0.2 + index * 0.1,
-        v: 0.7,
+function event(revision: bigint, payload: TableEvent['payload']) {
+  return new TableEvent({
+    tableId: 'global-dice-table',
+    revision,
+    bounds,
+    payload,
+  });
+}
+
+describe('authoritative table reducer', () => {
+  it('hydrates active rolls and absolute transforms from a snapshot', () => {
+    const snapshot = new TableSnapshot({
+      tableId: 'global-dice-table',
+      revision: 4n,
+      physicsTick: 90n,
+      bounds,
+      dice: [die('a', 'player-a', 100.125, DieMotionState.ROLLING)],
+      activeRolls: [new ActiveRoll({
+        rollId: 'roll-a',
+        rollerId: 'player-a',
+        mode: RollMode.ADD_NEW,
+        targetDieIds: ['a'],
+        startTick: 80n,
+      })],
+    });
+    const state = applyTableSnapshot(createInitialDiceTableState(), snapshot);
+    expect(state.physicsTick).toBe(90n);
+    expect(state.dice.a.transform.position?.x).toBe(100.125);
+    expect(state.activeRolls['roll-a'].targetDieIds).toEqual(['a']);
+  });
+
+  it('allows concurrent disjoint rolls and completes them independently', () => {
+    let state = createInitialDiceTableState();
+    state = applyTableEvent(state, event(1n, {
+      case: 'rollStarted',
+      value: new RollStarted({
+        rollId: 'roll-a', rollerId: 'player-a', mode: RollMode.ADD_NEW,
+        startTick: 1n,
+        dice: [die('a', 'player-a', -1, DieMotionState.ROLLING)],
       }),
     }));
-  return new TableEvent({
-    tableId,
-    revision,
-    payload: {
+    state = applyTableEvent(state, event(2n, {
+      case: 'rollStarted',
+      value: new RollStarted({
+        rollId: 'roll-b', rollerId: 'player-b', mode: RollMode.ADD_NEW,
+        startTick: 2n,
+        dice: [die('b', 'player-b', 1, DieMotionState.ROLLING)],
+      }),
+    }));
+    expect(Object.keys(state.activeRolls)).toHaveLength(2);
+    const settled = die('a', 'player-a', -2, DieMotionState.SETTLED);
+    settled.face = DieFace.FOUR;
+    state = applyTableEvent(state, event(3n, {
       case: 'rollCompleted',
       value: new RollCompleted({
-        rollId: active.rollId,
-        rollerId: active.rollerId,
-        animationSpec: active.spec,
-        result,
-        changedPlacements: [...rolledPlacements, ...extraPlacements],
-      }),
-    },
-  });
-}
-
-function addSettledDice(dieIds: readonly string[]) {
-  const initial = createInitialDiceTableState(tableId);
-  const started = startEvent(1n, RollMode.ADD_NEW, 'roll-1', dieIds);
-  const rolling = applyTableEvent(initial, started.event);
-  return applyTableEvent(
-    rolling,
-    completeEvent(2n, rolling, dieIds.map(() => DieFace.THREE)),
-  );
-}
-
-describe('dice table reducer', () => {
-  it('keeps prior dice mounted when an additive roll completes', () => {
-    const first = addSettledDice(['die-a']);
-    const secondStart = startEvent(
-      3n,
-      RollMode.ADD_NEW,
-      'roll-2',
-      ['die-b', 'die-c'],
-    );
-    const rolling = applyTableEvent(first, secondStart.event);
-    expect(rolling.dieOrder).toEqual(['die-a', 'die-b', 'die-c']);
-    expect(rolling.dice['die-a'].mode).toBe('settled');
-    expect(rolling.dice['die-b'].mode).toBe('rolling');
-
-    const complete = applyTableEvent(
-      rolling,
-      completeEvent(4n, rolling, [DieFace.ONE, DieFace.SIX]),
-    );
-    expect(complete.dieOrder).toEqual(['die-a', 'die-b', 'die-c']);
-    expect(complete.dice['die-a'].face).toBe(DieFace.THREE);
-    expect(complete.dice['die-b'].face).toBe(DieFace.ONE);
-    expect(complete.dice['die-c'].face).toBe(DieFace.SIX);
-    expect(complete.dice['die-c'].dieDefinitionId).toBe('letter-die-02');
-  });
-
-  it('rerolls existing stable IDs without replacing or reordering them', () => {
-    const settled = addSettledDice(['die-a', 'die-b']);
-    const reroll = startEvent(
-      3n,
-      RollMode.REROLL_EXISTING,
-      'roll-2',
-      ['die-b'],
-      settled,
-    );
-    const rolling = applyTableEvent(settled, reroll.event);
-    expect(rolling.dieOrder).toEqual(['die-a', 'die-b']);
-    expect(rolling.dice['die-a'].mode).toBe('settled');
-    expect(rolling.dice['die-b'].mode).toBe('rolling');
-    const complete = applyTableEvent(
-      rolling,
-      completeEvent(4n, rolling, [DieFace.FIVE]),
-    );
-    expect(complete.dice['die-b'].face).toBe(DieFace.FIVE);
-    expect(reroll.spec.dice[0].tablePosition?.u)
-      .toBeCloseTo(settled.dice['die-b'].position.u);
-  });
-
-  it('enforces one active roll and rejects stale completions', () => {
-    const initial = createInitialDiceTableState(tableId);
-    const first = startEvent(1n, RollMode.ADD_NEW, 'roll-1', ['die-a']);
-    const rolling = applyTableEvent(initial, first.event);
-    const second = startEvent(2n, RollMode.ADD_NEW, 'roll-2', ['die-b']);
-    expect(applyTableEvent(rolling, second.event)).toBe(rolling);
-
-    const stale = completeEvent(3n, rolling, [DieFace.ONE]);
-    stale.payload.case === 'rollCompleted' &&
-      (stale.payload.value.rollId = 'old-roll');
-    expect(applyTableEvent(rolling, stale)).toBe(rolling);
-  });
-
-  it('caps add-new events at twelve while allowing larger rerolls', () => {
-    const thirteenIds = Array.from({ length: 13 }, (_, index) => `die-${index}`);
-    const initial = createInitialDiceTableState(tableId);
-    const oversizedAdd = startEvent(
-      1n,
-      RollMode.ADD_NEW,
-      'roll-1',
-      thirteenIds,
-    );
-    expect(applyTableEvent(initial, oversizedAdd.event)).toBe(initial);
-
-    const settled = addSettledDice(thirteenIds.slice(0, 12));
-    const extraStart = startEvent(
-      3n,
-      RollMode.ADD_NEW,
-      'roll-2',
-      ['extra'],
-    );
-    const withExtraRolling = applyTableEvent(settled, extraStart.event);
-    const withExtra = applyTableEvent(
-      withExtraRolling,
-      completeEvent(4n, withExtraRolling, [DieFace.ONE]),
-    );
-    const rerollAll = startEvent(
-      5n,
-      RollMode.REROLL_EXISTING,
-      'roll-3',
-      withExtra.dieOrder,
-      withExtra,
-    );
-    expect(applyTableEvent(withExtra, rerollAll.event).activeRoll?.spec.dice)
-      .toHaveLength(13);
-  });
-
-  it('rejects remote results and snapshots with unknown definitions', () => {
-    const settled = addSettledDice(['die-a']);
-    const next = startEvent(
-      3n,
-      RollMode.REROLL_EXISTING,
-      'roll-2',
-      ['die-a'],
-      settled,
-    );
-    const rolling = applyTableEvent(settled, next.event);
-    const mismatched = completeEvent(4n, rolling, [DieFace.ONE]);
-    if (mismatched.payload.case === 'rollCompleted') {
-      mismatched.payload.value.result!.dice[0].dieDefinitionId = 'unknown';
-    }
-    expect(applyTableEvent(rolling, mismatched)).toBe(rolling);
-
-    const initial = createInitialDiceTableState(tableId);
-    const snapshot = new TableEvent({
-      tableId,
-      revision: 1n,
-      payload: {
-        case: 'snapshot',
-        value: new TableSnapshot({
-          tableId,
-          revision: 1n,
-          dice: [new TableDieState({
-            dieId: 'die-a',
-            dieDefinitionId: 'unknown',
-            face: DieFace.ONE,
-            position: new NormalizedTablePosition({ u: 0.5, v: 0.5 }),
-          })],
+        rollId: 'roll-a', rollerId: 'player-a', completedTick: 100n,
+        result: new RollResult({
+          rollId: 'roll-a',
+          dice: [new DieResult({ dieId: 'a', face: DieFace.FOUR })],
         }),
-      },
-    });
-    expect(applyTableEvent(initial, snapshot)).toBe(initial);
-  });
-
-  it('applies a remote completion face and displaced existing placement', () => {
-    const settled = addSettledDice(['rerolled', 'displaced']);
-    const next = startEvent(
-      3n,
-      RollMode.REROLL_EXISTING,
-      'remote-roll',
-      ['rerolled'],
-      settled,
-    );
-    const rolling = applyTableEvent(settled, next.event);
-    const completed = completeEvent(4n, rolling, [DieFace.SIX], [
-      new DiePlacement({
-        dieId: 'displaced',
-        position: new NormalizedTablePosition({ u: 0.91, v: 0.12 }),
+        changedDice: [settled],
       }),
-    ]);
-    if (completed.payload.case === 'rollCompleted') {
-      completed.payload.value.rollerId = 'remote-player';
-    }
-    const reconciled = applyTableEvent(rolling, completed);
-    expect(reconciled.dice.rerolled.face).toBe(DieFace.SIX);
-    expect(reconciled.dice.rerolled.canonicalSourcePlayerId)
-      .toBe('remote-player');
-    expect(reconciled.dice.displaced.position.u).toBeCloseTo(0.91);
+    }));
+    expect(state.activeRolls['roll-a']).toBeUndefined();
+    expect(state.activeRolls['roll-b']).toBeDefined();
+    expect(state.dice.a.face).toBe(DieFace.FOUR);
   });
 
-  it('moves held dice through sequenced drag events and preserves its face', () => {
-    const settled = addSettledDice(['die-a']);
-    const drag = (revision: bigint, caseName: 'dragStarted' | 'dragUpdated' | 'dragEnded', sequence: bigint) =>
-      new TableEvent({
-        tableId,
-        revision,
-        payload: {
-          case: caseName,
-          value: caseName === 'dragStarted'
-            ? new DragStarted({
-              dieId: 'die-a', playerId: 'player-a', interactionId: 'drag-1',
-              sequence, position: new NormalizedTablePosition({ u: 0.4, v: 0.4 }),
-            })
-            : caseName === 'dragUpdated'
-              ? new DragUpdated({
-                dieId: 'die-a', playerId: 'player-a', interactionId: 'drag-1',
-                sequence, position: new NormalizedTablePosition({ u: 0.6, v: 0.5 }),
-              })
-              : new DragEnded({
-                dieId: 'die-a', playerId: 'player-a', interactionId: 'drag-1',
-                sequence, position: new NormalizedTablePosition({ u: 0.7, v: 0.6 }),
-              }),
-        } as TableEvent['payload'],
-      });
-    const held = applyTableEvent(settled, drag(3n, 'dragStarted', 0n));
-    expect(held.dice['die-a'].mode).toBe('held');
-    const moved = applyTableEvent(held, drag(4n, 'dragUpdated', 1n));
-    expect(moved.dice['die-a'].position.u).toBeCloseTo(0.6);
-    const ended = applyTableEvent(moved, drag(5n, 'dragEnded', 2n));
-    expect(ended.dice['die-a'].mode).toBe('settled');
-    expect(ended.dice['die-a'].face).toBe(DieFace.THREE);
-    expect(ended.dice['die-a'].position.u).toBeCloseTo(0.7);
+  it('applies only newer physics frames', () => {
+    let state = applyTableSnapshot(createInitialDiceTableState(), new TableSnapshot({
+      tableId: 'global-dice-table', bounds, physicsTick: 5n,
+      dice: [die('a', 'player-a', 0)],
+    }));
+    const next = applyPhysicsFrame(state, new PhysicsFrame({
+      tick: 8n,
+      bounds: new TableBounds({ minX: -8, maxX: 10, minZ: -6, maxZ: 6 }),
+      dice: [new DieTransform({
+        dieId: 'a', motion: DieMotionState.SETTLED, revision: 2n,
+        transform: identityWorldTransform(7, 0.5, 2),
+      })],
+    }));
+    expect(next.dice.a.transform.position?.x).toBe(7);
+    expect(applyPhysicsFrame(next, new PhysicsFrame({
+      tick: 7n, bounds, dice: [],
+    }))).toBe(next);
+  });
+
+  it('tracks authoritative drag sequences in world coordinates', () => {
+    let state = applyTableSnapshot(createInitialDiceTableState(), new TableSnapshot({
+      tableId: 'global-dice-table', bounds,
+      dice: [die('a', 'player-a', 0)],
+    }));
+    state = applyTableEvent(state, event(1n, {
+      case: 'dragStarted',
+      value: new DragStarted({
+        dieId: 'a', playerId: 'player-a', interactionId: 'drag',
+        target: new TablePoint({ x: 20, z: -10 }),
+      }),
+    }));
+    expect(state.dice.a.mode).toBe('held');
+    expect(state.dice.a.transform.position).toMatchObject({ x: 20, z: -10 });
+    state = applyTableEvent(state, event(2n, {
+      case: 'dragEnded',
+      value: new DragEnded({
+        dieId: 'a', playerId: 'player-a', interactionId: 'drag', sequence: 1n,
+        target: new TablePoint({ x: 21, z: -11 }),
+      }),
+    }));
+    expect(state.dice.a.mode).toBe('settled');
+    expect(state.dice.a.transform.position?.y).toBe(0.5);
   });
 });

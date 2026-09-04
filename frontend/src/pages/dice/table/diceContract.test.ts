@@ -1,122 +1,71 @@
 import { describe, expect, it } from 'vitest';
 import {
-  DieResult,
-  DieThrowSpec,
-  DieFace,
-  DragUpdated,
-  NormalizedTablePosition,
+  ClientMessage,
+  DieMotionState,
+  DieTransform,
+  PhysicsFrame,
   RollMode,
-  RollResult,
-  RollSpec,
-  RollStarted,
-  TableDieState,
-  TableEvent,
-  TableSnapshot,
+  ServerMessage,
+  StartRollCommand,
+  TableBounds,
+  WorldQuaternion,
+  WorldTransform,
+  WorldVector3,
 } from '../../../rpc/proto/dice/v1/dice_pb';
-import { SIMULATION_VERSION } from '../constants';
 
-describe('dice protobuf contract', () => {
-  it.each([RollMode.ADD_NEW, RollMode.REROLL_EXISTING])(
-    'round-trips stable IDs, normalized positions, and roll mode %s',
-    (mode) => {
-      const spec = new RollSpec({
-        simulationVersion: SIMULATION_VERSION,
-        rollId: 'global-roll-id',
-        dice: [new DieThrowSpec({
-          dieIndex: 0,
-          dieId: 'stable-die-id',
-          dieDefinitionId: 'letter-die-01',
-          tablePosition: new NormalizedTablePosition({ u: 0.25, v: 0.75 }),
-        })],
-      });
-      const event = new TableEvent({
-        tableId: 'table-id',
-        revision: 9n,
-        payload: {
-          case: 'rollStarted',
-          value: new RollStarted({
-            rollId: spec.rollId,
-            rollerId: 'player-id',
-            mode,
-            animationSpec: spec,
-          }),
-        },
-      });
-      const decoded = TableEvent.fromBinary(event.toBinary());
-      expect(TableEvent.equals(decoded, event)).toBe(true);
-      expect(decoded.payload.case).toBe('rollStarted');
-      if (decoded.payload.case === 'rollStarted') {
-        expect(decoded.payload.value.mode).toBe(mode);
-        expect(decoded.payload.value.animationSpec?.dice[0].dieId)
-          .toBe('stable-die-id');
-        expect(decoded.payload.value.animationSpec?.dice[0].dieDefinitionId)
-          .toBe('letter-die-01');
-        expect(decoded.payload.value.animationSpec?.dice[0].tablePosition?.v)
-          .toBeCloseTo(0.75);
-      }
-    },
-  );
-
-  it('round-trips a revisioned table snapshot', () => {
-    const snapshot = new TableSnapshot({
-      tableId: 'table-id',
-      revision: 41n,
-      dice: [new TableDieState({
+describe('server-owned dice protobuf contract', () => {
+  it('round-trips double-precision world transforms and physics ticks', () => {
+    const frame = new PhysicsFrame({
+      tick: 9_007_199_254_740_000n,
+      bounds: new TableBounds({
+        minX: -1234.125,
+        maxX: 5678.875,
+        minZ: -20,
+        maxZ: 30,
+      }),
+      dice: [new DieTransform({
         dieId: 'die-a',
-        dieDefinitionId: 'letter-die-05',
-        ownerPlayerId: 'player-a',
-        face: DieFace.FIVE,
-        position: new NormalizedTablePosition({ u: 0.25, v: 0.75 }),
-        revision: 40n,
+        revision: 42n,
+        motion: DieMotionState.ROLLING,
+        transform: new WorldTransform({
+          position: new WorldVector3({ x: 1234.123456789, y: 4, z: -8 }),
+          rotation: new WorldQuaternion({ x: 0.5, y: -0.5, z: 0.5, w: 0.5 }),
+        }),
       })],
     });
-    const event = new TableEvent({
-      tableId: snapshot.tableId,
-      revision: snapshot.revision,
-      payload: { case: 'snapshot', value: snapshot },
-    });
-    expect(TableEvent.equals(
-      TableEvent.fromBinary(event.toBinary()),
-      event,
-    )).toBe(true);
+    const decoded = PhysicsFrame.fromBinary(frame.toBinary());
+    expect(decoded.tick).toBe(frame.tick);
+    expect(decoded.dice[0].transform?.position?.x)
+      .toBe(1234.123456789);
+    expect(decoded.bounds).toEqual(frame.bounds);
   });
 
-  it('keeps authoritative result IDs and sequenced drag data', () => {
-    const result = new RollResult({
-      simulationVersion: SIMULATION_VERSION,
-      rollId: 'roll',
-      dice: [new DieResult({
-        dieId: 'die-a',
-        dieDefinitionId: 'letter-die-12',
-        dieIndex: 0,
-        face: DieFace.SIX,
-      })],
-    });
-    expect(RollResult.equals(
-      RollResult.fromBinary(result.toBinary()),
-      result,
-    )).toBe(true);
-    expect('total' in result).toBe(false);
-
-    const drag = new TableEvent({
-      tableId: 'table',
-      revision: 11n,
+  it('keeps physics frames distinct from revisioned table events', () => {
+    const message = new ServerMessage({
       payload: {
-        case: 'dragUpdated',
-        value: new DragUpdated({
-          dieId: 'die-a',
-          playerId: 'player-a',
-          interactionId: 'interaction-a',
-          sequence: 17n,
-          position: new NormalizedTablePosition({ u: 0.8, v: 0.2 }),
+        case: 'physicsFrame',
+        value: new PhysicsFrame({ tick: 12n }),
+      },
+    });
+    expect(ServerMessage.fromBinary(message.toBinary()).payload.case)
+      .toBe('physicsFrame');
+  });
+
+  it('lets clients request targets but not author rolls or completion', () => {
+    const command = new ClientMessage({
+      requestId: 'request-a',
+      payload: {
+        case: 'startRoll',
+        value: new StartRollCommand({
+          mode: RollMode.REROLL_EXISTING,
+          targetDieIds: ['die-a', 'die-b'],
         }),
       },
     });
-    const decoded = TableEvent.fromBinary(drag.toBinary());
-    expect(decoded.payload.case).toBe('dragUpdated');
-    if (decoded.payload.case === 'dragUpdated') {
-      expect(decoded.payload.value.sequence).toBe(17n);
-      expect(decoded.payload.value.dieId).toBe('die-a');
+    const decoded = ClientMessage.fromBinary(command.toBinary());
+    expect(decoded.payload.case).toBe('startRoll');
+    if (decoded.payload.case === 'startRoll') {
+      expect(decoded.payload.value.targetDieIds).toEqual(['die-a', 'die-b']);
     }
   });
 });

@@ -1,0 +1,9 @@
+[workspace]
+members = ["services/dice"]
+resolver = "2"
+
+[workspace.package]
+edition = "2024"
+license = "ISC"
+rust-version = "1.96"
+

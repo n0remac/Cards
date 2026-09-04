@@ -1,16 +1,20 @@
 import {
   DieFace,
-  DieThrowSpec,
-  NormalizedTablePosition,
+  DieMotionState,
+  PhysicsFrame,
   RollMode,
   RollResult,
-  RollSpec,
+  TableBounds,
+  TableDieState,
   TableEvent,
+  TablePoint,
+  TableSnapshot,
+  WorldQuaternion,
+  WorldTransform,
+  WorldVector3,
 } from '../../../rpc/proto/dice/v1/dice_pb';
-import { MAX_DEFINITIONS_PER_ADD } from '../constants';
 import { isPlayableDieFace, PlayableDieFace } from './diceMath';
 import { isKnownLetterDieDefinitionId } from './letterDice';
-import { validateRollSpec } from './rollModel';
 
 export type DieBodyMode = 'rolling' | 'settled' | 'held';
 
@@ -20,61 +24,220 @@ export type TableDie = {
   ownerPlayerId: string;
   revision: bigint;
   face: DieFace;
-  position: NormalizedTablePosition;
+  transform: WorldTransform;
   mode: DieBodyMode;
   activeRollId?: string;
-  throwSpec?: DieThrowSpec;
   interaction?: {
     interactionId: string;
     playerId: string;
     sequence: bigint;
   };
-  canonicalRevision?: bigint;
-  canonicalSourcePlayerId?: string;
 };
 
 export type ActiveTableRoll = {
   rollId: string;
   rollerId: string;
   mode: RollMode;
-  spec: RollSpec;
+  targetDieIds: readonly string[];
+  startTick: bigint;
 };
 
 export type DiceTableState = {
   tableId: string;
   revision: bigint;
+  physicsTick: bigint;
+  bounds: TableBounds;
   dice: Readonly<Record<string, TableDie>>;
   dieOrder: readonly string[];
-  activeRoll?: ActiveTableRoll;
+  activeRolls: Readonly<Record<string, ActiveTableRoll>>;
   lastResult?: RollResult;
   selectedDieIds: readonly string[];
 };
 
 export type DiceTableAction =
   | { type: 'event'; event: TableEvent }
+  | { type: 'snapshot'; snapshot: TableSnapshot }
+  | { type: 'frame'; frame: PhysicsFrame }
   | { type: 'select'; dieIds: readonly string[] };
 
+export const INITIAL_TABLE_BOUNDS = new TableBounds({
+  minX: -8,
+  maxX: 8,
+  minZ: -6,
+  maxZ: 6,
+});
+
+export function identityWorldTransform(
+  x = 0,
+  y = 0.5,
+  z = 0,
+): WorldTransform {
+  return new WorldTransform({
+    position: new WorldVector3({ x, y, z }),
+    rotation: new WorldQuaternion({ w: 1 }),
+  });
+}
+
 export function createInitialDiceTableState(
-  tableId = 'local-table',
+  tableId = 'global-dice-table',
 ): DiceTableState {
   return {
     tableId,
     revision: 0n,
+    physicsTick: 0n,
+    bounds: new TableBounds(INITIAL_TABLE_BOUNDS),
     dice: {},
     dieOrder: [],
+    activeRolls: {},
     selectedDieIds: [],
   };
 }
 
-function clonePosition(
-  position: NormalizedTablePosition | undefined,
-): NormalizedTablePosition | undefined {
-  if (!position || !Number.isFinite(position.u) || !Number.isFinite(position.v)) {
+function cloneBounds(bounds: TableBounds | undefined): TableBounds | undefined {
+  if (!bounds || ![bounds.minX, bounds.maxX, bounds.minZ, bounds.maxZ]
+    .every(Number.isFinite) || bounds.minX >= bounds.maxX ||
+      bounds.minZ >= bounds.maxZ) {
     return undefined;
   }
-  return new NormalizedTablePosition({
-    u: Math.min(1, Math.max(0, position.u)),
-    v: Math.min(1, Math.max(0, position.v)),
+  return new TableBounds(bounds);
+}
+
+export function cloneWorldTransform(
+  transform: WorldTransform | undefined,
+): WorldTransform | undefined {
+  const position = transform?.position;
+  const rotation = transform?.rotation;
+  if (!position || !rotation ||
+      ![position.x, position.y, position.z, rotation.x, rotation.y,
+        rotation.z, rotation.w].every(Number.isFinite) ||
+      Math.max(Math.abs(position.x), Math.abs(position.y),
+        Math.abs(position.z)) > 10_000 ||
+      Math.hypot(rotation.x, rotation.y, rotation.z, rotation.w) < 1e-9) {
+    return undefined;
+  }
+  return new WorldTransform({
+    position: new WorldVector3(position),
+    rotation: new WorldQuaternion(rotation),
+  });
+}
+
+function modeFromProto(motion: DieMotionState): DieBodyMode | undefined {
+  if (motion === DieMotionState.SETTLED) return 'settled';
+  if (motion === DieMotionState.ROLLING) return 'rolling';
+  if (motion === DieMotionState.DRAGGED) return 'held';
+  return undefined;
+}
+
+function tableDieFromProto(entry: TableDieState): TableDie | undefined {
+  const transform = cloneWorldTransform(entry.transform);
+  const mode = modeFromProto(entry.motion);
+  const faceValid = entry.face === DieFace.UNSPECIFIED
+    ? mode === 'rolling'
+    : isPlayableDieFace(entry.face);
+  if (!entry.dieId || !entry.ownerPlayerId || !transform || !mode ||
+      !faceValid || !isKnownLetterDieDefinitionId(entry.dieDefinitionId)) {
+    return undefined;
+  }
+  return {
+    dieId: entry.dieId,
+    dieDefinitionId: entry.dieDefinitionId,
+    ownerPlayerId: entry.ownerPlayerId,
+    revision: entry.revision,
+    face: entry.face,
+    transform,
+    mode,
+    activeRollId: entry.activeRollId || undefined,
+  };
+}
+
+function activeRollFromProto(
+  roll: {
+    rollId: string;
+    rollerId: string;
+    mode: RollMode;
+    targetDieIds: readonly string[];
+    startTick: bigint;
+  },
+): ActiveTableRoll | undefined {
+  if (!roll.rollId || !roll.rollerId ||
+      (roll.mode !== RollMode.ADD_NEW &&
+       roll.mode !== RollMode.REROLL_EXISTING) ||
+      roll.targetDieIds.length === 0 ||
+      new Set(roll.targetDieIds).size !== roll.targetDieIds.length) {
+    return undefined;
+  }
+  return {
+    rollId: roll.rollId,
+    rollerId: roll.rollerId,
+    mode: roll.mode,
+    targetDieIds: [...roll.targetDieIds],
+    startTick: roll.startTick,
+  };
+}
+
+export function applyTableSnapshot(
+  state: DiceTableState,
+  snapshot: TableSnapshot,
+): DiceTableState {
+  const bounds = cloneBounds(snapshot.bounds);
+  if (snapshot.tableId !== state.tableId || !bounds) return state;
+  const dice: Record<string, TableDie> = {};
+  const dieOrder: string[] = [];
+  for (const entry of snapshot.dice) {
+    const die = tableDieFromProto(entry);
+    if (!die || dice[die.dieId]) return state;
+    dice[die.dieId] = die;
+    dieOrder.push(die.dieId);
+  }
+  const activeRolls: Record<string, ActiveTableRoll> = {};
+  const activePlayers = new Set<string>();
+  const activeTargets = new Set<string>();
+  for (const entry of snapshot.activeRolls) {
+    const roll = activeRollFromProto(entry);
+    if (!roll || activeRolls[roll.rollId] || activePlayers.has(roll.rollerId) ||
+        roll.targetDieIds.some((dieId) => activeTargets.has(dieId) ||
+          dice[dieId]?.ownerPlayerId !== roll.rollerId)) return state;
+    activeRolls[roll.rollId] = roll;
+    activePlayers.add(roll.rollerId);
+    roll.targetDieIds.forEach((dieId) => activeTargets.add(dieId));
+  }
+  for (const drag of snapshot.activeDrags) {
+    const die = dice[drag.dieId];
+    if (!die || die.ownerPlayerId !== drag.playerId || !drag.interactionId ||
+        activeTargets.has(drag.dieId)) return state;
+    die.mode = 'held';
+    die.interaction = {
+      interactionId: drag.interactionId,
+      playerId: drag.playerId,
+      sequence: drag.sequence,
+    };
+    die.transform = transformAtPoint(die.transform, drag.target, 0.58) ??
+      die.transform;
+  }
+  return {
+    ...state,
+    revision: snapshot.revision,
+    physicsTick: snapshot.physicsTick,
+    bounds,
+    dice,
+    dieOrder,
+    activeRolls,
+    selectedDieIds: state.selectedDieIds.filter((dieId) =>
+      dice[dieId]?.mode === 'settled'),
+  };
+}
+
+function transformAtPoint(
+  previous: WorldTransform,
+  point: TablePoint | undefined,
+  height: number,
+): WorldTransform | undefined {
+  if (!point || !Number.isFinite(point.x) || !Number.isFinite(point.z) ||
+      Math.max(Math.abs(point.x), Math.abs(point.z)) > 10_000 ||
+      !previous.rotation) return undefined;
+  return new WorldTransform({
+    position: new WorldVector3({ x: point.x, y: height, z: point.z }),
+    rotation: new WorldQuaternion(previous.rotation),
   });
 }
 
@@ -82,65 +245,33 @@ function applyRollStarted(
   state: DiceTableState,
   event: TableEvent,
 ): DiceTableState {
-  if (event.payload.case !== 'rollStarted' || state.activeRoll) {
-    return state;
-  }
+  if (event.payload.case !== 'rollStarted') return state;
   const started = event.payload.value;
-  const spec = started.animationSpec;
-  if (!spec || started.rollId !== spec.rollId ||
-      validateRollSpec(spec).length > 0 ||
-      (started.mode !== RollMode.ADD_NEW &&
-       started.mode !== RollMode.REROLL_EXISTING)) {
-    return state;
-  }
-
-  const targetIds = spec.dice.map((die) => die.dieId);
-  const isAdd = started.mode === RollMode.ADD_NEW;
-  const targetsAreValid = isAdd
-    ? spec.dice.length <= MAX_DEFINITIONS_PER_ADD &&
-      targetIds.every((dieId) => !state.dice[dieId])
-    : spec.dice.every((throwSpec) =>
-      state.dice[throwSpec.dieId]?.dieDefinitionId ===
-        throwSpec.dieDefinitionId);
-  if (!targetsAreValid) {
-    return state;
-  }
-
+  const roll = activeRollFromProto({
+    ...started,
+    targetDieIds: started.dice.map(({ dieId }) => dieId),
+  });
+  if (!roll || state.activeRolls[roll.rollId] ||
+      Object.values(state.activeRolls).some(({ rollerId }) =>
+        rollerId === roll.rollerId)) return state;
   const dice = { ...state.dice };
   const dieOrder = [...state.dieOrder];
-  for (const throwSpec of spec.dice) {
-    const position = clonePosition(throwSpec.tablePosition);
-    if (!position) {
-      return state;
-    }
-    const existing = dice[throwSpec.dieId];
-    dice[throwSpec.dieId] = {
-      dieId: throwSpec.dieId,
-      dieDefinitionId: throwSpec.dieDefinitionId,
-      ownerPlayerId: existing?.ownerPlayerId || started.rollerId,
-      revision: event.revision,
-      face: existing?.face ?? DieFace.UNSPECIFIED,
-      position,
-      mode: 'rolling',
-      activeRollId: started.rollId,
-      throwSpec,
-    };
-    if (!existing) {
-      dieOrder.push(throwSpec.dieId);
-    }
+  for (const entry of started.dice) {
+    const die = tableDieFromProto(entry);
+    if (!die || die.ownerPlayerId !== roll.rollerId ||
+        (dice[die.dieId] &&
+         dice[die.dieId].ownerPlayerId !== roll.rollerId)) return state;
+    if (!dice[die.dieId]) dieOrder.push(die.dieId);
+    dice[die.dieId] = die;
   }
-
   return {
     ...state,
     revision: event.revision,
+    physicsTick: started.startTick,
+    bounds: cloneBounds(event.bounds) ?? state.bounds,
     dice,
     dieOrder,
-    activeRoll: {
-      rollId: started.rollId,
-      rollerId: started.rollerId,
-      mode: started.mode,
-      spec,
-    },
+    activeRolls: { ...state.activeRolls, [roll.rollId]: roll },
   };
 }
 
@@ -148,75 +279,27 @@ function applyRollCompleted(
   state: DiceTableState,
   event: TableEvent,
 ): DiceTableState {
-  if (event.payload.case !== 'rollCompleted' || !state.activeRoll) {
-    return state;
-  }
+  if (event.payload.case !== 'rollCompleted') return state;
   const completed = event.payload.value;
-  const result = completed.result;
-  if (completed.rollId !== state.activeRoll.rollId || !result ||
-      result.rollId !== completed.rollId ||
-      result.simulationVersion !== state.activeRoll.spec.simulationVersion ||
-      !completed.animationSpec ||
-      !RollSpec.equals(completed.animationSpec, state.activeRoll.spec)) {
-    return state;
-  }
-
-  const expected = new Map(state.activeRoll.spec.dice.map((die) => [
-    die.dieId,
-    die,
-  ]));
-  const resultIds = result.dice.map((die) => die.dieId);
-  if (result.dice.length !== expected.size ||
-      new Set(resultIds).size !== expected.size ||
-      result.dice.some((die) => {
-        const expectedDie = expected.get(die.dieId);
-        return !expectedDie || die.dieIndex !== expectedDie.dieIndex ||
-          die.dieDefinitionId !== expectedDie.dieDefinitionId ||
-          !isKnownLetterDieDefinitionId(die.dieDefinitionId) ||
-          !isPlayableDieFace(die.face);
-      })) {
-    return state;
-  }
-  const resultById = new Map(result.dice.map((die) => [die.dieId, die.face]));
-  const placementById = new Map(completed.changedPlacements.flatMap((placement) => {
-    const position = clonePosition(placement.position);
-    return position ? [[placement.dieId, position] as const] : [];
-  }));
+  const active = state.activeRolls[completed.rollId];
+  if (!active || completed.rollerId !== active.rollerId ||
+      completed.result?.rollId !== active.rollId) return state;
   const dice = { ...state.dice };
-
-  for (const [dieId, die] of Object.entries(dice)) {
-    const canonicalFace = resultById.get(dieId);
-    const placement = placementById.get(dieId);
-    if (canonicalFace !== undefined) {
-      dice[dieId] = {
-        ...die,
-        face: canonicalFace,
-        revision: event.revision,
-        position: placement ?? die.position,
-        mode: 'settled',
-        activeRollId: undefined,
-        throwSpec: undefined,
-        interaction: undefined,
-        canonicalRevision: event.revision,
-        canonicalSourcePlayerId: completed.rollerId,
-      };
-    } else if (placement) {
-      dice[dieId] = {
-        ...die,
-        revision: event.revision,
-        position: placement,
-        canonicalRevision: event.revision,
-        canonicalSourcePlayerId: completed.rollerId,
-      };
-    }
+  for (const entry of completed.changedDice) {
+    const die = tableDieFromProto(entry);
+    if (!die || !dice[die.dieId]) return state;
+    dice[die.dieId] = die;
   }
-
+  const activeRolls = { ...state.activeRolls };
+  delete activeRolls[active.rollId];
   return {
     ...state,
     revision: event.revision,
+    physicsTick: completed.completedTick,
+    bounds: cloneBounds(event.bounds) ?? state.bounds,
     dice,
-    activeRoll: undefined,
-    lastResult: result,
+    activeRolls,
+    lastResult: completed.result,
   };
 }
 
@@ -226,58 +309,35 @@ function applyDragEvent(
 ): DiceTableState {
   const payload = event.payload;
   if (payload.case !== 'dragStarted' && payload.case !== 'dragUpdated' &&
-      payload.case !== 'dragEnded') {
-    return state;
-  }
+      payload.case !== 'dragEnded') return state;
   const drag = payload.value;
   const die = state.dice[drag.dieId];
-  const position = clonePosition(drag.position);
-  if (!die || !position || die.mode === 'rolling') {
-    return state;
-  }
-
-  if (payload.case === 'dragStarted') {
-    if (die.interaction) {
-      return state;
-    }
-    return {
-      ...state,
-      revision: event.revision,
-      dice: {
-        ...state.dice,
-        [die.dieId]: {
-          ...die,
-          revision: event.revision,
-          position,
-          mode: 'held',
-          interaction: {
-            interactionId: drag.interactionId,
-            playerId: drag.playerId,
-            sequence: drag.sequence,
-          },
-        },
-      },
-    };
-  }
-
-  if (!die.interaction || die.interaction.interactionId !== drag.interactionId ||
-      die.interaction.playerId !== drag.playerId ||
-      drag.sequence <= die.interaction.sequence) {
-    return state;
-  }
+  const transform = die && transformAtPoint(
+    die.transform, drag.target, payload.case === 'dragEnded' ? 0.5 : 0.58,
+  );
+  if (!die || !transform || die.ownerPlayerId !== drag.playerId ||
+      die.mode === 'rolling') return state;
+  if (payload.case === 'dragStarted' &&
+      (die.interaction || drag.sequence !== 0n)) return state;
+  if (payload.case !== 'dragStarted' &&
+      (!die.interaction ||
+       die.interaction.interactionId !== drag.interactionId ||
+       drag.sequence <= die.interaction.sequence)) return state;
   const ending = payload.case === 'dragEnded';
   return {
     ...state,
     revision: event.revision,
+    bounds: cloneBounds(event.bounds) ?? state.bounds,
     dice: {
       ...state.dice,
       [die.dieId]: {
         ...die,
         revision: event.revision,
-        position,
+        transform,
         mode: ending ? 'settled' : 'held',
         interaction: ending ? undefined : {
-          ...die.interaction,
+          interactionId: drag.interactionId,
+          playerId: drag.playerId,
           sequence: drag.sequence,
         },
       },
@@ -285,42 +345,26 @@ function applyDragEvent(
   };
 }
 
-function applySnapshot(state: DiceTableState, event: TableEvent): DiceTableState {
-  if (event.payload.case !== 'snapshot') {
-    return state;
-  }
-  const snapshot = event.payload.value;
-  if (snapshot.tableId !== state.tableId || snapshot.revision !== event.revision) {
-    return state;
-  }
-  const dice: Record<string, TableDie> = {};
-  const dieOrder: string[] = [];
-  for (const entry of snapshot.dice) {
-    const position = clonePosition(entry.position);
-    if (!entry.dieId || !position || !isPlayableDieFace(entry.face) ||
-        !isKnownLetterDieDefinitionId(entry.dieDefinitionId) ||
-        dice[entry.dieId]) {
-      return state;
-    }
-    dice[entry.dieId] = {
-      dieId: entry.dieId,
-      dieDefinitionId: entry.dieDefinitionId,
-      ownerPlayerId: entry.ownerPlayerId,
-      revision: entry.revision,
-      face: entry.face,
-      position,
-      mode: 'settled',
+export function applyPhysicsFrame(
+  state: DiceTableState,
+  frame: PhysicsFrame,
+): DiceTableState {
+  const bounds = cloneBounds(frame.bounds);
+  if (frame.tick <= state.physicsTick || !bounds) return state;
+  const dice = { ...state.dice };
+  for (const update of frame.dice) {
+    const die = dice[update.dieId];
+    const transform = cloneWorldTransform(update.transform);
+    const mode = modeFromProto(update.motion);
+    if (!die || !transform || !mode) continue;
+    dice[update.dieId] = {
+      ...die,
+      revision: update.revision,
+      transform,
+      mode,
     };
-    dieOrder.push(entry.dieId);
   }
-  return {
-    ...state,
-    revision: event.revision,
-    dice,
-    dieOrder,
-    activeRoll: undefined,
-    selectedDieIds: state.selectedDieIds.filter((dieId) => dice[dieId]),
-  };
+  return { ...state, physicsTick: frame.tick, bounds, dice };
 }
 
 export function applyTableEvent(
@@ -330,31 +374,26 @@ export function applyTableEvent(
   if (event.tableId !== state.tableId || event.revision <= state.revision) {
     return state;
   }
-  switch (event.payload.case) {
-    case 'rollStarted':
-      return applyRollStarted(state, event);
-    case 'rollCompleted':
-      return applyRollCompleted(state, event);
-    case 'dragStarted':
-    case 'dragUpdated':
-    case 'dragEnded':
-      return applyDragEvent(state, event);
-    case 'snapshot':
-      return applySnapshot(state, event);
-    default:
-      return state;
+  if (event.payload.case === 'rollStarted') return applyRollStarted(state, event);
+  if (event.payload.case === 'rollCompleted') return applyRollCompleted(state, event);
+  if (event.payload.case === 'dragStarted' ||
+      event.payload.case === 'dragUpdated' ||
+      event.payload.case === 'dragEnded') return applyDragEvent(state, event);
+  if (event.payload.case === 'snapshot') {
+    return applyTableSnapshot(state, event.payload.value);
   }
+  return state;
 }
 
 export function diceTableReducer(
   state: DiceTableState,
   action: DiceTableAction,
 ): DiceTableState {
-  if (action.type === 'event') {
-    return applyTableEvent(state, action.event);
-  }
-  const selectedDieIds = [...new Set(action.dieIds)]
-    .filter((dieId) => state.dice[dieId]?.mode === 'settled');
+  if (action.type === 'event') return applyTableEvent(state, action.event);
+  if (action.type === 'snapshot') return applyTableSnapshot(state, action.snapshot);
+  if (action.type === 'frame') return applyPhysicsFrame(state, action.frame);
+  const selectedDieIds = [...new Set(action.dieIds)].filter((dieId) =>
+    state.dice[dieId]?.mode === 'settled');
   return { ...state, selectedDieIds };
 }
 

@@ -2,38 +2,35 @@ syntax = "proto3";
 
 package dice.v1;
 
-message Vector3 {
-  float x = 1;
-  float y = 2;
-  float z = 3;
+// All table coordinates are server-owned, double-precision world units.
+message WorldVector3 {
+  double x = 1;
+  double y = 2;
+  double z = 3;
 }
 
-message Quaternion {
-  float x = 1;
-  float y = 2;
-  float z = 3;
-  float w = 4;
+message WorldQuaternion {
+  double x = 1;
+  double y = 2;
+  double z = 3;
+  double w = 4;
 }
 
-message DieThrowSpec {
-  uint32 die_index = 1;
-  // Legacy initial-position field retained for compatibility. Version 4 uses
-  // table_position for x/z and position.y for the spawn height.
-  Vector3 position = 2;
-  Quaternion rotation = 3;
-  Vector3 impulse = 4;
-  Vector3 torque = 5;
-  string die_id = 6;
-  NormalizedTablePosition table_position = 7;
-  string die_definition_id = 8;
+message WorldTransform {
+  WorldVector3 position = 1;
+  WorldQuaternion rotation = 2;
 }
 
-// RollSpec is shared animation input. Clients intentionally do not promise
-// deterministic replay across devices or simulation implementations.
-message RollSpec {
-  uint32 simulation_version = 1;
-  string roll_id = 2;
-  repeated DieThrowSpec dice = 3;
+message TablePoint {
+  double x = 1;
+  double z = 2;
+}
+
+message TableBounds {
+  double min_x = 1;
+  double max_x = 2;
+  double min_z = 3;
+  double max_z = 4;
 }
 
 enum RollMode {
@@ -42,8 +39,6 @@ enum RollMode {
   ROLL_MODE_REROLL_EXISTING = 2;
 }
 
-// DieFace identifies the physical upward face. Clients combine it with the
-// fixed die_definition_id catalog entry to derive the visible letter.
 enum DieFace {
   DIE_FACE_UNSPECIFIED = 0;
   DIE_FACE_ONE = 1;
@@ -52,6 +47,13 @@ enum DieFace {
   DIE_FACE_FOUR = 4;
   DIE_FACE_FIVE = 5;
   DIE_FACE_SIX = 6;
+}
+
+enum DieMotionState {
+  DIE_MOTION_STATE_UNSPECIFIED = 0;
+  DIE_MOTION_STATE_SETTLED = 1;
+  DIE_MOTION_STATE_ROLLING = 2;
+  DIE_MOTION_STATE_DRAGGED = 3;
 }
 
 message DieResult {
@@ -65,48 +67,61 @@ message RollResult {
   uint32 simulation_version = 1;
   string roll_id = 2;
   repeated DieResult dice = 3;
-  reserved 4;
-  reserved "total";
-}
-
-message NormalizedTablePosition {
-  float u = 1;
-  float v = 2;
 }
 
 message TableDieState {
   string die_id = 1;
   DieFace face = 2;
-  NormalizedTablePosition position = 3;
+  WorldTransform transform = 3;
   string owner_player_id = 4;
   uint64 revision = 5;
   string die_definition_id = 6;
+  DieMotionState motion = 7;
+  string active_roll_id = 8;
 }
 
-message DiePlacement {
+message ActiveRoll {
+  string roll_id = 1;
+  string roller_id = 2;
+  RollMode mode = 3;
+  repeated string target_die_ids = 4;
+  uint64 start_tick = 5;
+}
+
+message ActiveDrag {
   string die_id = 1;
-  NormalizedTablePosition position = 2;
+  string player_id = 2;
+  string interaction_id = 3;
+  uint64 sequence = 4;
+  TablePoint target = 5;
 }
 
 message TableSnapshot {
   string table_id = 1;
   uint64 revision = 2;
   repeated TableDieState dice = 3;
+  repeated ActiveRoll active_rolls = 4;
+  repeated ActiveDrag active_drags = 5;
+  uint64 physics_tick = 6;
+  TableBounds bounds = 7;
 }
 
 message RollStarted {
   string roll_id = 1;
   string roller_id = 2;
   RollMode mode = 3;
-  RollSpec animation_spec = 4;
+  repeated TableDieState dice = 4;
+  uint64 start_tick = 5;
 }
 
 message RollCompleted {
   string roll_id = 1;
   string roller_id = 2;
   RollResult result = 3;
-  repeated DiePlacement changed_placements = 4;
-  RollSpec animation_spec = 5;
+  // Includes every die whose transform or face changed during the shared
+  // simulation, including settled dice displaced by another player's roll.
+  repeated TableDieState changed_dice = 4;
+  uint64 completed_tick = 5;
 }
 
 message DragStarted {
@@ -114,7 +129,7 @@ message DragStarted {
   string player_id = 2;
   string interaction_id = 3;
   uint64 sequence = 4;
-  NormalizedTablePosition position = 5;
+  TablePoint target = 5;
 }
 
 message DragUpdated {
@@ -122,7 +137,7 @@ message DragUpdated {
   string player_id = 2;
   string interaction_id = 3;
   uint64 sequence = 4;
-  NormalizedTablePosition position = 5;
+  TablePoint target = 5;
 }
 
 message DragEnded {
@@ -130,11 +145,9 @@ message DragEnded {
   string player_id = 2;
   string interaction_id = 3;
   uint64 sequence = 4;
-  NormalizedTablePosition position = 5;
+  TablePoint target = 5;
 }
 
-// TableEvent can back a later snapshot-plus-event-stream transport. The
-// frontend already applies local actions through this same event envelope.
 message TableEvent {
   string table_id = 1;
   uint64 revision = 2;
@@ -146,5 +159,93 @@ message TableEvent {
     DragUpdated drag_updated = 6;
     DragEnded drag_ended = 7;
     TableSnapshot snapshot = 8;
+  }
+
+  string source_request_id = 9;
+  TableBounds bounds = 10;
+}
+
+message JoinRoom {
+  string resume_token = 1;
+}
+
+message StartRollCommand {
+  RollMode mode = 1;
+  // Empty for the first ADD_NEW roll. The server creates the standard twelve.
+  repeated string target_die_ids = 2;
+}
+
+message StartDragCommand {
+  string die_id = 1;
+  string interaction_id = 2;
+  uint64 sequence = 3;
+  TablePoint target = 4;
+}
+
+message UpdateDragCommand {
+  string die_id = 1;
+  string interaction_id = 2;
+  uint64 sequence = 3;
+  TablePoint target = 4;
+}
+
+message EndDragCommand {
+  string die_id = 1;
+  string interaction_id = 2;
+  uint64 sequence = 3;
+  TablePoint target = 4;
+}
+
+message ClientMessage {
+  string request_id = 1;
+
+  oneof payload {
+    JoinRoom join = 2;
+    StartRollCommand start_roll = 3;
+    StartDragCommand start_drag = 4;
+    UpdateDragCommand update_drag = 5;
+    EndDragCommand end_drag = 6;
+  }
+}
+
+message Welcome {
+  string player_id = 1;
+  string resume_token = 2;
+  TableSnapshot snapshot = 3;
+}
+
+enum CommandRejectionCode {
+  COMMAND_REJECTION_CODE_UNSPECIFIED = 0;
+  COMMAND_REJECTION_CODE_INVALID_COMMAND = 1;
+  COMMAND_REJECTION_CODE_NOT_OWNER = 2;
+  COMMAND_REJECTION_CODE_CONFLICT = 3;
+  COMMAND_REJECTION_CODE_STALE_STATE = 4;
+}
+
+message CommandRejected {
+  string request_id = 1;
+  CommandRejectionCode code = 2;
+  string message = 3;
+}
+
+message DieTransform {
+  string die_id = 1;
+  WorldTransform transform = 2;
+  DieMotionState motion = 3;
+  uint64 revision = 4;
+}
+
+message PhysicsFrame {
+  uint64 tick = 1;
+  repeated DieTransform dice = 2;
+  TableBounds bounds = 3;
+}
+
+message ServerMessage {
+  oneof payload {
+    Welcome welcome = 1;
+    TableEvent event = 2;
+    CommandRejected rejected = 3;
+    PhysicsFrame physics_frame = 4;
   }
 }

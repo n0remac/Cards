@@ -33,9 +33,6 @@ proto3.util.setEnumType(RollMode, "dice.v1.RollMode", [
 ]);
 
 /**
- * DieFace identifies the physical upward face. Clients combine it with the
- * fixed die_definition_id catalog entry to derive the visible letter.
- *
  * @generated from enum dice.v1.DieFace
  */
 export enum DieFace {
@@ -86,240 +83,319 @@ proto3.util.setEnumType(DieFace, "dice.v1.DieFace", [
 ]);
 
 /**
- * @generated from message dice.v1.Vector3
+ * @generated from enum dice.v1.DieMotionState
  */
-export class Vector3 extends Message<Vector3> {
+export enum DieMotionState {
   /**
-   * @generated from field: float x = 1;
+   * @generated from enum value: DIE_MOTION_STATE_UNSPECIFIED = 0;
+   */
+  UNSPECIFIED = 0,
+
+  /**
+   * @generated from enum value: DIE_MOTION_STATE_SETTLED = 1;
+   */
+  SETTLED = 1,
+
+  /**
+   * @generated from enum value: DIE_MOTION_STATE_ROLLING = 2;
+   */
+  ROLLING = 2,
+
+  /**
+   * @generated from enum value: DIE_MOTION_STATE_DRAGGED = 3;
+   */
+  DRAGGED = 3,
+}
+// Retrieve enum metadata with: proto3.getEnumType(DieMotionState)
+proto3.util.setEnumType(DieMotionState, "dice.v1.DieMotionState", [
+  { no: 0, name: "DIE_MOTION_STATE_UNSPECIFIED" },
+  { no: 1, name: "DIE_MOTION_STATE_SETTLED" },
+  { no: 2, name: "DIE_MOTION_STATE_ROLLING" },
+  { no: 3, name: "DIE_MOTION_STATE_DRAGGED" },
+]);
+
+/**
+ * @generated from enum dice.v1.CommandRejectionCode
+ */
+export enum CommandRejectionCode {
+  /**
+   * @generated from enum value: COMMAND_REJECTION_CODE_UNSPECIFIED = 0;
+   */
+  UNSPECIFIED = 0,
+
+  /**
+   * @generated from enum value: COMMAND_REJECTION_CODE_INVALID_COMMAND = 1;
+   */
+  INVALID_COMMAND = 1,
+
+  /**
+   * @generated from enum value: COMMAND_REJECTION_CODE_NOT_OWNER = 2;
+   */
+  NOT_OWNER = 2,
+
+  /**
+   * @generated from enum value: COMMAND_REJECTION_CODE_CONFLICT = 3;
+   */
+  CONFLICT = 3,
+
+  /**
+   * @generated from enum value: COMMAND_REJECTION_CODE_STALE_STATE = 4;
+   */
+  STALE_STATE = 4,
+}
+// Retrieve enum metadata with: proto3.getEnumType(CommandRejectionCode)
+proto3.util.setEnumType(CommandRejectionCode, "dice.v1.CommandRejectionCode", [
+  { no: 0, name: "COMMAND_REJECTION_CODE_UNSPECIFIED" },
+  { no: 1, name: "COMMAND_REJECTION_CODE_INVALID_COMMAND" },
+  { no: 2, name: "COMMAND_REJECTION_CODE_NOT_OWNER" },
+  { no: 3, name: "COMMAND_REJECTION_CODE_CONFLICT" },
+  { no: 4, name: "COMMAND_REJECTION_CODE_STALE_STATE" },
+]);
+
+/**
+ * All table coordinates are server-owned, double-precision world units.
+ *
+ * @generated from message dice.v1.WorldVector3
+ */
+export class WorldVector3 extends Message<WorldVector3> {
+  /**
+   * @generated from field: double x = 1;
    */
   x = 0;
 
   /**
-   * @generated from field: float y = 2;
+   * @generated from field: double y = 2;
    */
   y = 0;
 
   /**
-   * @generated from field: float z = 3;
+   * @generated from field: double z = 3;
    */
   z = 0;
 
-  constructor(data?: PartialMessage<Vector3>) {
+  constructor(data?: PartialMessage<WorldVector3>) {
     super();
     proto3.util.initPartial(data, this);
   }
 
   static readonly runtime: typeof proto3 = proto3;
-  static readonly typeName = "dice.v1.Vector3";
+  static readonly typeName = "dice.v1.WorldVector3";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 1, name: "x", kind: "scalar", T: 2 /* ScalarType.FLOAT */ },
-    { no: 2, name: "y", kind: "scalar", T: 2 /* ScalarType.FLOAT */ },
-    { no: 3, name: "z", kind: "scalar", T: 2 /* ScalarType.FLOAT */ },
+    { no: 1, name: "x", kind: "scalar", T: 1 /* ScalarType.DOUBLE */ },
+    { no: 2, name: "y", kind: "scalar", T: 1 /* ScalarType.DOUBLE */ },
+    { no: 3, name: "z", kind: "scalar", T: 1 /* ScalarType.DOUBLE */ },
   ]);
 
-  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): Vector3 {
-    return new Vector3().fromBinary(bytes, options);
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): WorldVector3 {
+    return new WorldVector3().fromBinary(bytes, options);
   }
 
-  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): Vector3 {
-    return new Vector3().fromJson(jsonValue, options);
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): WorldVector3 {
+    return new WorldVector3().fromJson(jsonValue, options);
   }
 
-  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): Vector3 {
-    return new Vector3().fromJsonString(jsonString, options);
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): WorldVector3 {
+    return new WorldVector3().fromJsonString(jsonString, options);
   }
 
-  static equals(a: Vector3 | PlainMessage<Vector3> | undefined, b: Vector3 | PlainMessage<Vector3> | undefined): boolean {
-    return proto3.util.equals(Vector3, a, b);
+  static equals(a: WorldVector3 | PlainMessage<WorldVector3> | undefined, b: WorldVector3 | PlainMessage<WorldVector3> | undefined): boolean {
+    return proto3.util.equals(WorldVector3, a, b);
   }
 }
 
 /**
- * @generated from message dice.v1.Quaternion
+ * @generated from message dice.v1.WorldQuaternion
  */
-export class Quaternion extends Message<Quaternion> {
+export class WorldQuaternion extends Message<WorldQuaternion> {
   /**
-   * @generated from field: float x = 1;
+   * @generated from field: double x = 1;
    */
   x = 0;
 
   /**
-   * @generated from field: float y = 2;
+   * @generated from field: double y = 2;
    */
   y = 0;
 
   /**
-   * @generated from field: float z = 3;
+   * @generated from field: double z = 3;
    */
   z = 0;
 
   /**
-   * @generated from field: float w = 4;
+   * @generated from field: double w = 4;
    */
   w = 0;
 
-  constructor(data?: PartialMessage<Quaternion>) {
+  constructor(data?: PartialMessage<WorldQuaternion>) {
     super();
     proto3.util.initPartial(data, this);
   }
 
   static readonly runtime: typeof proto3 = proto3;
-  static readonly typeName = "dice.v1.Quaternion";
+  static readonly typeName = "dice.v1.WorldQuaternion";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 1, name: "x", kind: "scalar", T: 2 /* ScalarType.FLOAT */ },
-    { no: 2, name: "y", kind: "scalar", T: 2 /* ScalarType.FLOAT */ },
-    { no: 3, name: "z", kind: "scalar", T: 2 /* ScalarType.FLOAT */ },
-    { no: 4, name: "w", kind: "scalar", T: 2 /* ScalarType.FLOAT */ },
+    { no: 1, name: "x", kind: "scalar", T: 1 /* ScalarType.DOUBLE */ },
+    { no: 2, name: "y", kind: "scalar", T: 1 /* ScalarType.DOUBLE */ },
+    { no: 3, name: "z", kind: "scalar", T: 1 /* ScalarType.DOUBLE */ },
+    { no: 4, name: "w", kind: "scalar", T: 1 /* ScalarType.DOUBLE */ },
   ]);
 
-  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): Quaternion {
-    return new Quaternion().fromBinary(bytes, options);
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): WorldQuaternion {
+    return new WorldQuaternion().fromBinary(bytes, options);
   }
 
-  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): Quaternion {
-    return new Quaternion().fromJson(jsonValue, options);
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): WorldQuaternion {
+    return new WorldQuaternion().fromJson(jsonValue, options);
   }
 
-  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): Quaternion {
-    return new Quaternion().fromJsonString(jsonString, options);
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): WorldQuaternion {
+    return new WorldQuaternion().fromJsonString(jsonString, options);
   }
 
-  static equals(a: Quaternion | PlainMessage<Quaternion> | undefined, b: Quaternion | PlainMessage<Quaternion> | undefined): boolean {
-    return proto3.util.equals(Quaternion, a, b);
+  static equals(a: WorldQuaternion | PlainMessage<WorldQuaternion> | undefined, b: WorldQuaternion | PlainMessage<WorldQuaternion> | undefined): boolean {
+    return proto3.util.equals(WorldQuaternion, a, b);
   }
 }
 
 /**
- * @generated from message dice.v1.DieThrowSpec
+ * @generated from message dice.v1.WorldTransform
  */
-export class DieThrowSpec extends Message<DieThrowSpec> {
+export class WorldTransform extends Message<WorldTransform> {
   /**
-   * @generated from field: uint32 die_index = 1;
+   * @generated from field: dice.v1.WorldVector3 position = 1;
    */
-  dieIndex = 0;
+  position?: WorldVector3;
 
   /**
-   * Legacy initial-position field retained for compatibility. Version 4 uses
-   * table_position for x/z and position.y for the spawn height.
-   *
-   * @generated from field: dice.v1.Vector3 position = 2;
+   * @generated from field: dice.v1.WorldQuaternion rotation = 2;
    */
-  position?: Vector3;
+  rotation?: WorldQuaternion;
 
-  /**
-   * @generated from field: dice.v1.Quaternion rotation = 3;
-   */
-  rotation?: Quaternion;
-
-  /**
-   * @generated from field: dice.v1.Vector3 impulse = 4;
-   */
-  impulse?: Vector3;
-
-  /**
-   * @generated from field: dice.v1.Vector3 torque = 5;
-   */
-  torque?: Vector3;
-
-  /**
-   * @generated from field: string die_id = 6;
-   */
-  dieId = "";
-
-  /**
-   * @generated from field: dice.v1.NormalizedTablePosition table_position = 7;
-   */
-  tablePosition?: NormalizedTablePosition;
-
-  /**
-   * @generated from field: string die_definition_id = 8;
-   */
-  dieDefinitionId = "";
-
-  constructor(data?: PartialMessage<DieThrowSpec>) {
+  constructor(data?: PartialMessage<WorldTransform>) {
     super();
     proto3.util.initPartial(data, this);
   }
 
   static readonly runtime: typeof proto3 = proto3;
-  static readonly typeName = "dice.v1.DieThrowSpec";
+  static readonly typeName = "dice.v1.WorldTransform";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 1, name: "die_index", kind: "scalar", T: 13 /* ScalarType.UINT32 */ },
-    { no: 2, name: "position", kind: "message", T: Vector3 },
-    { no: 3, name: "rotation", kind: "message", T: Quaternion },
-    { no: 4, name: "impulse", kind: "message", T: Vector3 },
-    { no: 5, name: "torque", kind: "message", T: Vector3 },
-    { no: 6, name: "die_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 7, name: "table_position", kind: "message", T: NormalizedTablePosition },
-    { no: 8, name: "die_definition_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 1, name: "position", kind: "message", T: WorldVector3 },
+    { no: 2, name: "rotation", kind: "message", T: WorldQuaternion },
   ]);
 
-  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): DieThrowSpec {
-    return new DieThrowSpec().fromBinary(bytes, options);
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): WorldTransform {
+    return new WorldTransform().fromBinary(bytes, options);
   }
 
-  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): DieThrowSpec {
-    return new DieThrowSpec().fromJson(jsonValue, options);
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): WorldTransform {
+    return new WorldTransform().fromJson(jsonValue, options);
   }
 
-  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): DieThrowSpec {
-    return new DieThrowSpec().fromJsonString(jsonString, options);
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): WorldTransform {
+    return new WorldTransform().fromJsonString(jsonString, options);
   }
 
-  static equals(a: DieThrowSpec | PlainMessage<DieThrowSpec> | undefined, b: DieThrowSpec | PlainMessage<DieThrowSpec> | undefined): boolean {
-    return proto3.util.equals(DieThrowSpec, a, b);
+  static equals(a: WorldTransform | PlainMessage<WorldTransform> | undefined, b: WorldTransform | PlainMessage<WorldTransform> | undefined): boolean {
+    return proto3.util.equals(WorldTransform, a, b);
   }
 }
 
 /**
- * RollSpec is shared animation input. Clients intentionally do not promise
- * deterministic replay across devices or simulation implementations.
- *
- * @generated from message dice.v1.RollSpec
+ * @generated from message dice.v1.TablePoint
  */
-export class RollSpec extends Message<RollSpec> {
+export class TablePoint extends Message<TablePoint> {
   /**
-   * @generated from field: uint32 simulation_version = 1;
+   * @generated from field: double x = 1;
    */
-  simulationVersion = 0;
+  x = 0;
 
   /**
-   * @generated from field: string roll_id = 2;
+   * @generated from field: double z = 2;
    */
-  rollId = "";
+  z = 0;
 
-  /**
-   * @generated from field: repeated dice.v1.DieThrowSpec dice = 3;
-   */
-  dice: DieThrowSpec[] = [];
-
-  constructor(data?: PartialMessage<RollSpec>) {
+  constructor(data?: PartialMessage<TablePoint>) {
     super();
     proto3.util.initPartial(data, this);
   }
 
   static readonly runtime: typeof proto3 = proto3;
-  static readonly typeName = "dice.v1.RollSpec";
+  static readonly typeName = "dice.v1.TablePoint";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 1, name: "simulation_version", kind: "scalar", T: 13 /* ScalarType.UINT32 */ },
-    { no: 2, name: "roll_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 3, name: "dice", kind: "message", T: DieThrowSpec, repeated: true },
+    { no: 1, name: "x", kind: "scalar", T: 1 /* ScalarType.DOUBLE */ },
+    { no: 2, name: "z", kind: "scalar", T: 1 /* ScalarType.DOUBLE */ },
   ]);
 
-  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): RollSpec {
-    return new RollSpec().fromBinary(bytes, options);
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): TablePoint {
+    return new TablePoint().fromBinary(bytes, options);
   }
 
-  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): RollSpec {
-    return new RollSpec().fromJson(jsonValue, options);
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): TablePoint {
+    return new TablePoint().fromJson(jsonValue, options);
   }
 
-  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): RollSpec {
-    return new RollSpec().fromJsonString(jsonString, options);
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): TablePoint {
+    return new TablePoint().fromJsonString(jsonString, options);
   }
 
-  static equals(a: RollSpec | PlainMessage<RollSpec> | undefined, b: RollSpec | PlainMessage<RollSpec> | undefined): boolean {
-    return proto3.util.equals(RollSpec, a, b);
+  static equals(a: TablePoint | PlainMessage<TablePoint> | undefined, b: TablePoint | PlainMessage<TablePoint> | undefined): boolean {
+    return proto3.util.equals(TablePoint, a, b);
+  }
+}
+
+/**
+ * @generated from message dice.v1.TableBounds
+ */
+export class TableBounds extends Message<TableBounds> {
+  /**
+   * @generated from field: double min_x = 1;
+   */
+  minX = 0;
+
+  /**
+   * @generated from field: double max_x = 2;
+   */
+  maxX = 0;
+
+  /**
+   * @generated from field: double min_z = 3;
+   */
+  minZ = 0;
+
+  /**
+   * @generated from field: double max_z = 4;
+   */
+  maxZ = 0;
+
+  constructor(data?: PartialMessage<TableBounds>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "dice.v1.TableBounds";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "min_x", kind: "scalar", T: 1 /* ScalarType.DOUBLE */ },
+    { no: 2, name: "max_x", kind: "scalar", T: 1 /* ScalarType.DOUBLE */ },
+    { no: 3, name: "min_z", kind: "scalar", T: 1 /* ScalarType.DOUBLE */ },
+    { no: 4, name: "max_z", kind: "scalar", T: 1 /* ScalarType.DOUBLE */ },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): TableBounds {
+    return new TableBounds().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): TableBounds {
+    return new TableBounds().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): TableBounds {
+    return new TableBounds().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: TableBounds | PlainMessage<TableBounds> | undefined, b: TableBounds | PlainMessage<TableBounds> | undefined): boolean {
+    return proto3.util.equals(TableBounds, a, b);
   }
 }
 
@@ -428,49 +504,6 @@ export class RollResult extends Message<RollResult> {
 }
 
 /**
- * @generated from message dice.v1.NormalizedTablePosition
- */
-export class NormalizedTablePosition extends Message<NormalizedTablePosition> {
-  /**
-   * @generated from field: float u = 1;
-   */
-  u = 0;
-
-  /**
-   * @generated from field: float v = 2;
-   */
-  v = 0;
-
-  constructor(data?: PartialMessage<NormalizedTablePosition>) {
-    super();
-    proto3.util.initPartial(data, this);
-  }
-
-  static readonly runtime: typeof proto3 = proto3;
-  static readonly typeName = "dice.v1.NormalizedTablePosition";
-  static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 1, name: "u", kind: "scalar", T: 2 /* ScalarType.FLOAT */ },
-    { no: 2, name: "v", kind: "scalar", T: 2 /* ScalarType.FLOAT */ },
-  ]);
-
-  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): NormalizedTablePosition {
-    return new NormalizedTablePosition().fromBinary(bytes, options);
-  }
-
-  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): NormalizedTablePosition {
-    return new NormalizedTablePosition().fromJson(jsonValue, options);
-  }
-
-  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): NormalizedTablePosition {
-    return new NormalizedTablePosition().fromJsonString(jsonString, options);
-  }
-
-  static equals(a: NormalizedTablePosition | PlainMessage<NormalizedTablePosition> | undefined, b: NormalizedTablePosition | PlainMessage<NormalizedTablePosition> | undefined): boolean {
-    return proto3.util.equals(NormalizedTablePosition, a, b);
-  }
-}
-
-/**
  * @generated from message dice.v1.TableDieState
  */
 export class TableDieState extends Message<TableDieState> {
@@ -485,9 +518,9 @@ export class TableDieState extends Message<TableDieState> {
   face = DieFace.UNSPECIFIED;
 
   /**
-   * @generated from field: dice.v1.NormalizedTablePosition position = 3;
+   * @generated from field: dice.v1.WorldTransform transform = 3;
    */
-  position?: NormalizedTablePosition;
+  transform?: WorldTransform;
 
   /**
    * @generated from field: string owner_player_id = 4;
@@ -504,6 +537,16 @@ export class TableDieState extends Message<TableDieState> {
    */
   dieDefinitionId = "";
 
+  /**
+   * @generated from field: dice.v1.DieMotionState motion = 7;
+   */
+  motion = DieMotionState.UNSPECIFIED;
+
+  /**
+   * @generated from field: string active_roll_id = 8;
+   */
+  activeRollId = "";
+
   constructor(data?: PartialMessage<TableDieState>) {
     super();
     proto3.util.initPartial(data, this);
@@ -514,10 +557,12 @@ export class TableDieState extends Message<TableDieState> {
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
     { no: 1, name: "die_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 2, name: "face", kind: "enum", T: proto3.getEnumType(DieFace) },
-    { no: 3, name: "position", kind: "message", T: NormalizedTablePosition },
+    { no: 3, name: "transform", kind: "message", T: WorldTransform },
     { no: 4, name: "owner_player_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 5, name: "revision", kind: "scalar", T: 4 /* ScalarType.UINT64 */ },
     { no: 6, name: "die_definition_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 7, name: "motion", kind: "enum", T: proto3.getEnumType(DieMotionState) },
+    { no: 8, name: "active_roll_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): TableDieState {
@@ -538,45 +583,124 @@ export class TableDieState extends Message<TableDieState> {
 }
 
 /**
- * @generated from message dice.v1.DiePlacement
+ * @generated from message dice.v1.ActiveRoll
  */
-export class DiePlacement extends Message<DiePlacement> {
+export class ActiveRoll extends Message<ActiveRoll> {
+  /**
+   * @generated from field: string roll_id = 1;
+   */
+  rollId = "";
+
+  /**
+   * @generated from field: string roller_id = 2;
+   */
+  rollerId = "";
+
+  /**
+   * @generated from field: dice.v1.RollMode mode = 3;
+   */
+  mode = RollMode.UNSPECIFIED;
+
+  /**
+   * @generated from field: repeated string target_die_ids = 4;
+   */
+  targetDieIds: string[] = [];
+
+  /**
+   * @generated from field: uint64 start_tick = 5;
+   */
+  startTick = protoInt64.zero;
+
+  constructor(data?: PartialMessage<ActiveRoll>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "dice.v1.ActiveRoll";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "roll_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "roller_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 3, name: "mode", kind: "enum", T: proto3.getEnumType(RollMode) },
+    { no: 4, name: "target_die_ids", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
+    { no: 5, name: "start_tick", kind: "scalar", T: 4 /* ScalarType.UINT64 */ },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ActiveRoll {
+    return new ActiveRoll().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): ActiveRoll {
+    return new ActiveRoll().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): ActiveRoll {
+    return new ActiveRoll().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: ActiveRoll | PlainMessage<ActiveRoll> | undefined, b: ActiveRoll | PlainMessage<ActiveRoll> | undefined): boolean {
+    return proto3.util.equals(ActiveRoll, a, b);
+  }
+}
+
+/**
+ * @generated from message dice.v1.ActiveDrag
+ */
+export class ActiveDrag extends Message<ActiveDrag> {
   /**
    * @generated from field: string die_id = 1;
    */
   dieId = "";
 
   /**
-   * @generated from field: dice.v1.NormalizedTablePosition position = 2;
+   * @generated from field: string player_id = 2;
    */
-  position?: NormalizedTablePosition;
+  playerId = "";
 
-  constructor(data?: PartialMessage<DiePlacement>) {
+  /**
+   * @generated from field: string interaction_id = 3;
+   */
+  interactionId = "";
+
+  /**
+   * @generated from field: uint64 sequence = 4;
+   */
+  sequence = protoInt64.zero;
+
+  /**
+   * @generated from field: dice.v1.TablePoint target = 5;
+   */
+  target?: TablePoint;
+
+  constructor(data?: PartialMessage<ActiveDrag>) {
     super();
     proto3.util.initPartial(data, this);
   }
 
   static readonly runtime: typeof proto3 = proto3;
-  static readonly typeName = "dice.v1.DiePlacement";
+  static readonly typeName = "dice.v1.ActiveDrag";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
     { no: 1, name: "die_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 2, name: "position", kind: "message", T: NormalizedTablePosition },
+    { no: 2, name: "player_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 3, name: "interaction_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 4, name: "sequence", kind: "scalar", T: 4 /* ScalarType.UINT64 */ },
+    { no: 5, name: "target", kind: "message", T: TablePoint },
   ]);
 
-  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): DiePlacement {
-    return new DiePlacement().fromBinary(bytes, options);
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ActiveDrag {
+    return new ActiveDrag().fromBinary(bytes, options);
   }
 
-  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): DiePlacement {
-    return new DiePlacement().fromJson(jsonValue, options);
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): ActiveDrag {
+    return new ActiveDrag().fromJson(jsonValue, options);
   }
 
-  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): DiePlacement {
-    return new DiePlacement().fromJsonString(jsonString, options);
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): ActiveDrag {
+    return new ActiveDrag().fromJsonString(jsonString, options);
   }
 
-  static equals(a: DiePlacement | PlainMessage<DiePlacement> | undefined, b: DiePlacement | PlainMessage<DiePlacement> | undefined): boolean {
-    return proto3.util.equals(DiePlacement, a, b);
+  static equals(a: ActiveDrag | PlainMessage<ActiveDrag> | undefined, b: ActiveDrag | PlainMessage<ActiveDrag> | undefined): boolean {
+    return proto3.util.equals(ActiveDrag, a, b);
   }
 }
 
@@ -599,6 +723,26 @@ export class TableSnapshot extends Message<TableSnapshot> {
    */
   dice: TableDieState[] = [];
 
+  /**
+   * @generated from field: repeated dice.v1.ActiveRoll active_rolls = 4;
+   */
+  activeRolls: ActiveRoll[] = [];
+
+  /**
+   * @generated from field: repeated dice.v1.ActiveDrag active_drags = 5;
+   */
+  activeDrags: ActiveDrag[] = [];
+
+  /**
+   * @generated from field: uint64 physics_tick = 6;
+   */
+  physicsTick = protoInt64.zero;
+
+  /**
+   * @generated from field: dice.v1.TableBounds bounds = 7;
+   */
+  bounds?: TableBounds;
+
   constructor(data?: PartialMessage<TableSnapshot>) {
     super();
     proto3.util.initPartial(data, this);
@@ -610,6 +754,10 @@ export class TableSnapshot extends Message<TableSnapshot> {
     { no: 1, name: "table_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 2, name: "revision", kind: "scalar", T: 4 /* ScalarType.UINT64 */ },
     { no: 3, name: "dice", kind: "message", T: TableDieState, repeated: true },
+    { no: 4, name: "active_rolls", kind: "message", T: ActiveRoll, repeated: true },
+    { no: 5, name: "active_drags", kind: "message", T: ActiveDrag, repeated: true },
+    { no: 6, name: "physics_tick", kind: "scalar", T: 4 /* ScalarType.UINT64 */ },
+    { no: 7, name: "bounds", kind: "message", T: TableBounds },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): TableSnapshot {
@@ -649,9 +797,14 @@ export class RollStarted extends Message<RollStarted> {
   mode = RollMode.UNSPECIFIED;
 
   /**
-   * @generated from field: dice.v1.RollSpec animation_spec = 4;
+   * @generated from field: repeated dice.v1.TableDieState dice = 4;
    */
-  animationSpec?: RollSpec;
+  dice: TableDieState[] = [];
+
+  /**
+   * @generated from field: uint64 start_tick = 5;
+   */
+  startTick = protoInt64.zero;
 
   constructor(data?: PartialMessage<RollStarted>) {
     super();
@@ -664,7 +817,8 @@ export class RollStarted extends Message<RollStarted> {
     { no: 1, name: "roll_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 2, name: "roller_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 3, name: "mode", kind: "enum", T: proto3.getEnumType(RollMode) },
-    { no: 4, name: "animation_spec", kind: "message", T: RollSpec },
+    { no: 4, name: "dice", kind: "message", T: TableDieState, repeated: true },
+    { no: 5, name: "start_tick", kind: "scalar", T: 4 /* ScalarType.UINT64 */ },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): RollStarted {
@@ -704,14 +858,17 @@ export class RollCompleted extends Message<RollCompleted> {
   result?: RollResult;
 
   /**
-   * @generated from field: repeated dice.v1.DiePlacement changed_placements = 4;
+   * Includes every die whose transform or face changed during the shared
+   * simulation, including settled dice displaced by another player's roll.
+   *
+   * @generated from field: repeated dice.v1.TableDieState changed_dice = 4;
    */
-  changedPlacements: DiePlacement[] = [];
+  changedDice: TableDieState[] = [];
 
   /**
-   * @generated from field: dice.v1.RollSpec animation_spec = 5;
+   * @generated from field: uint64 completed_tick = 5;
    */
-  animationSpec?: RollSpec;
+  completedTick = protoInt64.zero;
 
   constructor(data?: PartialMessage<RollCompleted>) {
     super();
@@ -724,8 +881,8 @@ export class RollCompleted extends Message<RollCompleted> {
     { no: 1, name: "roll_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 2, name: "roller_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 3, name: "result", kind: "message", T: RollResult },
-    { no: 4, name: "changed_placements", kind: "message", T: DiePlacement, repeated: true },
-    { no: 5, name: "animation_spec", kind: "message", T: RollSpec },
+    { no: 4, name: "changed_dice", kind: "message", T: TableDieState, repeated: true },
+    { no: 5, name: "completed_tick", kind: "scalar", T: 4 /* ScalarType.UINT64 */ },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): RollCompleted {
@@ -770,9 +927,9 @@ export class DragStarted extends Message<DragStarted> {
   sequence = protoInt64.zero;
 
   /**
-   * @generated from field: dice.v1.NormalizedTablePosition position = 5;
+   * @generated from field: dice.v1.TablePoint target = 5;
    */
-  position?: NormalizedTablePosition;
+  target?: TablePoint;
 
   constructor(data?: PartialMessage<DragStarted>) {
     super();
@@ -786,7 +943,7 @@ export class DragStarted extends Message<DragStarted> {
     { no: 2, name: "player_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 3, name: "interaction_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 4, name: "sequence", kind: "scalar", T: 4 /* ScalarType.UINT64 */ },
-    { no: 5, name: "position", kind: "message", T: NormalizedTablePosition },
+    { no: 5, name: "target", kind: "message", T: TablePoint },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): DragStarted {
@@ -831,9 +988,9 @@ export class DragUpdated extends Message<DragUpdated> {
   sequence = protoInt64.zero;
 
   /**
-   * @generated from field: dice.v1.NormalizedTablePosition position = 5;
+   * @generated from field: dice.v1.TablePoint target = 5;
    */
-  position?: NormalizedTablePosition;
+  target?: TablePoint;
 
   constructor(data?: PartialMessage<DragUpdated>) {
     super();
@@ -847,7 +1004,7 @@ export class DragUpdated extends Message<DragUpdated> {
     { no: 2, name: "player_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 3, name: "interaction_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 4, name: "sequence", kind: "scalar", T: 4 /* ScalarType.UINT64 */ },
-    { no: 5, name: "position", kind: "message", T: NormalizedTablePosition },
+    { no: 5, name: "target", kind: "message", T: TablePoint },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): DragUpdated {
@@ -892,9 +1049,9 @@ export class DragEnded extends Message<DragEnded> {
   sequence = protoInt64.zero;
 
   /**
-   * @generated from field: dice.v1.NormalizedTablePosition position = 5;
+   * @generated from field: dice.v1.TablePoint target = 5;
    */
-  position?: NormalizedTablePosition;
+  target?: TablePoint;
 
   constructor(data?: PartialMessage<DragEnded>) {
     super();
@@ -908,7 +1065,7 @@ export class DragEnded extends Message<DragEnded> {
     { no: 2, name: "player_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 3, name: "interaction_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 4, name: "sequence", kind: "scalar", T: 4 /* ScalarType.UINT64 */ },
-    { no: 5, name: "position", kind: "message", T: NormalizedTablePosition },
+    { no: 5, name: "target", kind: "message", T: TablePoint },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): DragEnded {
@@ -929,9 +1086,6 @@ export class DragEnded extends Message<DragEnded> {
 }
 
 /**
- * TableEvent can back a later snapshot-plus-event-stream transport. The
- * frontend already applies local actions through this same event envelope.
- *
  * @generated from message dice.v1.TableEvent
  */
 export class TableEvent extends Message<TableEvent> {
@@ -986,6 +1140,16 @@ export class TableEvent extends Message<TableEvent> {
     case: "snapshot";
   } | { case: undefined; value?: undefined } = { case: undefined };
 
+  /**
+   * @generated from field: string source_request_id = 9;
+   */
+  sourceRequestId = "";
+
+  /**
+   * @generated from field: dice.v1.TableBounds bounds = 10;
+   */
+  bounds?: TableBounds;
+
   constructor(data?: PartialMessage<TableEvent>) {
     super();
     proto3.util.initPartial(data, this);
@@ -1002,6 +1166,8 @@ export class TableEvent extends Message<TableEvent> {
     { no: 6, name: "drag_updated", kind: "message", T: DragUpdated, oneof: "payload" },
     { no: 7, name: "drag_ended", kind: "message", T: DragEnded, oneof: "payload" },
     { no: 8, name: "snapshot", kind: "message", T: TableSnapshot, oneof: "payload" },
+    { no: 9, name: "source_request_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 10, name: "bounds", kind: "message", T: TableBounds },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): TableEvent {
@@ -1018,6 +1184,596 @@ export class TableEvent extends Message<TableEvent> {
 
   static equals(a: TableEvent | PlainMessage<TableEvent> | undefined, b: TableEvent | PlainMessage<TableEvent> | undefined): boolean {
     return proto3.util.equals(TableEvent, a, b);
+  }
+}
+
+/**
+ * @generated from message dice.v1.JoinRoom
+ */
+export class JoinRoom extends Message<JoinRoom> {
+  /**
+   * @generated from field: string resume_token = 1;
+   */
+  resumeToken = "";
+
+  constructor(data?: PartialMessage<JoinRoom>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "dice.v1.JoinRoom";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "resume_token", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): JoinRoom {
+    return new JoinRoom().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): JoinRoom {
+    return new JoinRoom().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): JoinRoom {
+    return new JoinRoom().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: JoinRoom | PlainMessage<JoinRoom> | undefined, b: JoinRoom | PlainMessage<JoinRoom> | undefined): boolean {
+    return proto3.util.equals(JoinRoom, a, b);
+  }
+}
+
+/**
+ * @generated from message dice.v1.StartRollCommand
+ */
+export class StartRollCommand extends Message<StartRollCommand> {
+  /**
+   * @generated from field: dice.v1.RollMode mode = 1;
+   */
+  mode = RollMode.UNSPECIFIED;
+
+  /**
+   * Empty for the first ADD_NEW roll. The server creates the standard twelve.
+   *
+   * @generated from field: repeated string target_die_ids = 2;
+   */
+  targetDieIds: string[] = [];
+
+  constructor(data?: PartialMessage<StartRollCommand>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "dice.v1.StartRollCommand";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "mode", kind: "enum", T: proto3.getEnumType(RollMode) },
+    { no: 2, name: "target_die_ids", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): StartRollCommand {
+    return new StartRollCommand().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): StartRollCommand {
+    return new StartRollCommand().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): StartRollCommand {
+    return new StartRollCommand().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: StartRollCommand | PlainMessage<StartRollCommand> | undefined, b: StartRollCommand | PlainMessage<StartRollCommand> | undefined): boolean {
+    return proto3.util.equals(StartRollCommand, a, b);
+  }
+}
+
+/**
+ * @generated from message dice.v1.StartDragCommand
+ */
+export class StartDragCommand extends Message<StartDragCommand> {
+  /**
+   * @generated from field: string die_id = 1;
+   */
+  dieId = "";
+
+  /**
+   * @generated from field: string interaction_id = 2;
+   */
+  interactionId = "";
+
+  /**
+   * @generated from field: uint64 sequence = 3;
+   */
+  sequence = protoInt64.zero;
+
+  /**
+   * @generated from field: dice.v1.TablePoint target = 4;
+   */
+  target?: TablePoint;
+
+  constructor(data?: PartialMessage<StartDragCommand>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "dice.v1.StartDragCommand";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "die_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "interaction_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 3, name: "sequence", kind: "scalar", T: 4 /* ScalarType.UINT64 */ },
+    { no: 4, name: "target", kind: "message", T: TablePoint },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): StartDragCommand {
+    return new StartDragCommand().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): StartDragCommand {
+    return new StartDragCommand().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): StartDragCommand {
+    return new StartDragCommand().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: StartDragCommand | PlainMessage<StartDragCommand> | undefined, b: StartDragCommand | PlainMessage<StartDragCommand> | undefined): boolean {
+    return proto3.util.equals(StartDragCommand, a, b);
+  }
+}
+
+/**
+ * @generated from message dice.v1.UpdateDragCommand
+ */
+export class UpdateDragCommand extends Message<UpdateDragCommand> {
+  /**
+   * @generated from field: string die_id = 1;
+   */
+  dieId = "";
+
+  /**
+   * @generated from field: string interaction_id = 2;
+   */
+  interactionId = "";
+
+  /**
+   * @generated from field: uint64 sequence = 3;
+   */
+  sequence = protoInt64.zero;
+
+  /**
+   * @generated from field: dice.v1.TablePoint target = 4;
+   */
+  target?: TablePoint;
+
+  constructor(data?: PartialMessage<UpdateDragCommand>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "dice.v1.UpdateDragCommand";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "die_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "interaction_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 3, name: "sequence", kind: "scalar", T: 4 /* ScalarType.UINT64 */ },
+    { no: 4, name: "target", kind: "message", T: TablePoint },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): UpdateDragCommand {
+    return new UpdateDragCommand().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): UpdateDragCommand {
+    return new UpdateDragCommand().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): UpdateDragCommand {
+    return new UpdateDragCommand().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: UpdateDragCommand | PlainMessage<UpdateDragCommand> | undefined, b: UpdateDragCommand | PlainMessage<UpdateDragCommand> | undefined): boolean {
+    return proto3.util.equals(UpdateDragCommand, a, b);
+  }
+}
+
+/**
+ * @generated from message dice.v1.EndDragCommand
+ */
+export class EndDragCommand extends Message<EndDragCommand> {
+  /**
+   * @generated from field: string die_id = 1;
+   */
+  dieId = "";
+
+  /**
+   * @generated from field: string interaction_id = 2;
+   */
+  interactionId = "";
+
+  /**
+   * @generated from field: uint64 sequence = 3;
+   */
+  sequence = protoInt64.zero;
+
+  /**
+   * @generated from field: dice.v1.TablePoint target = 4;
+   */
+  target?: TablePoint;
+
+  constructor(data?: PartialMessage<EndDragCommand>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "dice.v1.EndDragCommand";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "die_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "interaction_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 3, name: "sequence", kind: "scalar", T: 4 /* ScalarType.UINT64 */ },
+    { no: 4, name: "target", kind: "message", T: TablePoint },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): EndDragCommand {
+    return new EndDragCommand().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): EndDragCommand {
+    return new EndDragCommand().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): EndDragCommand {
+    return new EndDragCommand().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: EndDragCommand | PlainMessage<EndDragCommand> | undefined, b: EndDragCommand | PlainMessage<EndDragCommand> | undefined): boolean {
+    return proto3.util.equals(EndDragCommand, a, b);
+  }
+}
+
+/**
+ * @generated from message dice.v1.ClientMessage
+ */
+export class ClientMessage extends Message<ClientMessage> {
+  /**
+   * @generated from field: string request_id = 1;
+   */
+  requestId = "";
+
+  /**
+   * @generated from oneof dice.v1.ClientMessage.payload
+   */
+  payload: {
+    /**
+     * @generated from field: dice.v1.JoinRoom join = 2;
+     */
+    value: JoinRoom;
+    case: "join";
+  } | {
+    /**
+     * @generated from field: dice.v1.StartRollCommand start_roll = 3;
+     */
+    value: StartRollCommand;
+    case: "startRoll";
+  } | {
+    /**
+     * @generated from field: dice.v1.StartDragCommand start_drag = 4;
+     */
+    value: StartDragCommand;
+    case: "startDrag";
+  } | {
+    /**
+     * @generated from field: dice.v1.UpdateDragCommand update_drag = 5;
+     */
+    value: UpdateDragCommand;
+    case: "updateDrag";
+  } | {
+    /**
+     * @generated from field: dice.v1.EndDragCommand end_drag = 6;
+     */
+    value: EndDragCommand;
+    case: "endDrag";
+  } | { case: undefined; value?: undefined } = { case: undefined };
+
+  constructor(data?: PartialMessage<ClientMessage>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "dice.v1.ClientMessage";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "request_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "join", kind: "message", T: JoinRoom, oneof: "payload" },
+    { no: 3, name: "start_roll", kind: "message", T: StartRollCommand, oneof: "payload" },
+    { no: 4, name: "start_drag", kind: "message", T: StartDragCommand, oneof: "payload" },
+    { no: 5, name: "update_drag", kind: "message", T: UpdateDragCommand, oneof: "payload" },
+    { no: 6, name: "end_drag", kind: "message", T: EndDragCommand, oneof: "payload" },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ClientMessage {
+    return new ClientMessage().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): ClientMessage {
+    return new ClientMessage().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): ClientMessage {
+    return new ClientMessage().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: ClientMessage | PlainMessage<ClientMessage> | undefined, b: ClientMessage | PlainMessage<ClientMessage> | undefined): boolean {
+    return proto3.util.equals(ClientMessage, a, b);
+  }
+}
+
+/**
+ * @generated from message dice.v1.Welcome
+ */
+export class Welcome extends Message<Welcome> {
+  /**
+   * @generated from field: string player_id = 1;
+   */
+  playerId = "";
+
+  /**
+   * @generated from field: string resume_token = 2;
+   */
+  resumeToken = "";
+
+  /**
+   * @generated from field: dice.v1.TableSnapshot snapshot = 3;
+   */
+  snapshot?: TableSnapshot;
+
+  constructor(data?: PartialMessage<Welcome>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "dice.v1.Welcome";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "player_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "resume_token", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 3, name: "snapshot", kind: "message", T: TableSnapshot },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): Welcome {
+    return new Welcome().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): Welcome {
+    return new Welcome().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): Welcome {
+    return new Welcome().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: Welcome | PlainMessage<Welcome> | undefined, b: Welcome | PlainMessage<Welcome> | undefined): boolean {
+    return proto3.util.equals(Welcome, a, b);
+  }
+}
+
+/**
+ * @generated from message dice.v1.CommandRejected
+ */
+export class CommandRejected extends Message<CommandRejected> {
+  /**
+   * @generated from field: string request_id = 1;
+   */
+  requestId = "";
+
+  /**
+   * @generated from field: dice.v1.CommandRejectionCode code = 2;
+   */
+  code = CommandRejectionCode.UNSPECIFIED;
+
+  /**
+   * @generated from field: string message = 3;
+   */
+  message = "";
+
+  constructor(data?: PartialMessage<CommandRejected>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "dice.v1.CommandRejected";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "request_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "code", kind: "enum", T: proto3.getEnumType(CommandRejectionCode) },
+    { no: 3, name: "message", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): CommandRejected {
+    return new CommandRejected().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): CommandRejected {
+    return new CommandRejected().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): CommandRejected {
+    return new CommandRejected().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: CommandRejected | PlainMessage<CommandRejected> | undefined, b: CommandRejected | PlainMessage<CommandRejected> | undefined): boolean {
+    return proto3.util.equals(CommandRejected, a, b);
+  }
+}
+
+/**
+ * @generated from message dice.v1.DieTransform
+ */
+export class DieTransform extends Message<DieTransform> {
+  /**
+   * @generated from field: string die_id = 1;
+   */
+  dieId = "";
+
+  /**
+   * @generated from field: dice.v1.WorldTransform transform = 2;
+   */
+  transform?: WorldTransform;
+
+  /**
+   * @generated from field: dice.v1.DieMotionState motion = 3;
+   */
+  motion = DieMotionState.UNSPECIFIED;
+
+  /**
+   * @generated from field: uint64 revision = 4;
+   */
+  revision = protoInt64.zero;
+
+  constructor(data?: PartialMessage<DieTransform>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "dice.v1.DieTransform";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "die_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "transform", kind: "message", T: WorldTransform },
+    { no: 3, name: "motion", kind: "enum", T: proto3.getEnumType(DieMotionState) },
+    { no: 4, name: "revision", kind: "scalar", T: 4 /* ScalarType.UINT64 */ },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): DieTransform {
+    return new DieTransform().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): DieTransform {
+    return new DieTransform().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): DieTransform {
+    return new DieTransform().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: DieTransform | PlainMessage<DieTransform> | undefined, b: DieTransform | PlainMessage<DieTransform> | undefined): boolean {
+    return proto3.util.equals(DieTransform, a, b);
+  }
+}
+
+/**
+ * @generated from message dice.v1.PhysicsFrame
+ */
+export class PhysicsFrame extends Message<PhysicsFrame> {
+  /**
+   * @generated from field: uint64 tick = 1;
+   */
+  tick = protoInt64.zero;
+
+  /**
+   * @generated from field: repeated dice.v1.DieTransform dice = 2;
+   */
+  dice: DieTransform[] = [];
+
+  /**
+   * @generated from field: dice.v1.TableBounds bounds = 3;
+   */
+  bounds?: TableBounds;
+
+  constructor(data?: PartialMessage<PhysicsFrame>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "dice.v1.PhysicsFrame";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "tick", kind: "scalar", T: 4 /* ScalarType.UINT64 */ },
+    { no: 2, name: "dice", kind: "message", T: DieTransform, repeated: true },
+    { no: 3, name: "bounds", kind: "message", T: TableBounds },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): PhysicsFrame {
+    return new PhysicsFrame().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): PhysicsFrame {
+    return new PhysicsFrame().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): PhysicsFrame {
+    return new PhysicsFrame().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: PhysicsFrame | PlainMessage<PhysicsFrame> | undefined, b: PhysicsFrame | PlainMessage<PhysicsFrame> | undefined): boolean {
+    return proto3.util.equals(PhysicsFrame, a, b);
+  }
+}
+
+/**
+ * @generated from message dice.v1.ServerMessage
+ */
+export class ServerMessage extends Message<ServerMessage> {
+  /**
+   * @generated from oneof dice.v1.ServerMessage.payload
+   */
+  payload: {
+    /**
+     * @generated from field: dice.v1.Welcome welcome = 1;
+     */
+    value: Welcome;
+    case: "welcome";
+  } | {
+    /**
+     * @generated from field: dice.v1.TableEvent event = 2;
+     */
+    value: TableEvent;
+    case: "event";
+  } | {
+    /**
+     * @generated from field: dice.v1.CommandRejected rejected = 3;
+     */
+    value: CommandRejected;
+    case: "rejected";
+  } | {
+    /**
+     * @generated from field: dice.v1.PhysicsFrame physics_frame = 4;
+     */
+    value: PhysicsFrame;
+    case: "physicsFrame";
+  } | { case: undefined; value?: undefined } = { case: undefined };
+
+  constructor(data?: PartialMessage<ServerMessage>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "dice.v1.ServerMessage";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "welcome", kind: "message", T: Welcome, oneof: "payload" },
+    { no: 2, name: "event", kind: "message", T: TableEvent, oneof: "payload" },
+    { no: 3, name: "rejected", kind: "message", T: CommandRejected, oneof: "payload" },
+    { no: 4, name: "physics_frame", kind: "message", T: PhysicsFrame, oneof: "payload" },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ServerMessage {
+    return new ServerMessage().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): ServerMessage {
+    return new ServerMessage().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): ServerMessage {
+    return new ServerMessage().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: ServerMessage | PlainMessage<ServerMessage> | undefined, b: ServerMessage | PlainMessage<ServerMessage> | undefined): boolean {
+    return proto3.util.equals(ServerMessage, a, b);
   }
 }
 
