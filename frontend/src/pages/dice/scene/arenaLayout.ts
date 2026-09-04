@@ -6,9 +6,9 @@ import {
   Vector2,
   Vector3,
 } from 'three';
-import { NormalizedTablePosition } from '../../rpc/proto/dice/v1/dice_pb';
-import { DICE_TABLE_CONFIG } from './constants';
-import { VectorLike, VectorTuple } from './diceMath';
+import { NormalizedTablePosition } from '../../../rpc/proto/dice/v1/dice_pb';
+import { DICE_TABLE_CONFIG } from '../constants';
+import { VectorLike, VectorTuple } from '../table/diceMath';
 
 export type ArenaPoint = { x: number; z: number };
 export type ArenaQuadrilateral = readonly [

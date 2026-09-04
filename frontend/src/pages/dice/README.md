@@ -13,25 +13,29 @@ reconciles normalized placements.
 
 ## Responsibilities
 
-| File | Responsibility |
+| File or directory | Responsibility |
 | --- | --- |
 | `DiceGame.tsx` | Route presentation, loading/error state, and bottom controls. |
-| `letterDice.ts` | Pure fixed catalog, definition validation, and physical-face-to-letter resolution. |
-| `tableCommands.ts` | Pure construction of first-roll, add-new, targeted-reroll, and reroll-all targets. |
-| `useDiceTable.ts` | UI controller and construction of local domain events. Exposes roll-all, definition-based add-new, reroll, selection, drag, settlement, and remote-event commands. |
-| `tableModel.ts` | Pure reducer for the persistent die map, stable ordering, active roll, snapshots, drag sequences, and reconciliation targets. |
-| `tableEventAdapter.ts` | Synchronous loopback adapter with the same publish/receive boundary expected from a future network adapter. |
-| `arenaLayout.ts` | Pure aspect-derived camera, edge walls, playable quadrilateral, visual-floor/shadow bounds, normalized mapping, and containment correction. |
-| `DiceArena.tsx` | Camera, fitted visual floor, and Rapier floor/wall collider ownership. The visual receiver and physics floor are separate. |
-| `RollObserver.tsx` | Post-step containment, active-roll settlement, face reading, and displaced-die placement reporting. |
-| `Die.tsx` | Stable Rapier body, cached canvas letter materials, body-mode transitions, pointer dragging, and result reconciliation. |
-| `dieSnapping.ts` | Pure open-edge selection for half-width drag snapping without overlapping occupied positions. |
-| `letterStringDetection.ts` | Pure tolerant adjacency graph, maximal string derivation, and normalized crossword-grid layout. |
-| `LetterStringObserver.tsx` | Live Rapier-position adapter that resolves playable faces and reports changed strings and shapes. |
-| `crosswordValidation.ts` | Pure dictionary validation for formed words, die coverage, and single-component connectivity. |
-| `useWordDictionary.ts` | Browser adapter that parses, loads, and caches the bundled line-delimited Scrabble dictionary. |
-| `rollModel.ts` | Shared animation input generation and validation plus authoritative result construction. |
-| `diceMath.ts` | Face/quaternion and settlement math with no React or Rapier dependency. |
+| `constants.ts` | Configuration shared by the table, scene, and word-detection areas. |
+| `table/` | Persistent table state, commands, roll contracts, the letter-die catalog, and the client controller/event adapter. |
+| `table/letterDice.ts` | Pure fixed catalog, definition validation, and physical-face-to-letter resolution. |
+| `table/tableCommands.ts` | Pure construction of first-roll, add-new, targeted-reroll, and reroll-all targets. |
+| `table/useDiceTable.ts` | UI controller and construction of local domain events. Exposes roll-all, definition-based add-new, reroll, selection, drag, settlement, and remote-event commands. |
+| `table/tableModel.ts` | Pure reducer for the persistent die map, stable ordering, active roll, snapshots, drag sequences, and reconciliation targets. |
+| `table/tableEventAdapter.ts` | Synchronous loopback adapter with the same publish/receive boundary expected from a future network adapter. |
+| `table/rollModel.ts` | Shared animation input generation and validation plus authoritative result construction. |
+| `table/diceMath.ts` | Face/quaternion and settlement math with no React or Rapier dependency. |
+| `scene/` | React Three Fiber/Rapier rendering, physics observation, dragging, snapping, and visual reconciliation. |
+| `scene/arenaLayout.ts` | Pure aspect-derived camera, edge walls, playable quadrilateral, visual-floor/shadow bounds, normalized mapping, and containment correction. |
+| `scene/DiceArena.tsx` | Camera, fitted visual floor, and Rapier floor/wall collider ownership. The visual receiver and physics floor are separate. |
+| `scene/RollObserver.tsx` | Post-step containment, active-roll settlement, face reading, and displaced-die placement reporting. |
+| `scene/Die.tsx` | Stable Rapier body, cached canvas letter materials, body-mode transitions, pointer dragging, and result reconciliation. |
+| `scene/dieSnapping.ts` | Pure open-edge selection for half-width drag snapping without overlapping occupied positions. |
+| `scene/LetterStringObserver.tsx` | Live Rapier-position adapter that resolves playable faces and reports changed strings and shapes. |
+| `words/` | Letter-string detection, crossword validation, and the bundled dictionary adapter and asset. |
+| `words/letterStringDetection.ts` | Pure tolerant adjacency graph, maximal string derivation, and normalized crossword-grid layout. |
+| `words/crosswordValidation.ts` | Pure dictionary validation for formed words, die coverage, and single-component connectivity. |
+| `words/useWordDictionary.ts` | Browser adapter that parses, loads, and caches the bundled line-delimited Scrabble dictionary. |
 
 ## State and events
 

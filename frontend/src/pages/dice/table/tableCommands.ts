@@ -1,5 +1,5 @@
-import { RollMode } from '../../rpc/proto/dice/v1/dice_pb';
-import { MAX_DEFINITIONS_PER_ADD } from './constants';
+import { RollMode } from '../../../rpc/proto/dice/v1/dice_pb';
+import { MAX_DEFINITIONS_PER_ADD } from '../constants';
 import {
   isKnownLetterDieDefinitionId,
   LetterDieDefinitionId,

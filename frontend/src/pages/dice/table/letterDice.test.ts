@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { DieFace } from '../../rpc/proto/dice/v1/dice_pb';
+import { DieFace } from '../../../rpc/proto/dice/v1/dice_pb';
 import { faceUpQuaternion, getUpwardFace } from './diceMath';
 import {
   getLetterDieDefinition,

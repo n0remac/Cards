@@ -1,4 +1,4 @@
-import { TableEvent } from '../../rpc/proto/dice/v1/dice_pb';
+import { TableEvent } from '../../../rpc/proto/dice/v1/dice_pb';
 
 export type TableEventPayload = TableEvent['payload'];
 export type TableEventListener = (event: TableEvent) => void;

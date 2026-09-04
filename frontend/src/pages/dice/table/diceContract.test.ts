@@ -12,8 +12,8 @@ import {
   TableDieState,
   TableEvent,
   TableSnapshot,
-} from '../../rpc/proto/dice/v1/dice_pb';
-import { SIMULATION_VERSION } from './constants';
+} from '../../../rpc/proto/dice/v1/dice_pb';
+import { SIMULATION_VERSION } from '../constants';
 
 describe('dice protobuf contract', () => {
   it.each([RollMode.ADD_NEW, RollMode.REROLL_EXISTING])(

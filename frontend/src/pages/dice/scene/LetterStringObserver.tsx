@@ -1,14 +1,14 @@
 import { useRef } from 'react';
 import { useAfterPhysicsStep } from '@react-three/rapier';
-import { DICE_TABLE_CONFIG } from './constants';
+import { DICE_TABLE_CONFIG } from '../constants';
 import {
   detectLetterLayout,
-} from './letterStringDetection';
-import type { DetectedLetterLayout } from './letterStringDetection';
-import { letterForFace } from './letterDice';
+} from '../words/letterStringDetection';
+import type { DetectedLetterLayout } from '../words/letterStringDetection';
+import { letterForFace } from '../table/letterDice';
 import type { DiceBodyRegistry } from './RollObserver';
-import { playableTableFace } from './tableModel';
-import type { TableDie } from './tableModel';
+import { playableTableFace } from '../table/tableModel';
+import type { TableDie } from '../table/tableModel';
 
 type LetterStringObserverProps = {
   dice: Readonly<Record<string, TableDie>>;

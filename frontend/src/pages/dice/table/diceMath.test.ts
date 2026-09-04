@@ -3,8 +3,8 @@ import {
   DieFace,
   Quaternion,
   Vector3,
-} from '../../rpc/proto/dice/v1/dice_pb';
-import { DICE_TABLE_CONFIG } from './constants';
+} from '../../../rpc/proto/dice/v1/dice_pb';
+import { DICE_TABLE_CONFIG } from '../constants';
 import {
   advanceRollSettling,
   faceUpQuaternion,

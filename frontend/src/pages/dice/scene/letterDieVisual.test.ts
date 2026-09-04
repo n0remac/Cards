@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { Euler, Quaternion, Vector3 } from 'three';
-import { DieFace } from '../../rpc/proto/dice/v1/dice_pb';
-import { faceUpQuaternion } from './diceMath';
+import { DieFace } from '../../../rpc/proto/dice/v1/dice_pb';
+import { faceUpQuaternion } from '../table/diceMath';
 import { getLetterFaceVisuals } from './letterDieVisual';
 
 describe('letter die face visuals', () => {

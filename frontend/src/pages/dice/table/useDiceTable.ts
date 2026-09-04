@@ -9,8 +9,8 @@ import {
   RollMode,
   RollStarted,
   TableEvent,
-} from '../../rpc/proto/dice/v1/dice_pb';
-import { MAX_DEFINITIONS_PER_ADD } from './constants';
+} from '../../../rpc/proto/dice/v1/dice_pb';
+import { MAX_DEFINITIONS_PER_ADD } from '../constants';
 import { LetterDieDefinitionId } from './letterDice';
 import {
   createAddRollTargets,

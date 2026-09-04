@@ -12,7 +12,7 @@ import {
   TableDieState,
   TableEvent,
   TableSnapshot,
-} from '../../rpc/proto/dice/v1/dice_pb';
+} from '../../../rpc/proto/dice/v1/dice_pb';
 import { createLocalRollSpec, createRollResult } from './rollModel';
 import { PlayableDieFace } from './diceMath';
 import { STANDARD_LETTER_DIE_DEFINITION_IDS } from './letterDice';

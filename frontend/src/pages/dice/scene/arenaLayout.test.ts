@@ -8,7 +8,7 @@ import {
   normalizedToWorld,
   worldToNormalized,
 } from './arenaLayout';
-import { DICE_TABLE_CONFIG } from './constants';
+import { DICE_TABLE_CONFIG } from '../constants';
 
 const viewports = [
   { name: 'portrait', width: 390, height: 844 },

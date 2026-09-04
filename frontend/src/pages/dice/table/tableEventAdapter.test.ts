@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { RollStarted, TableEvent } from '../../rpc/proto/dice/v1/dice_pb';
+import { RollStarted, TableEvent } from '../../../rpc/proto/dice/v1/dice_pb';
 import { createLocalTableEventAdapter } from './tableEventAdapter';
 
 describe('local table event adapter', () => {

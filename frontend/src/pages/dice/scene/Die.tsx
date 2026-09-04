@@ -16,7 +16,7 @@ import {
   Vector3 as ThreeVector3,
 } from 'three';
 import { RoundedBoxGeometry } from 'three/examples/jsm/geometries/RoundedBoxGeometry.js';
-import { NormalizedTablePosition } from '../../rpc/proto/dice/v1/dice_pb';
+import { NormalizedTablePosition } from '../../../rpc/proto/dice/v1/dice_pb';
 import {
   ArenaLayout,
   clampNormalizedPosition,
@@ -24,17 +24,17 @@ import {
   normalizedToWorld,
   worldToNormalized,
 } from './arenaLayout';
-import { DICE_TABLE_CONFIG } from './constants';
+import { DICE_TABLE_CONFIG } from '../constants';
 import { createDragPointerTracker } from './dragPointerTracker';
 import {
   faceUpQuaternion,
   isPlayableDieFace,
   quaternionToObject,
   vectorToObject,
-} from './diceMath';
+} from '../table/diceMath';
 import { getLetterFaceVisuals } from './letterDieVisual';
 import { createLetterMaterialCache } from './letterMaterialCache';
-import { TableDie } from './tableModel';
+import { TableDie } from '../table/tableModel';
 import { shouldSnapReconciliation } from './reconciliation';
 
 type DieProps = {

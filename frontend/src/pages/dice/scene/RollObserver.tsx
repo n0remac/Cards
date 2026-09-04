@@ -4,9 +4,9 @@ import {
   ArenaLayout,
   containArenaMotion,
 } from './arenaLayout';
-import { advanceRollSettling, getUpwardFace } from './diceMath';
-import { RollSettledEvent } from './rollModel';
-import { ActiveTableRoll, TableDie } from './tableModel';
+import { advanceRollSettling, getUpwardFace } from '../table/diceMath';
+import { RollSettledEvent } from '../table/rollModel';
+import { ActiveTableRoll, TableDie } from '../table/tableModel';
 import { collectChangedPlacements } from './reconciliation';
 
 export type DiceBodyRegistry = MutableRefObject<Map<string, RapierRigidBody>>;

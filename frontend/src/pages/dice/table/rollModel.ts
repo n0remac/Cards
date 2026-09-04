@@ -6,8 +6,8 @@ import {
   RollResult,
   RollSpec,
   Vector3,
-} from '../../rpc/proto/dice/v1/dice_pb';
-import { DICE_TABLE_CONFIG, SIMULATION_VERSION } from './constants';
+} from '../../../rpc/proto/dice/v1/dice_pb';
+import { DICE_TABLE_CONFIG, SIMULATION_VERSION } from '../constants';
 import { isPlayableDieFace, PlayableDieFace } from './diceMath';
 import { isKnownLetterDieDefinitionId } from './letterDice';
 

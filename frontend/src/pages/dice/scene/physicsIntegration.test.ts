@@ -6,7 +6,7 @@ import {
   normalizedToWorld,
   worldToNormalized,
 } from './arenaLayout';
-import { DICE_TABLE_CONFIG } from './constants';
+import { DICE_TABLE_CONFIG } from '../constants';
 import { collectChangedPlacements } from './reconciliation';
 
 beforeAll(async () => {

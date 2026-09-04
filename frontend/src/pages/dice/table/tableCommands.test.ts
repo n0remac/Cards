@@ -3,7 +3,7 @@ import {
   DieFace,
   NormalizedTablePosition,
   RollMode,
-} from '../../rpc/proto/dice/v1/dice_pb';
+} from '../../../rpc/proto/dice/v1/dice_pb';
 import { STANDARD_LETTER_DIE_DEFINITION_IDS } from './letterDice';
 import {
   createAddRollTargets,

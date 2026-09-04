@@ -1,4 +1,4 @@
-import { DieFace } from '../../rpc/proto/dice/v1/dice_pb';
+import { DieFace } from '../../../rpc/proto/dice/v1/dice_pb';
 import { PlayableDieFace } from './diceMath';
 
 const DEFINITIONS = [

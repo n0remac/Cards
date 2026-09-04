@@ -1,6 +1,6 @@
-import { DieFace } from '../../rpc/proto/dice/v1/dice_pb';
-import type { PlayableDieFace } from './diceMath';
-import { letterForFace } from './letterDice';
+import { DieFace } from '../../../rpc/proto/dice/v1/dice_pb';
+import type { PlayableDieFace } from '../table/diceMath';
+import { letterForFace } from '../table/letterDice';
 
 export type LetterFaceVisual = {
   face: PlayableDieFace;

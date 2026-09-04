@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { DieFace, RollSpec } from '../../rpc/proto/dice/v1/dice_pb';
-import { DICE_TABLE_CONFIG, SIMULATION_VERSION } from './constants';
+import { DieFace, RollSpec } from '../../../rpc/proto/dice/v1/dice_pb';
+import { DICE_TABLE_CONFIG, SIMULATION_VERSION } from '../constants';
 import { STANDARD_LETTER_DIE_DEFINITION_IDS } from './letterDice';
 import {
   createLocalRollSpec,
@@ -60,13 +60,25 @@ describe('createLocalRollSpec', () => {
   });
 
   it('keeps the initial linear impulse within compact-roll limits', () => {
+    const {
+      horizontalImpulseMaximum,
+      verticalImpulseMaximum,
+    } = DICE_TABLE_CONFIG.roll;
     const maximum = createLocalRollSpec(targets(1), 'maximum-force', () => 1)
       .dice[0].impulse;
     const minimum = createLocalRollSpec(targets(1), 'minimum-force', () => 0)
       .dice[0].impulse;
 
-    expect(maximum).toMatchObject({ x: 1.5, y: 1, z: 1.5 });
-    expect(minimum).toMatchObject({ x: -1.5, y: 0, z: -1.5 });
+    expect(maximum).toMatchObject({
+      x: horizontalImpulseMaximum,
+      y: verticalImpulseMaximum,
+      z: horizontalImpulseMaximum,
+    });
+    expect(minimum).toMatchObject({
+      x: -horizontalImpulseMaximum,
+      y: 0,
+      z: -horizontalImpulseMaximum,
+    });
   });
 
   it('uses supplied normalized positions for reroll animation', () => {

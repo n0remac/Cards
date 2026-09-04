@@ -2,10 +2,10 @@ import {
   DieFace,
   Quaternion as ProtoQuaternion,
   Vector3 as ProtoVector3,
-} from '../../rpc/proto/dice/v1/dice_pb';
+} from '../../../rpc/proto/dice/v1/dice_pb';
 import {
   DICE_TABLE_CONFIG,
-} from './constants';
+} from '../constants';
 
 export type PlayableDieFace =
   | DieFace.ONE

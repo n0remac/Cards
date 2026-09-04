@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { NormalizedTablePosition } from '../../rpc/proto/dice/v1/dice_pb';
+import { NormalizedTablePosition } from '../../../rpc/proto/dice/v1/dice_pb';
 import { createArenaLayout, normalizedToWorld } from './arenaLayout';
 import {
   collectChangedPlacements,

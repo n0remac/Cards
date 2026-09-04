@@ -3,7 +3,7 @@ import { CuboidCollider, RigidBody } from '@react-three/rapier';
 import { useThree } from '@react-three/fiber';
 import { PerspectiveCamera } from 'three';
 import { ArenaLayout } from './arenaLayout';
-import { DICE_TABLE_CONFIG } from './constants';
+import { DICE_TABLE_CONFIG } from '../constants';
 
 export function ResponsiveArenaCamera({ layout }: { layout: ArenaLayout }) {
   const { camera } = useThree();

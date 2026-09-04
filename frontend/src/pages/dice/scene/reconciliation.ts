@@ -1,12 +1,12 @@
-import { NormalizedTablePosition } from '../../rpc/proto/dice/v1/dice_pb';
+import { NormalizedTablePosition } from '../../../rpc/proto/dice/v1/dice_pb';
 import {
   ArenaLayout,
   ArenaPoint,
   isWorldPositionInsideArena,
   worldToNormalized,
 } from './arenaLayout';
-import { DICE_TABLE_CONFIG } from './constants';
-import { SettledPlacement } from './rollModel';
+import { DICE_TABLE_CONFIG } from '../constants';
+import { SettledPlacement } from '../table/rollModel';
 
 export function collectChangedPlacements(
   layout: ArenaLayout,

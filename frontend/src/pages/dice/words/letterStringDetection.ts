@@ -1,11 +1,11 @@
-import type { ArenaPoint } from './arenaLayout';
-
 export type LetterStringDirection = 'horizontal' | 'vertical';
+
+export type LetterPosition = { x: number; z: number };
 
 export type PositionedLetter = {
   dieId: string;
   letter: string;
-  position: ArenaPoint;
+  position: LetterPosition;
 };
 
 export type DetectedLetterString = {
@@ -60,7 +60,7 @@ type GridNeighbor = GridPosition & {
 };
 
 function axisCoordinates(
-  position: ArenaPoint,
+  position: LetterPosition,
   direction: LetterStringDirection,
 ) {
   return direction === 'horizontal'

@@ -6,8 +6,8 @@ import {
   RollResult,
   RollSpec,
   TableEvent,
-} from '../../rpc/proto/dice/v1/dice_pb';
-import { MAX_DEFINITIONS_PER_ADD } from './constants';
+} from '../../../rpc/proto/dice/v1/dice_pb';
+import { MAX_DEFINITIONS_PER_ADD } from '../constants';
 import { isPlayableDieFace, PlayableDieFace } from './diceMath';
 import { isKnownLetterDieDefinitionId } from './letterDice';
 import { validateRollSpec } from './rollModel';

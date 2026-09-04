@@ -9,7 +9,7 @@ import React, {
 import { Canvas, useThree } from '@react-three/fiber';
 import { Physics, RapierRigidBody } from '@react-three/rapier';
 import { DirectionalLight } from 'three';
-import { NormalizedTablePosition } from '../../rpc/proto/dice/v1/dice_pb';
+import { NormalizedTablePosition } from '../../../rpc/proto/dice/v1/dice_pb';
 import {
   ArenaLayout,
   clampNormalizedPosition,
@@ -18,15 +18,15 @@ import {
   normalizedToWorld,
   worldToNormalized,
 } from './arenaLayout';
-import { DICE_TABLE_CONFIG } from './constants';
+import { DICE_TABLE_CONFIG } from '../constants';
 import { Die } from './Die';
 import { DiceArena, ResponsiveArenaCamera } from './DiceArena';
 import { snapToAdjacentDie } from './dieSnapping';
-import type { DetectedLetterLayout } from './letterStringDetection';
+import type { DetectedLetterLayout } from '../words/letterStringDetection';
 import { LetterStringObserver } from './LetterStringObserver';
 import { DiceBodyRegistry, RollObserver } from './RollObserver';
-import { RollSettledEvent } from './rollModel';
-import { ActiveTableRoll, TableDie } from './tableModel';
+import { RollSettledEvent } from '../table/rollModel';
+import { ActiveTableRoll, TableDie } from '../table/tableModel';
 
 type DiceSceneProps = {
   dice: Readonly<Record<string, TableDie>>;

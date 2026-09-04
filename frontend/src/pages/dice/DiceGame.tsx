@@ -1,9 +1,9 @@
 import React, { Component, ErrorInfo, ReactNode, useCallback, useState } from 'react';
-import { validateCrossword } from './crosswordValidation';
-import { DiceScene } from './DiceScene';
-import type { DetectedLetterLayout } from './letterStringDetection';
-import { useDiceTable } from './useDiceTable';
-import { useWordDictionary } from './useWordDictionary';
+import { DiceScene } from './scene/DiceScene';
+import { useDiceTable } from './table/useDiceTable';
+import { validateCrossword } from './words/crosswordValidation';
+import type { DetectedLetterLayout } from './words/letterStringDetection';
+import { useWordDictionary } from './words/useWordDictionary';
 
 type SceneStatus = 'loading' | 'ready' | 'unsupported' | 'error';
 
