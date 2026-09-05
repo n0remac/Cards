@@ -14,6 +14,7 @@ Welcome to our unique AI-powered trading card game, where every card is a one-of
 - Node.js
 - Go (Golang)
 - Rust 1.96 (the pinned toolchain is installed automatically by rustup)
+- tmux (for the local development launcher)
 
 ### Setting Up the Project
 
@@ -54,3 +55,22 @@ Welcome to our unique AI-powered trading card game, where every card is a one-of
 
 5. **Access the Game**
    - Open your browser at the URL printed by the frontend development server.
+
+### Start All Services with tmux
+
+After installing the dependencies, start the Go backend, React frontend, and
+Rust dice service in separate tmux windows with:
+
+```bash
+./dev.sh
+```
+
+The script creates a `cards` session with `backend`, `frontend`, and `dice`
+windows, then attaches to it. Use `Ctrl-b n` and `Ctrl-b p` to move between
+windows. To start it without attaching, pass `--detached`. To stop everything:
+
+```bash
+tmux kill-session -t cards
+```
+
+Set `CARDS_TMUX_SESSION` to use a different session name.
