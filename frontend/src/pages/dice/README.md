@@ -22,7 +22,7 @@ timing may differ while every player still converges on the same world state.
 | `sync/` | Feature-local transport adapters and authoritative-frame interpolation. |
 | `sync/webSocketTableTransport.ts` | Binary protobuf WebSocket, resume-token storage, reconnects, lifecycle revision checks, and stale-frame filtering. |
 | `sync/frameInterpolation.ts` | Six-tick frame buffer and position/quaternion interpolation without extrapolation. |
-| `scene/` | React Three Fiber rendering, field/camera gestures, meshes, owner tinting, and visual drag prediction. |
+| `scene/` | React Three Fiber rendering, field/camera gestures, meshes, owner designs, and visual drag prediction. |
 | `scene/TableCamera.ts` | Fixed-angle camera, coordinate rebasing, bounds-aware pan/zoom, and fit transitions. |
 | `scene/DiceArena.tsx` | Large felt receiver centered under the local render origin; it has no walls or physics. |
 | `scene/Die.tsx` | Mesh-only die rendering, ownership-gated pointer input, and world-space drag targets. |
